@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: melikyan-academy
+  threads:
+    virtual:
+      enabled: true
