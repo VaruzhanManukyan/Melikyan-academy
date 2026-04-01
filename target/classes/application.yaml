@@ -7,9 +7,9 @@ spring:
       enabled: true
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://localhost:5432/melikyan_academy
+    username: root
+    password: 12345678
 
   jpa:
     hibernate:
