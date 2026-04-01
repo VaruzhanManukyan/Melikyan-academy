@@ -27,7 +27,7 @@ import java.util.Map;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_homework_task_order_index_homework",
-                        columnNames = {"order_index", "homework_id"}
+                        columnNames = {"homework_id", "order_index"}
                 )
         }
 )

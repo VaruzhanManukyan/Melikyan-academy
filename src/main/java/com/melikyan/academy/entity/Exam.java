@@ -11,8 +11,16 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "exams")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "exams",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_exam_purchasable",
+                        columnNames = {"purchasable_id"}
+                )
+        }
+)
 public class Exam {
     @Id
     @GeneratedValue

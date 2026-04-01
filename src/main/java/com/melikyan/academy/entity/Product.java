@@ -29,6 +29,10 @@ public class Product extends BaseEntitySoftDelete {
     @Column(name = "is_private")
     private Boolean isPrivate;
 
+    @ManyToOne
+    @JoinColumn(name = "created_by", nullable = false)
+    private User createdBy;
+
     @OneToMany(mappedBy = "product")
     private List<ProductPurchasable> purchasables;
 

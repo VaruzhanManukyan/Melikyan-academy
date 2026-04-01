@@ -1,14 +1,14 @@
 package com.melikyan.academy.entity;
 
-import jakarta.persistence.*;
 import lombok.AccessLevel;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,7 +17,10 @@ import java.util.UUID;
 @Table(
         name = "product_purchasables",
         uniqueConstraints = {
-                @UniqueConstraint(columnNames = {"product_id", "purchasable_id"})
+                @UniqueConstraint(
+                        name = "uk_product_purchasable",
+                        columnNames = {"product_id", "purchasable_id"}
+                )
         }
 )
 public class ProductPurchasable {

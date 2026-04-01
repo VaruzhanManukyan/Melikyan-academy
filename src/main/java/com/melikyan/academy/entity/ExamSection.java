@@ -10,13 +10,15 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
 
-import java.time.Duration;
 import java.util.List;
+import java.time.Duration;
 
 @Getter
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(
         name = "exam_sections",
         uniqueConstraints = {
@@ -24,10 +26,11 @@ import java.util.List;
                         name = "uk_exam_section_order_index_exam",
                         columnNames = {"order_index", "exam_id"}
                 )
+        },
+        indexes = {
+                @Index(name = "idx_exam_section_exam_id", columnList = "exam_id"),
         }
 )
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class ExamSection extends BaseEntitySoftDelete {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;

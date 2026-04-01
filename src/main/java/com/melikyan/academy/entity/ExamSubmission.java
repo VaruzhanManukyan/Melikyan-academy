@@ -1,18 +1,17 @@
 package com.melikyan.academy.entity;
 
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
-import com.melikyan.academy.entity.enums.ExamStatus;
-import com.melikyan.academy.entity.enums.HomeworkStatus;
-import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.SoftDelete;
-import org.hibernate.annotations.SoftDeleteType;
+import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
+import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.enums.ExamStatus;
+import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.Map;
 
@@ -20,8 +19,14 @@ import java.util.Map;
 @Setter
 @Entity
 @SuperBuilder
-@Table(name = "exam_submissions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "exam_submissions",
+        indexes = {
+                @Index(name = "idx_exam_submissions_user_id", columnList = "user_id"),
+                @Index(name = "idx_exam_submissions_task_id", columnList = "task_id")
+        }
+)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class ExamSubmission extends BaseEntitySoftDelete {
     @Column(name = "node")

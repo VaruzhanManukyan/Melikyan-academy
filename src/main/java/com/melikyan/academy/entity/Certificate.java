@@ -16,9 +16,15 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @SuperBuilder
-@Table(name = "certificates")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
+@Table(
+        name = "certificates",
+        indexes = {
+                @Index(name = "idx_certificate_user_id", columnList = "user_id"),
+                @Index(name = "idx_certificate_purchasable_id", columnList = "purchasable_id")
+        }
+)
 public class Certificate extends BaseEntitySoftDelete {
     @Column(name = "certificate_code", nullable = false)
     private String certificateCode;

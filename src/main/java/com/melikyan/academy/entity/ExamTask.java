@@ -7,11 +7,11 @@ import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.TaskType;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.List;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.time.Duration;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_exam_task_order_index_section",
-                        columnNames = {"order_index", "section_id"}
+                        columnNames = {"section_id", "order_index"}
                 )
         }
 )

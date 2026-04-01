@@ -4,15 +4,22 @@ import lombok.*;
 import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 @Getter
 @Setter
 @Entity
-@Table(name = "courses")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "courses",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_course_purchasable",
+                        columnNames = {"purchasable_id"}
+                )
+        }
+)
 public class Course {
     @Id
     @GeneratedValue
@@ -37,6 +44,4 @@ public class Course {
 
     @OneToMany(mappedBy = "course")
     private List<Lesson> lessons;
-
-
 }

@@ -19,9 +19,15 @@ import java.util.Map;
 @Setter
 @Entity
 @SuperBuilder
-@Table(name = "homework_submissions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
+@Table(
+        name = "homework_submissions",
+        indexes = {
+                @Index(name = "idx_homework_submission_user_id", columnList = "user_id"),
+                @Index(name = "idx_homework_submission_task_id", columnList = "task_id")
+        }
+)
 public class HomeworkSubmission extends BaseEntitySoftDelete {
     @Column(name = "node")
     private String node;

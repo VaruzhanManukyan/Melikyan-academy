@@ -14,6 +14,8 @@ import org.hibernate.annotations.SoftDelete;
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(
         name = "professors",
         uniqueConstraints = {
@@ -23,8 +25,6 @@ import org.hibernate.annotations.SoftDelete;
                 )
         }
 )
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class Professor extends BaseEntitySoftDelete {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

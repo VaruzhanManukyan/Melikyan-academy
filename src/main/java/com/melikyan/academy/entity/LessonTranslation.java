@@ -12,8 +12,13 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @Entity
 @SuperBuilder
-@Table(name = "lesson_translations")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "lesson_translations",
+        indexes = {
+                @Index(name = "uk_lesson_translation_lesson_id", columnList = "lesson_id")
+        }
+)
 public class LessonTranslation extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;

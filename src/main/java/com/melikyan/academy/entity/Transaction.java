@@ -3,8 +3,8 @@ package com.melikyan.academy.entity;
 import lombok.AccessLevel;
 import jakarta.persistence.*;
 import com.melikyan.academy.entity.enums.PaymentMethod;
-import com.melikyan.academy.entity.enums.TransactionStatus;
 import com.melikyan.academy.entity.enums.TransactionType;
+import com.melikyan.academy.entity.enums.TransactionStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -19,8 +19,14 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "transactions")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(
+        name = "transactions",
+        indexes = {
+                @Index(name = "idx_transaction_user_id", columnList = "user_id"),
+                @Index(name = "idx_transaction_product_id", columnList = "product_id")
+        }
+)
 public class Transaction {
     @Id
     @GeneratedValue

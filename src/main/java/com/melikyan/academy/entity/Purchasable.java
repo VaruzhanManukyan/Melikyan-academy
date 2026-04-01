@@ -17,9 +17,14 @@ import java.util.List;
 @Setter
 @Entity
 @SuperBuilder
-@Table(name = "purchasables")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
+@Table(
+        name = "purchasables",
+        indexes = {
+                @Index(name = "idx_purchasable_category_id", columnList = "category_id")
+        }
+)
 public class Purchasable extends BaseEntitySoftDelete {
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)

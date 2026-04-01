@@ -1,9 +1,9 @@
 package com.melikyan.academy.entity;
 
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;

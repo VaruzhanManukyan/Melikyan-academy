@@ -24,7 +24,7 @@ import java.time.OffsetDateTime;
         uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_homework_order_index_lesson",
-                        columnNames = {"order_index", "lesson_id"}
+                        columnNames = {"lesson_id", "order_index"}
                 )
         }
 )
