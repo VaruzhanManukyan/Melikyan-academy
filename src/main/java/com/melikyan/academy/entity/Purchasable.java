@@ -2,6 +2,7 @@ package com.melikyan.academy.entity;
 
 import lombok.AccessLevel;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.PurchasableType;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.List;
 
@@ -27,6 +29,7 @@ import java.util.List;
 )
 public class Purchasable extends BaseEntitySoftDelete {
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
     private PurchasableType type;
 

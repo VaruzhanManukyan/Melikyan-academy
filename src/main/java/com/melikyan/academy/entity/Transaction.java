@@ -2,12 +2,14 @@ package com.melikyan.academy.entity;
 
 import lombok.AccessLevel;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import com.melikyan.academy.entity.enums.PaymentMethod;
 import com.melikyan.academy.entity.enums.TransactionType;
 import com.melikyan.academy.entity.enums.TransactionStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -40,14 +42,17 @@ public class Transaction {
     private String currency = "USD";
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "payment_method", nullable = false)
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)
     private TransactionStatus status;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "transaction_type", nullable = false)
     private TransactionType transactionType;
 

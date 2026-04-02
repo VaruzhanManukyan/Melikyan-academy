@@ -2,6 +2,7 @@ package com.melikyan.academy.entity;
 
 import lombok.AccessLevel;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.SessionType;
 import com.melikyan.academy.entity.enums.SessionState;
@@ -11,6 +12,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.List;
 import java.time.Duration;
@@ -42,6 +44,7 @@ public class Lesson extends BaseEntitySoftDelete {
     private String description;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
     private SessionType sessionType;
 
@@ -49,6 +52,7 @@ public class Lesson extends BaseEntitySoftDelete {
     private String valueUrl;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "state", nullable = false)
     private SessionState state;
 

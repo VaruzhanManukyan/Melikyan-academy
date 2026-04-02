@@ -2,6 +2,7 @@ package com.melikyan.academy.entity;
 
 import lombok.AccessLevel;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.RegistrationStatus;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Getter
 @Setter
@@ -31,6 +33,7 @@ import org.hibernate.annotations.SoftDelete;
 )
 public class ProductRegistration extends BaseEntitySoftDelete {
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)
     private RegistrationStatus status;
 

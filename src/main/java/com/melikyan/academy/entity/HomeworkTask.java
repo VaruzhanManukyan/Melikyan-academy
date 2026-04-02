@@ -39,6 +39,7 @@ public class HomeworkTask extends BaseEntitySoftDelete {
     private int point;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type")
     private TaskType type;
 

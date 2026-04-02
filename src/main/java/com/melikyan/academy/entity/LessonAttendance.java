@@ -2,6 +2,7 @@ package com.melikyan.academy.entity;
 
 import lombok.AccessLevel;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.AttendanceStatus;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
@@ -10,6 +11,7 @@ import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 @Getter
 @Setter
@@ -29,6 +31,7 @@ public class LessonAttendance extends BaseEntitySoftDelete {
     private String node;
 
     @Enumerated(EnumType.STRING)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)
     private AttendanceStatus status;
 
