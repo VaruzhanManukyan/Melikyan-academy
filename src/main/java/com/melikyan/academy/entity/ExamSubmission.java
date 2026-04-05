@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
@@ -19,7 +18,7 @@ import java.util.Map;
 @Setter
 @Entity
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(
         name = "exam_submissions",
         indexes = {
@@ -29,8 +28,8 @@ import java.util.Map;
 )
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class ExamSubmission extends BaseEntitySoftDelete {
-    @Column(name = "node")
-    private String node;
+    @Column(name = "note")
+    private String note;
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)

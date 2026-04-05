@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import com.melikyan.academy.entity.enums.Role;
@@ -17,8 +16,8 @@ import java.util.List;
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor
 @Table(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User extends BaseEntitySoftDelete {
     @Column(name = "email", nullable = false, unique = true, length = 255)
     private String email;

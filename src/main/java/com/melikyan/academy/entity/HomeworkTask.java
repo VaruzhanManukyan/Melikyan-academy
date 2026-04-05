@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
@@ -13,14 +12,14 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.JdbcTypeCode;
 
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 
 @Getter
 @Setter
 @Entity
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(
         name = "homework_tasks",

@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
@@ -15,7 +14,7 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(
         name = "user_processes",
         uniqueConstraints = {

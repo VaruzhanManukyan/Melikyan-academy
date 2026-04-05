@@ -17,10 +17,16 @@ import java.math.BigDecimal;
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor
 @Table(name = "products")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class Product extends BaseEntitySoftDelete {
+    @Column(name = "title", nullable = false, length = 50)
+    private String title;
+
+    @Column(name = "description")
+    private String description;
+
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)

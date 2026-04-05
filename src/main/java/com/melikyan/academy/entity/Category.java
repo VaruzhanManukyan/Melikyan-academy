@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
@@ -16,8 +15,8 @@ import java.util.List;
 @Setter
 @Entity
 @SuperBuilder
+@NoArgsConstructor
 @Table(name = "categories")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class Category extends BaseEntitySoftDelete {
     @Column(name = "title", nullable = false, length = 50)

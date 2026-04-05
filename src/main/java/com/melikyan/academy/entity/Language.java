@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
@@ -16,8 +15,8 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
+@NoArgsConstructor
 @Table(name = "languages")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 public class Language extends BaseEntitySoftDelete {
     @Id

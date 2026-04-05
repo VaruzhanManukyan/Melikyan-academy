@@ -11,7 +11,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(name = "courses",
         uniqueConstraints = {
                 @UniqueConstraint(

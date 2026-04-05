@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @SuperBuilder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(
         name = "certificates",

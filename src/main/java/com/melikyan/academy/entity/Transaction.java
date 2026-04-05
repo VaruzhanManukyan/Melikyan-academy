@@ -1,6 +1,5 @@
 package com.melikyan.academy.entity;
 
-import lombok.AccessLevel;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import com.melikyan.academy.entity.enums.PaymentMethod;
@@ -21,7 +20,7 @@ import java.time.OffsetDateTime;
 @Getter
 @Setter
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor
 @Table(
         name = "transactions",
         indexes = {

@@ -18,6 +18,9 @@ spring:
     properties:
       hibernate:
         format_sql: true
-#
+
+  messages:
+    basename: messages
+
 #  flyway:
 #    enabled: true
