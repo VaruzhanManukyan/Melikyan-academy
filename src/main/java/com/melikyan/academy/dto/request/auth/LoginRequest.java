@@ -12,6 +12,8 @@ public record LoginRequest(
 
         @NotBlank(message = "{auth.password.notBlank}")
         @Size(max = 255, message = "{auth.password.size}")
-        String password
+        String password,
+
+        Boolean rememberMe
 ) {
 }

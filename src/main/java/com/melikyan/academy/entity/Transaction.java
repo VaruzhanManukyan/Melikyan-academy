@@ -36,7 +36,7 @@ public class Transaction {
     @Column(name = "amount", precision = 10, scale = 2, nullable = false)
     private BigDecimal amount;
 
-    @Column(name = "currency", columnDefinition = "char(3)", nullable = false)
+    @Column(length = 3, name = "currency", nullable = false)
     @ColumnDefault("'USD'")
     private String currency = "USD";
 

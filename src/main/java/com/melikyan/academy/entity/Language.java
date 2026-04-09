@@ -18,9 +18,9 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Table(name = "languages")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-public class Language extends BaseEntitySoftDelete {
+public class Language {
     @Id
-    @Column(name = "code", columnDefinition = "char(2)", unique = true, nullable = false)
+    @Column(length = 2, name = "code", unique = true, nullable = false)
     private String code;
 
     @Column(name = "name", nullable = false, length = 50)
@@ -37,4 +37,7 @@ public class Language extends BaseEntitySoftDelete {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
+
+    @Column(name = "deleted_at", insertable = false, updatable = false)
+    private OffsetDateTime deletedAt;
 }

@@ -25,7 +25,7 @@ public class HomeworkTranslation extends BaseEntity {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "code", columnDefinition = "char(2)", nullable = false)
+    @Column(length = 2, name = "code", nullable = false)
     private String code;
 
     @ManyToOne

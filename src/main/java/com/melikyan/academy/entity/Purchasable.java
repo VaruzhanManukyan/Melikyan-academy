@@ -39,11 +39,11 @@ public class Purchasable extends BaseEntitySoftDelete {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "category_id")
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn(name = "created_by",  nullable = false)
     private User createdBy;
 
     @OneToMany(mappedBy = "purchasable")
