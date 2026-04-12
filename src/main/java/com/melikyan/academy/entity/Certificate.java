@@ -4,7 +4,7 @@ import lombok.*;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -25,7 +25,7 @@ import java.time.OffsetDateTime;
                 @Index(name = "idx_certificate_purchasable_id", columnList = "purchasable_id")
         }
 )
-public class Certificate extends BaseEntitySoftDelete {
+public class Certificate extends BaseEntity {
     @Column(name = "certificate_code", nullable = false)
     private String certificateCode;
 

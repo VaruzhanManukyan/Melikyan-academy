@@ -1,8 +1,8 @@
 package com.melikyan.academy.entity;
 
 import jakarta.persistence.*;
+import com.melikyan.academy.entity.base.BaseEntity;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ import java.time.OffsetDateTime;
                 )
         }
 )
-public class Homework extends BaseEntitySoftDelete {
+public class Homework extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 

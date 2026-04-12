@@ -19,7 +19,6 @@ public interface HomeworkSubmissionMapper {
     @Mapping(target = "task", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     HomeworkSubmission toEntity(CreateHomeworkSubmissionRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +27,6 @@ public interface HomeworkSubmissionMapper {
     @Mapping(target = "task", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     void updateEntityFromRequest(UpdateHomeworkSubmissionRequest request, @MappingTarget HomeworkSubmission homeworkSubmission);
 
     @Mapping(target = "note", source = "note")

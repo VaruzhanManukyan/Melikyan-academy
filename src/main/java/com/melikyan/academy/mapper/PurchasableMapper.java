@@ -13,7 +13,6 @@ public interface PurchasableMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     Purchasable toEntity(CreatePurchasableRequest request);
 
@@ -21,7 +20,6 @@ public interface PurchasableMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
 
     void updateEntity(@MappingTarget Purchasable purchasable, UpdatePurchasableRequest request);

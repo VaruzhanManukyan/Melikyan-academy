@@ -4,8 +4,8 @@ import lombok.*;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.PurchasableType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Table(name = "products")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-public class Product extends BaseEntitySoftDelete {
+public class Product extends BaseEntity {
     @Column(name = "title", nullable = false, length = 50)
     private String title;
 

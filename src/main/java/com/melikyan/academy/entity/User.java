@@ -3,11 +3,13 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import com.melikyan.academy.entity.enums.Role;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.List;
@@ -18,8 +20,9 @@ import java.util.List;
 @SuperBuilder
 @NoArgsConstructor
 @Table(name = "users")
-public class User extends BaseEntitySoftDelete {
-    @Column(name = "email", nullable = false, unique = true, length = 255)
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
+public class User extends BaseEntity {
+    @Column(name = "email", nullable = false, length = 255)
     private String email;
 
     @Column(name = "password", nullable = false)

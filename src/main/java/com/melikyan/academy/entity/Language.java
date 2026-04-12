@@ -2,7 +2,6 @@ package com.melikyan.academy.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -37,7 +36,4 @@ public class Language {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
-
-    @Column(name = "deleted_at", insertable = false, updatable = false)
-    private OffsetDateTime deletedAt;
 }

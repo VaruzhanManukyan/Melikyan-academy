@@ -46,10 +46,10 @@ class AuthControllerTest {
     private RememberMeCookieService rememberMeCookieService;
 
     @MockitoBean
-    private RememberMeSecurityFilter rememberMeSecurityFilter;
+    private RememberMeLogoutHandler rememberMeLogoutHandler;
 
     @MockitoBean
-    private RememberMeLogoutHandler rememberMeLogoutHandler;
+    private RememberMeSecurityFilter rememberMeSecurityFilter;
 
     @MockitoBean
     private RememberMeTokenRepository rememberMeTokenRepository;

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.enums.TaskType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -31,7 +31,7 @@ import java.time.Duration;
                 )
         }
 )
-public class ExamTask extends BaseEntitySoftDelete {
+public class ExamTask extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 

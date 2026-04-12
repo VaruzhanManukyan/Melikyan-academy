@@ -3,8 +3,8 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.ExamStatus;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -19,6 +19,7 @@ import java.util.Map;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(
         name = "exam_submissions",
         indexes = {
@@ -26,8 +27,7 @@ import java.util.Map;
                 @Index(name = "idx_exam_submissions_task_id", columnList = "task_id")
         }
 )
-@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-public class ExamSubmission extends BaseEntitySoftDelete {
+public class ExamSubmission extends BaseEntity {
     @Column(name = "note")
     private String note;
 

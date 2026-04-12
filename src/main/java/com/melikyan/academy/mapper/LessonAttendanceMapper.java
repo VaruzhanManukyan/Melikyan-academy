@@ -19,7 +19,6 @@ public interface LessonAttendanceMapper {
     @Mapping(target = "lesson", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     LessonAttendance toEntity(CreateLessonAttendanceRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +27,6 @@ public interface LessonAttendanceMapper {
     @Mapping(target = "lesson", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     void updateEntityFromRequest(UpdateLessonAttendanceRequest request, @MappingTarget LessonAttendance lessonAttendance);
 
     @Mapping(target = "userId", source = "user.id")

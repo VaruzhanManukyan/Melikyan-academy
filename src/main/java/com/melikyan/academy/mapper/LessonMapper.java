@@ -19,7 +19,6 @@ public interface LessonMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "lessonAttendances", ignore = true)
     @Mapping(target = "lessonTranslations", ignore = true)
     Lesson toEntity(CreateLessonRequest request);
@@ -29,7 +28,6 @@ public interface LessonMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "lessonAttendances", ignore = true)
     @Mapping(target = "lessonTranslations", ignore = true)

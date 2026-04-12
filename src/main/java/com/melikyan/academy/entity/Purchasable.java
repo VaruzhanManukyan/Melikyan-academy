@@ -3,8 +3,8 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.PurchasableType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ import java.util.List;
                 @Index(name = "idx_purchasable_category_id", columnList = "category_id")
         }
 )
-public class Purchasable extends BaseEntitySoftDelete {
+public class Purchasable extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)

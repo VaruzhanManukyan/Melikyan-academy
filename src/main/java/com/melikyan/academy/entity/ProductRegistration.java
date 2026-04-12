@@ -3,8 +3,8 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.RegistrationStatus;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ import org.hibernate.annotations.JdbcTypeCode;
                 @Index(name = "idx_product_registration_transaction_id", columnList = "transaction_id")
         }
 )
-public class ProductRegistration extends BaseEntitySoftDelete {
+public class ProductRegistration extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "status", nullable = false)

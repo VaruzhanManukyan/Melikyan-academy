@@ -19,7 +19,6 @@ public interface HomeworkMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "homeworkTasks", ignore = true)
     Homework toEntity(CreateHomeworkRequest request);
 
@@ -29,7 +28,6 @@ public interface HomeworkMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "homeworkTasks", ignore = true)
     void updateEntityFromRequest(UpdateHomeworkRequest request, @MappingTarget Homework homework);
 

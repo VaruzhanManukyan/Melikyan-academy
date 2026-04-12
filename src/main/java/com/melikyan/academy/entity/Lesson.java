@@ -3,9 +3,9 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.SessionType;
 import com.melikyan.academy.entity.enums.SessionState;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ import java.time.OffsetDateTime;
                 )
         }
 )
-public class Lesson extends BaseEntitySoftDelete {
+public class Lesson extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 

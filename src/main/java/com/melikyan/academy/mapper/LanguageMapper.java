@@ -15,7 +15,6 @@ public interface LanguageMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     Language toEntity(CreateLanguageRequest request);
 
@@ -23,7 +22,6 @@ public interface LanguageMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     void updateEntity(@MappingTarget Language entity, UpdateLanguageRequest request);
 

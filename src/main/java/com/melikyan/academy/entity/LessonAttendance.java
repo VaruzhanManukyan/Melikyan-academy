@@ -3,8 +3,8 @@ package com.melikyan.academy.entity;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.AttendanceStatus;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -25,7 +25,7 @@ import org.hibernate.annotations.JdbcTypeCode;
                 @Index(name = "idx_lesson_attendance_lesson_id", columnList = "lesson_id")
         }
 )
-public class LessonAttendance extends BaseEntitySoftDelete {
+public class LessonAttendance extends BaseEntity {
     @Column(name = "note")
     private String note;
 

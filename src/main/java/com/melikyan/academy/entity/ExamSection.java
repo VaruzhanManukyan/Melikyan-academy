@@ -1,8 +1,8 @@
 package com.melikyan.academy.entity;
 
+import com.melikyan.academy.entity.base.BaseEntity;
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ import java.time.Duration;
                 @Index(name = "idx_exam_section_exam_id", columnList = "exam_id"),
         }
 )
-public class ExamSection extends BaseEntitySoftDelete {
+public class ExamSection extends BaseEntity {
     @Column(name = "order_index", nullable = false)
     private int orderIndex;
 

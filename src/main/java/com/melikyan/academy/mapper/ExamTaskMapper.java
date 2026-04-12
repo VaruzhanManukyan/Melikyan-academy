@@ -19,7 +19,6 @@ public interface ExamTaskMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "examSubmissions", ignore = true)
     ExamTask toEntity(CreateExamTaskRequest request);
 
@@ -29,7 +28,6 @@ public interface ExamTaskMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "examSubmissions", ignore = true)
     void updateEntityFromRequest(UpdateExamTaskRequest request, @MappingTarget ExamTask examTask);
 

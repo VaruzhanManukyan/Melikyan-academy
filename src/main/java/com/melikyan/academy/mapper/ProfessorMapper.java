@@ -19,7 +19,6 @@ public interface ProfessorMapper {
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     Professor toEntity(CreateProfessorRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +27,6 @@ public interface ProfessorMapper {
     @Mapping(target = "course", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
 
     void updateEntityFromRequest(UpdateProfessorRequest request, @MappingTarget Professor professor);
     @Mapping(target = "userId", source = "user.id")

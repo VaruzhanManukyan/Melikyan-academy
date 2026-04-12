@@ -2,7 +2,7 @@ package com.melikyan.academy.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "categories")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-public class Category extends BaseEntitySoftDelete {
+public class Category extends BaseEntity {
     @Column(name = "title", nullable = false, length = 50)
     private String title;
 

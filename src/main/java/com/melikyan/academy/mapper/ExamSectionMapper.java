@@ -19,7 +19,6 @@ public interface ExamSectionMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "examTasks", ignore = true)
     @Mapping(target = "sections", ignore = true)
     ExamSection toEntity(CreateExamSectionRequest request);
@@ -30,7 +29,6 @@ public interface ExamSectionMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "examTasks", ignore = true)
     @Mapping(target = "sections", ignore = true)
     void updateEntityFromRequest(UpdateExamSectionRequest request, @MappingTarget ExamSection examSection);

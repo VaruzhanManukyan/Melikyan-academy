@@ -19,7 +19,6 @@ public interface CertificateMapper {
     @Mapping(target = "purchasable", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     Certificate toEntity(CreateCertificateRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +27,6 @@ public interface CertificateMapper {
     @Mapping(target = "purchasable", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     void updateEntityFromRequest(UpdateCertificateRequest request, @MappingTarget Certificate certificate);
 
     @Mapping(target = "userId", source = "user.id")

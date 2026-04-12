@@ -2,7 +2,7 @@ package com.melikyan.academy.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
-import com.melikyan.academy.entity.base.BaseEntitySoftDelete;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ import org.hibernate.annotations.SoftDelete;
                 )
         }
 )
-public class Professor extends BaseEntitySoftDelete {
+public class Professor extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

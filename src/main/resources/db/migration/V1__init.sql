@@ -447,35 +447,43 @@ ALTER TABLE remember_me_tokens
 ALTER TABLE remember_me_tokens
     ADD CONSTRAINT remember_me_token_user_key UNIQUE (user_id);
 
-ALTER TABLE exam_sections
-    ADD CONSTRAINT uk_exam_section_order_index_exam UNIQUE (order_index, exam_id);
-
-ALTER TABLE exam_tasks
-    ADD CONSTRAINT uk_exam_task_order_index_section UNIQUE (section_id, order_index);
-
-ALTER TABLE homeworks
-    ADD CONSTRAINT uk_homework_order_index_lesson UNIQUE (lesson_id, order_index);
-
-ALTER TABLE homework_tasks
-    ADD CONSTRAINT uk_homework_task_order_index_homework UNIQUE (homework_id, order_index);
-
-ALTER TABLE lessons
-    ADD CONSTRAINT uk_lesson_order_index_course UNIQUE (course_id, order_index);
-
 ALTER TABLE product_purchasables
     ADD CONSTRAINT uk_product_purchasable UNIQUE (product_id, purchasable_id);
-
-ALTER TABLE product_registrations
-    ADD CONSTRAINT uk_product_registration_user_product UNIQUE (user_id, product_id);
-
-ALTER TABLE professors
-    ADD CONSTRAINT uk_professor_user_course UNIQUE (user_id, course_id);
 
 ALTER TABLE user_processes
     ADD CONSTRAINT uk_user_process_user_purchsable UNIQUE (user_id, purchasable_id);
 
-ALTER TABLE users
-    ADD CONSTRAINT users_email_key UNIQUE (email);
+CREATE UNIQUE INDEX uk_users_email_active
+    ON users (email)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_exam_section_order_index_exam_active
+    ON exam_sections (exam_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_exam_task_order_index_section_active
+    ON exam_tasks (section_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_homework_order_index_lesson_active
+    ON homeworks (lesson_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_homework_task_order_index_homework_active
+    ON homework_tasks (homework_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_lesson_order_index_course_active
+    ON lessons (course_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_product_registration_user_product_active
+    ON product_registrations (user_id, product_id)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_professor_user_course_active
+    ON professors (user_id, course_id)
+    WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_product_translation_code ON product_translations (code);
 

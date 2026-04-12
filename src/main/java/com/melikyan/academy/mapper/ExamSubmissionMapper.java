@@ -19,7 +19,6 @@ public interface ExamSubmissionMapper {
     @Mapping(target = "task", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     ExamSubmission toEntity(CreateExamSubmissionRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +27,6 @@ public interface ExamSubmissionMapper {
     @Mapping(target = "task", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
     void updateEntityFromRequest(UpdateExamSubmissionRequest request, @MappingTarget ExamSubmission examSubmission);
 
     @Mapping(target = "userId", source = "user.id")
