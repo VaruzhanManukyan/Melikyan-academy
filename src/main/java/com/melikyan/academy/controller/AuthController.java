@@ -1,6 +1,7 @@
 package com.melikyan.academy.controller;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.HttpServletRequest;
 import com.melikyan.academy.service.AuthService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -23,38 +24,40 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/csrf")
-    public CsrfTokenResponse getCsrfToken(HttpServletRequest request) {
+    public ResponseEntity<CsrfTokenResponse> getCsrfToken(HttpServletRequest request) {
         CsrfToken token = (CsrfToken) request.getAttribute("_csrf");
 
         if (token == null) {
             throw new IllegalStateException("CSRF token not found");
         }
 
-        return new CsrfTokenResponse(
-                token.getHeaderName(),
-                token.getParameterName(),
-                token.getToken()
+        return ResponseEntity.ok(
+                new CsrfTokenResponse(
+                    token.getHeaderName(),
+                    token.getParameterName(),
+                    token.getToken()
+                )
         );
     }
 
     @PostMapping("/register")
-    @ResponseStatus(HttpStatus.CREATED)
-    public RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
-        return authService.register(request);
+    public ResponseEntity<RegisterResponse> register(@Valid @RequestBody RegisterRequest request) {
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(authService.register(request));
     }
 
     @PostMapping("/login")
-    public LoginResponse login(
+    public ResponseEntity<LoginResponse> login(
             @Valid @RequestBody LoginRequest request,
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse
     ) {
-        return authService.login(request, httpRequest, httpResponse);
+        return ResponseEntity.ok(authService.login(request, httpRequest, httpResponse));
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PostMapping("/logout")
-    public void logout(
+    public ResponseEntity<Void> logout(
             Authentication authentication,
             HttpServletRequest request,
             HttpServletResponse response
@@ -65,5 +68,7 @@ public class AuthController {
         logoutHandler.setClearAuthentication(true);
         logoutHandler.setInvalidateHttpSession(true);
         logoutHandler.logout(request, response, authentication);
+
+        return ResponseEntity.noContent().build();
     }
 }
