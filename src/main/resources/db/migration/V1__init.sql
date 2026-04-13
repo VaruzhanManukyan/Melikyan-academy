@@ -485,6 +485,10 @@ CREATE UNIQUE INDEX uk_professor_user_course_active
     ON professors (user_id, course_id)
     WHERE deleted_at IS NULL;
 
+CREATE UNIQUE INDEX uk_categories_title_active
+    ON categories (title)
+    WHERE deleted_at IS NULL;
+
 CREATE INDEX idx_product_translation_code ON product_translations (code);
 
 CREATE INDEX idx_purchasable_translation_code ON purchasable_translations (code);

@@ -1,13 +1,13 @@
 package com.melikyan.academy.exception;
 
-import com.melikyan.academy.dto.response.common.ApiErrorResponse;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import jakarta.validation.ConstraintViolationException;
+import org.springframework.web.server.ResponseStatusException;
+import com.melikyan.academy.dto.response.common.ApiErrorResponse;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 import java.time.OffsetDateTime;
 import java.util.LinkedHashMap;
@@ -99,6 +99,25 @@ public class GlobalExceptionHandler extends RuntimeException {
                 request.getRequestURI(),
                 null
         );
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public org.springframework.http.ResponseEntity<ApiErrorResponse> handleResponseStatusException(
+            ResponseStatusException exception,
+            HttpServletRequest request
+    ) {
+        HttpStatus status = HttpStatus.valueOf(exception.getStatusCode().value());
+
+        ApiErrorResponse response = new ApiErrorResponse(
+                OffsetDateTime.now(),
+                status.value(),
+                status.getReasonPhrase(),
+                exception.getReason(),
+                request.getRequestURI(),
+                null
+        );
+
+        return org.springframework.http.ResponseEntity.status(status).body(response);
     }
 
     @ExceptionHandler(Exception.class)
