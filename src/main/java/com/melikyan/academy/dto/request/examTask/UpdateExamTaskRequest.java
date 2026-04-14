@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public record UpdateExamTaskRequest(
-        @Min(value = 1, message = "{examTask.orderIndex.min}")
+        @Min(value = 1, message = "examTask.orderIndex.min")
         Integer orderIndex,
 
-        @Min(value = 1, message = "{examTask.point.min}")
+        @Min(value = 1, message = "examTask.point.min")
         Integer point,
 
         TaskType type,

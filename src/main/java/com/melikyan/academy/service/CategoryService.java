@@ -33,7 +33,7 @@ public class CategoryService {
                 ));
     }
 
-    public CategoryResponse createCategory(CreateCategoryRequest request) {
+    public CategoryResponse create(CreateCategoryRequest request) {
         String normalizedTitle = request.title().trim();
 
         if (categoryRepository.existsByTitleIgnoreCase(normalizedTitle)) {
@@ -62,18 +62,18 @@ public class CategoryService {
     }
 
     @Transactional(readOnly = true)
-    public CategoryResponse getCategoryById(UUID id) {
+    public CategoryResponse getById(UUID id) {
         Category category = getCategoryEntityById(id);
         return categoryMapper.toResponse(category);
     }
 
     @Transactional(readOnly = true)
-    public List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getAll() {
         List<Category> allCategories = categoryRepository.findAll();
         return categoryMapper.toResponseList(allCategories);
     }
 
-    public CategoryResponse updateCategory(UUID id, UpdateCategoryRequest request) {
+    public CategoryResponse update(UUID id, UpdateCategoryRequest request) {
         Category category = getCategoryEntityById(id);
 
         if (request.title() != null) {
@@ -105,7 +105,7 @@ public class CategoryService {
         return categoryMapper.toResponse(savedCategory);
     }
 
-    public void deleteCategory(UUID categoryId) {
+    public void delete(UUID categoryId) {
         Category category = getCategoryEntityById(categoryId);
         categoryRepository.delete(category);
     }

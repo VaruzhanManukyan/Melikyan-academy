@@ -75,7 +75,7 @@ class CategoryControllerTest {
 
         CategoryResponse response = mock(CategoryResponse.class);
 
-        when(categoryService.createCategory(any(CreateCategoryRequest.class)))
+        when(categoryService.create(any(CreateCategoryRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(post("/api/v1/categories")
@@ -83,42 +83,42 @@ class CategoryControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
 
-        verify(categoryService).createCategory(any(CreateCategoryRequest.class));
+        verify(categoryService).create(any(CreateCategoryRequest.class));
     }
 
     @Test
-    void getCategoryById_shouldReturnOk() throws Exception {
+    void getById_shouldReturnOk() throws Exception {
         UUID categoryId = UUID.randomUUID();
 
         CategoryResponse response = mock(CategoryResponse.class);
 
-        when(categoryService.getCategoryById(categoryId))
+        when(categoryService.getById(categoryId))
                 .thenReturn(response);
 
         mockMvc.perform(get("/api/v1/categories/{id}", categoryId))
                 .andExpect(status().isOk());
 
-        verify(categoryService).getCategoryById(categoryId);
+        verify(categoryService).getById(categoryId);
     }
 
     @Test
-    void getAllCategories_shouldReturnOk() throws Exception {
+    void getAll_shouldReturnOk() throws Exception {
         List<CategoryResponse> responses = List.of(
                 mock(CategoryResponse.class),
                 mock(CategoryResponse.class)
         );
 
-        when(categoryService.getAllCategories())
+        when(categoryService.getAll())
                 .thenReturn(responses);
 
         mockMvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isOk());
 
-        verify(categoryService).getAllCategories();
+        verify(categoryService).getAll();
     }
 
     @Test
-    void updateCategory_shouldReturnOk() throws Exception {
+    void update_shouldReturnOk() throws Exception {
         UUID categoryId = UUID.randomUUID();
 
         UpdateCategoryRequest request = new UpdateCategoryRequest(
@@ -128,7 +128,7 @@ class CategoryControllerTest {
 
         CategoryResponse response = mock(CategoryResponse.class);
 
-        when(categoryService.updateCategory(eq(categoryId), any(UpdateCategoryRequest.class)))
+        when(categoryService.update(eq(categoryId), any(UpdateCategoryRequest.class)))
                 .thenReturn(response);
 
         mockMvc.perform(patch("/api/v1/categories/{id}", categoryId)
@@ -136,18 +136,18 @@ class CategoryControllerTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
 
-        verify(categoryService).updateCategory(eq(categoryId), any(UpdateCategoryRequest.class));
+        verify(categoryService).update(eq(categoryId), any(UpdateCategoryRequest.class));
     }
 
     @Test
-    void deleteCategory_shouldReturnNoContent() throws Exception {
+    void delete_shouldReturnNoContent() throws Exception {
         UUID categoryId = UUID.randomUUID();
 
-        doNothing().when(categoryService).deleteCategory(categoryId);
+        doNothing().when(categoryService).delete(categoryId);
 
         mockMvc.perform(delete("/api/v1/categories/{id}", categoryId))
                 .andExpect(status().isNoContent());
 
-        verify(categoryService).deleteCategory(categoryId);
+        verify(categoryService).delete(categoryId);
     }
 }

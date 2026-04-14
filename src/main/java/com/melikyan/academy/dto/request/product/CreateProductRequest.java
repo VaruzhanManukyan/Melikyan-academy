@@ -11,16 +11,16 @@ import java.util.UUID;
 import java.math.BigDecimal;
 
 public record CreateProductRequest(
-        @NotNull(message = "{product.price.notNull}")
-        @DecimalMin(value = "0.00", inclusive = true, message = "{product.price.min}")
-        @Digits(integer = 10, fraction = 2, message = "{product.price.digits}")
+        @NotNull(message = "product.price.notNull")
+        @DecimalMin(value = "0.00", inclusive = true, message = "product.price.min")
+        @Digits(integer = 10, fraction = 2, message = "product.price.digits")
         BigDecimal price,
 
         @JsonProperty("is_private")
-        @NotNull(message = "{product.isPrivate.notNull}")
+        @NotNull(message = "product.isPrivate.notNull")
         Boolean isPrivate,
 
-        @NotEmpty(message = "{product.purchasableIds.notEmpty}")
+        @NotEmpty(message = "product.purchasableIds.notEmpty")
         List<UUID> purchasableIds
 ) {
 }

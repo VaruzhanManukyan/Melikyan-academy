@@ -14,29 +14,29 @@ import java.util.UUID;
 import java.math.BigDecimal;
 
 public record CreateTransactionRequest(
-        @NotNull(message = "{transaction.amount.notNull}")
-        @DecimalMin(value = "0.00", inclusive = false, message = "{transaction.amount.min}")
-        @Digits(integer = 10, fraction = 2, message = "{transaction.amount.digits}")
+        @NotNull(message = "transaction.amount.notNull")
+        @DecimalMin(value = "0.00", inclusive = false, message = "transaction.amount.min")
+        @Digits(integer = 10, fraction = 2, message = "transaction.amount.digits")
         BigDecimal amount,
 
-        @NotBlank(message = "{transaction.currency.notBlank}")
-        @Size(min = 3, max = 3, message = "{transaction.currency.size}")
-        @Pattern(regexp = "^[A-Z]{3}$", message = "{transaction.currency.invalid}")
+        @NotBlank(message = "transaction.currency.notBlank")
+        @Size(min = 3, max = 3, message = "transaction.currency.size")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "transaction.currency.invalid")
         String currency,
 
-        @NotNull(message = "{transaction.paymentMethod.notNull}")
+        @NotNull(message = "transaction.paymentMethod.notNull")
         PaymentMethod paymentMethod,
 
-        @NotNull(message = "{transaction.status.notNull}")
+        @NotNull(message = "transaction.status.notNull")
         TransactionStatus status,
 
-        @NotNull(message = "{transaction.transactionType.notNull}")
+        @NotNull(message = "transaction.transactionType.notNull")
         TransactionType transactionType,
 
-        @NotNull(message = "{transaction.userId.notNull}")
+        @NotNull(message = "transaction.userId.notNull")
         UUID userId,
 
-        @NotNull(message = "{transaction.productId.notNull}")
+        @NotNull(message = "transaction.productId.notNull")
         UUID productId
 ) {
 }

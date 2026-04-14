@@ -9,16 +9,16 @@ import java.util.UUID;
 public record CreateExamSubmissionRequest(
         String note,
 
-        @NotNull(message = "{examSubmission.status.notNull}")
+        @NotNull(message = "examSubmission.status.notNull")
         ExamStatus status,
 
-        @NotNull(message = "{examSubmission.answerPayload.notNull}")
+        @NotNull(message = "examSubmission.answerPayload.notNull")
         Map<String, Object> answerPayload,
 
-        @NotNull(message = "{examSubmission.userId.notNull}")
+        @NotNull(message = "examSubmission.userId.notNull")
         UUID userId,
 
-        @NotNull(message = "{examSubmission.taskId.notNull}")
+        @NotNull(message = "examSubmission.taskId.notNull")
         UUID taskId
 ) {
 }

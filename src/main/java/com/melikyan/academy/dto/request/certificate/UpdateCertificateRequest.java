@@ -7,7 +7,7 @@ import java.util.UUID;
 import java.time.OffsetDateTime;
 
 public record UpdateCertificateRequest(
-        @Size(max = 255, message = "{certificate.certificateCode.size}")
+        @Size(max = 255, message = "certificate.certificateCode.size")
         String certificateCode,
 
         OffsetDateTime issueDate,

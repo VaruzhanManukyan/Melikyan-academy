@@ -9,6 +9,7 @@ import com.melikyan.academy.dto.request.category.UpdateCategoryRequest;
 import com.melikyan.academy.dto.request.category.CreateCategoryRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,39 +21,42 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponse> create(
             @Valid @RequestBody CreateCategoryRequest request
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(categoryService.createCategory(request));
+                .body(categoryService.create(request));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategoryById(
+    public ResponseEntity<CategoryResponse> getById(
             @PathVariable UUID id
     ) {
-        return ResponseEntity.ok(categoryService.getCategoryById(id));
+        return ResponseEntity.ok(categoryService.getById(id));
     }
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        return ResponseEntity.ok(categoryService.getAllCategories());
+    public ResponseEntity<List<CategoryResponse>> getAll() {
+        return ResponseEntity.ok(categoryService.getAll());
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<CategoryResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateCategoryRequest request
     ) {
-        return ResponseEntity.ok(categoryService.updateCategory(id, request));
+        return ResponseEntity.ok(categoryService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(
             @PathVariable UUID id
     ) {
-        categoryService.deleteCategory(id);
+        categoryService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }

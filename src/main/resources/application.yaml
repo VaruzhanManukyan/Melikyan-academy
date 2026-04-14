@@ -2,6 +2,9 @@ spring:
   application:
     name: melikyan-academy
 
+  config:
+    import: optional:file:.env[.properties]
+
   threads:
     virtual:
       enabled: true
@@ -33,6 +36,13 @@ app:
   cors:
     allowed-origins:
           - http://localhost:3000
+  admin:
+    seed-enabled: ${APP_ADMIN_SEED_ENABLED:false}
+    email: ${APP_ADMIN_EMAIL:}
+    password: ${APP_ADMIN_PASSWORD:}
+    first-name: ${APP_ADMIN_FIRST_NAME:}
+    last-name: ${APP_ADMIN_LAST_NAME:}
+
 
 server:
   servlet:

@@ -2,19 +2,24 @@ package com.melikyan.academy.exception;
 
 import org.springframework.http.HttpStatus;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.access.AccessDeniedException;
 import com.melikyan.academy.dto.response.common.ApiErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.OffsetDateTime;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.LinkedHashMap;
+import java.time.OffsetDateTime;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler extends RuntimeException {
+public class GlobalExceptionHandler {
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleMethodArgumentNotValid(
@@ -101,8 +106,24 @@ public class GlobalExceptionHandler extends RuntimeException {
         );
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiErrorResponse handleAccessDenied(
+            AccessDeniedException exception,
+            HttpServletRequest request
+    ) {
+        return new ApiErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.FORBIDDEN.value(),
+                HttpStatus.FORBIDDEN.getReasonPhrase(),
+                "Access denied",
+                request.getRequestURI(),
+                null
+        );
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
-    public org.springframework.http.ResponseEntity<ApiErrorResponse> handleResponseStatusException(
+    public ResponseEntity<ApiErrorResponse> handleResponseStatusException(
             ResponseStatusException exception,
             HttpServletRequest request
     ) {
@@ -117,7 +138,7 @@ public class GlobalExceptionHandler extends RuntimeException {
                 null
         );
 
-        return org.springframework.http.ResponseEntity.status(status).body(response);
+        return ResponseEntity.status(status).body(response);
     }
 
     @ExceptionHandler(Exception.class)
@@ -132,7 +153,7 @@ public class GlobalExceptionHandler extends RuntimeException {
                 OffsetDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase(),
-                exception.getClass().getSimpleName() + ": " + exception.getMessage(),
+                "Unexpected internal server error",
                 request.getRequestURI(),
                 null
         );

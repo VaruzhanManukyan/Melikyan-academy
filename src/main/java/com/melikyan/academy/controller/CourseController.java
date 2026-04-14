@@ -9,6 +9,7 @@ import com.melikyan.academy.dto.request.course.CreateCourseRequest;
 import com.melikyan.academy.dto.request.course.UpdateCourseRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +22,7 @@ public class CourseController {
     private final CourseService courseService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public ResponseEntity<CourseResponse> create(
             @Valid @RequestBody CreateCourseRequest request
     ) {
@@ -39,6 +41,7 @@ public class CourseController {
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public ResponseEntity<CourseResponse> update(
             @PathVariable UUID id,
             @Valid @RequestBody UpdateCourseRequest request
@@ -47,6 +50,7 @@ public class CourseController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         courseService.delete(id);
         return ResponseEntity.noContent().build();

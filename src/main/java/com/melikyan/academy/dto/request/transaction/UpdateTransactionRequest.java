@@ -12,12 +12,12 @@ import java.util.UUID;
 import java.math.BigDecimal;
 
 public record UpdateTransactionRequest(
-        @DecimalMin(value = "0.00", inclusive = false, message = "{transaction.amount.min}")
-        @Digits(integer = 10, fraction = 2, message = "{transaction.amount.digits}")
+        @DecimalMin(value = "0.00", inclusive = false, message = "transaction.amount.min")
+        @Digits(integer = 10, fraction = 2, message = "transaction.amount.digits")
         BigDecimal amount,
 
-        @Size(min = 3, max = 3, message = "{transaction.currency.size}")
-        @Pattern(regexp = "^[A-Z]{3}$", message = "{transaction.currency.invalid}")
+        @Size(min = 3, max = 3, message = "transaction.currency.size")
+        @Pattern(regexp = "^[A-Z]{3}$", message = "transaction.currency.invalid")
         String currency,
 
         PaymentMethod paymentMethod,

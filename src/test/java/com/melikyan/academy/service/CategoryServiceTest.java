@@ -66,7 +66,7 @@ class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(savedCategory);
         when(categoryMapper.toResponse(savedCategory)).thenReturn(response);
 
-        CategoryResponse result = categoryService.createCategory(request);
+        CategoryResponse result = categoryService.create(request);
 
         assertNotNull(result);
         assertEquals(response, result);
@@ -82,7 +82,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void createCategory_shouldThrowConflict_whenTitleAlreadyExists() {
+    void create_shouldThrowConflict_whenTitleAlreadyExists() {
         UUID userId = UUID.randomUUID();
 
         CreateCategoryRequest request = new CreateCategoryRequest(
@@ -95,7 +95,7 @@ class CategoryServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.createCategory(request)
+                () -> categoryService.create(request)
         );
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
@@ -107,7 +107,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void createCategory_shouldThrowNotFound_whenUserNotExists() {
+    void create_shouldThrowNotFound_whenUserNotExists() {
         UUID userId = UUID.randomUUID();
 
         CreateCategoryRequest request = new CreateCategoryRequest(
@@ -121,7 +121,7 @@ class CategoryServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.createCategory(request)
+                () -> categoryService.create(request)
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
@@ -133,7 +133,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryById_shouldReturnResponse() {
+    void getById_shouldReturnResponse() {
         UUID categoryId = UUID.randomUUID();
 
         Category category = new Category();
@@ -144,7 +144,7 @@ class CategoryServiceTest {
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(categoryMapper.toResponse(category)).thenReturn(response);
 
-        CategoryResponse result = categoryService.getCategoryById(categoryId);
+        CategoryResponse result = categoryService.getById(categoryId);
 
         assertNotNull(result);
         assertEquals(response, result);
@@ -154,14 +154,14 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryById_shouldThrowNotFound_whenCategoryDoesNotExist() {
+    void getCategoryById_shouldThrowNotFound_whenDoesNotExist() {
         UUID categoryId = UUID.randomUUID();
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.getCategoryById(categoryId)
+                () -> categoryService.getById(categoryId)
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
@@ -172,7 +172,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getAllCategories_shouldReturnResponseList() {
+    void getAll_shouldReturnResponseList() {
         Category category1 = new Category();
         Category category2 = new Category();
 
@@ -185,7 +185,7 @@ class CategoryServiceTest {
         when(categoryRepository.findAll()).thenReturn(categories);
         when(categoryMapper.toResponseList(categories)).thenReturn(responses);
 
-        List<CategoryResponse> result = categoryService.getAllCategories();
+        List<CategoryResponse> result = categoryService.getAll();
 
         assertNotNull(result);
         assertEquals(2, result.size());
@@ -220,7 +220,7 @@ class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(savedCategory);
         when(categoryMapper.toResponse(savedCategory)).thenReturn(response);
 
-        CategoryResponse result = categoryService.updateCategory(categoryId, request);
+        CategoryResponse result = categoryService.update(categoryId, request);
 
         assertNotNull(result);
         assertEquals(response, result);
@@ -234,7 +234,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_shouldThrowBadRequest_whenTitleIsBlank() {
+    void update_shouldThrowBadRequest_whenTitleIsBlank() {
         UUID categoryId = UUID.randomUUID();
 
         UpdateCategoryRequest request = new UpdateCategoryRequest(
@@ -250,7 +250,7 @@ class CategoryServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.updateCategory(categoryId, request)
+                () -> categoryService.update(categoryId, request)
         );
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
@@ -261,7 +261,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_shouldThrowConflict_whenNewTitleAlreadyExists() {
+    void update_shouldThrowConflict_whenNewTitleAlreadyExists() {
         UUID categoryId = UUID.randomUUID();
 
         UpdateCategoryRequest request = new UpdateCategoryRequest(
@@ -278,7 +278,7 @@ class CategoryServiceTest {
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.updateCategory(categoryId, request)
+                () -> categoryService.update(categoryId, request)
         );
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
@@ -290,7 +290,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_shouldNotCheckDuplicate_whenTitleDidNotChangeIgnoringCase() {
+    void update_shouldNotCheckDuplicate_whenTitleDidNotChangeIgnoringCase() {
         UUID categoryId = UUID.randomUUID();
 
         UpdateCategoryRequest request = new UpdateCategoryRequest(
@@ -309,7 +309,7 @@ class CategoryServiceTest {
         when(categoryRepository.save(category)).thenReturn(category);
         when(categoryMapper.toResponse(category)).thenReturn(response);
 
-        CategoryResponse result = categoryService.updateCategory(categoryId, request);
+        CategoryResponse result = categoryService.update(categoryId, request);
 
         assertNotNull(result);
         assertEquals("backend", category.getTitle());
@@ -322,7 +322,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void deleteCategory_shouldDeleteCategory() {
+    void deleteCategory_shouldDelete() {
         UUID categoryId = UUID.randomUUID();
 
         Category category = new Category();
@@ -330,21 +330,21 @@ class CategoryServiceTest {
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
-        categoryService.deleteCategory(categoryId);
+        categoryService.delete(categoryId);
 
         verify(categoryRepository).findById(categoryId);
         verify(categoryRepository).delete(category);
     }
 
     @Test
-    void deleteCategory_shouldThrowNotFound_whenCategoryDoesNotExist() {
+    void deleteCategory_shouldThrowNotFound_whenDoesNotExist() {
         UUID categoryId = UUID.randomUUID();
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
-                () -> categoryService.deleteCategory(categoryId)
+                () -> categoryService.delete(categoryId)
         );
 
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());

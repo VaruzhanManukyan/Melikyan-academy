@@ -8,20 +8,20 @@ import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 public record CreateUserProcessRequest(
-        @NotNull(message = "{userProcess.currentStep.notNull}")
-        @Min(value = 0, message = "{userProcess.currentStep.min}")
+        @NotNull(message = "userProcess.currentStep.notNull")
+        @Min(value = 0, message = "userProcess.currentStep.min")
         Integer currentStep,
 
-        @NotNull(message = "{userProcess.totalSteps.notNull}")
-        @Min(value = 1, message = "{userProcess.totalSteps.min}")
+        @NotNull(message = "userProcess.totalSteps.notNull")
+        @Min(value = 1, message = "userProcess.totalSteps.min")
         Integer totalSteps,
 
         BigDecimal scoreAccumulated,
 
-        @NotNull(message = "{userProcess.userId.notNull}")
+        @NotNull(message = "userProcess.userId.notNull")
         UUID userId,
 
-        @NotNull(message = "{userProcess.purchasableId.notNull}")
+        @NotNull(message = "userProcess.purchasableId.notNull")
         UUID purchasableId,
 
         OffsetDateTime lastAccessedAt
