@@ -78,7 +78,7 @@ class CategoryControllerTest {
         when(categoryService.createCategory(any(CreateCategoryRequest.class)))
                 .thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/category")
+        mockMvc.perform(post("/api/v1/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated());
@@ -95,7 +95,7 @@ class CategoryControllerTest {
         when(categoryService.getCategoryById(categoryId))
                 .thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/category/{id}", categoryId))
+        mockMvc.perform(get("/api/v1/categories/{id}", categoryId))
                 .andExpect(status().isOk());
 
         verify(categoryService).getCategoryById(categoryId);
@@ -111,7 +111,7 @@ class CategoryControllerTest {
         when(categoryService.getAllCategories())
                 .thenReturn(responses);
 
-        mockMvc.perform(get("/api/v1/category"))
+        mockMvc.perform(get("/api/v1/categories"))
                 .andExpect(status().isOk());
 
         verify(categoryService).getAllCategories();
@@ -131,7 +131,7 @@ class CategoryControllerTest {
         when(categoryService.updateCategory(eq(categoryId), any(UpdateCategoryRequest.class)))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/api/v1/category/{id}", categoryId)
+        mockMvc.perform(patch("/api/v1/categories/{id}", categoryId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk());
@@ -145,7 +145,7 @@ class CategoryControllerTest {
 
         doNothing().when(categoryService).deleteCategory(categoryId);
 
-        mockMvc.perform(delete("/api/v1/category/{id}", categoryId))
+        mockMvc.perform(delete("/api/v1/categories/{id}", categoryId))
                 .andExpect(status().isNoContent());
 
         verify(categoryService).deleteCategory(categoryId);

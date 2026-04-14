@@ -45,7 +45,8 @@ public class CategoryService {
 
         User createdBy = userRepository.findById(request.createdById())
                 .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND, "User not found"
+                        HttpStatus.NOT_FOUND,
+                        "User not found"
                 ));
 
         Category category = categoryMapper.toEntity(request);
@@ -56,7 +57,7 @@ public class CategoryService {
             category.setDescription(request.description());
         }
 
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryRepository.saveAndFlush(category);
         return categoryMapper.toResponse(savedCategory);
     }
 
@@ -100,7 +101,7 @@ public class CategoryService {
             category.setDescription(request.description().trim());
         }
 
-        Category savedCategory = categoryRepository.save(category);
+        Category savedCategory = categoryRepository.saveAndFlush(category);
         return categoryMapper.toResponse(savedCategory);
     }
 

@@ -1,13 +1,21 @@
 package com.melikyan.academy.dto.response.course;
 
-import java.time.OffsetDateTime;
+import com.melikyan.academy.entity.enums.PurchasableType;
+
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 public record CourseResponse(
         UUID id,
-        OffsetDateTime startDate,
+        String title,
+        String description,
+        PurchasableType type,
         Integer durationWeeks,
+        OffsetDateTime startDate,
+        UUID categoryId,
+        UUID createdById,
         UUID purchasableId,
+        OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {
 }

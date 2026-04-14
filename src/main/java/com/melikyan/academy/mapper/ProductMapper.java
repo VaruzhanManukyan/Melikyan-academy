@@ -12,10 +12,7 @@ import org.mapstruct.MappingTarget;
 
 import java.util.List;
 
-@Mapper(
-        componentModel = "spring",
-        uses = {PurchasableMapper.class}
-)
+@Mapper(componentModel = "spring")
 public interface ProductMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdBy", ignore = true)

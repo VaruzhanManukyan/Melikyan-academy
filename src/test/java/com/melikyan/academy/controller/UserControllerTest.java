@@ -104,7 +104,7 @@ class UserControllerTest {
     void getCurrentUser_shouldReturn200WithProfile() throws Exception {
         when(userService.getCurrentUserProfile()).thenReturn(profileResponse);
 
-        mockMvc.perform(get("/api/v1/user/me"))
+        mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.email").value("test@test.com"))
                 .andExpect(jsonPath("$.firstName").value("Test"))
@@ -113,7 +113,7 @@ class UserControllerTest {
 
     @Test
     void getCurrentUser_whenNotAuthenticated_shouldReturn401() throws Exception {
-        mockMvc.perform(get("/api/v1/user/me"))
+        mockMvc.perform(get("/api/v1/users/me"))
                 .andExpect(status().isUnauthorized());
 
         verify(userService, never()).getCurrentUserProfile();
@@ -124,7 +124,7 @@ class UserControllerTest {
     void updateProfile_withValidData_shouldReturn200() throws Exception {
         when(userService.updateCurrentUserProfile(any())).thenReturn(profileResponse);
 
-        mockMvc.perform(multipart("/api/v1/user/me")
+        mockMvc.perform(multipart("/api/v1/users/me")
                         .param("firstName", "Jane")
                         .param("lastName", "Smith")
                         .with(request -> {
@@ -151,7 +151,7 @@ class UserControllerTest {
                 "fake image bytes".getBytes()
         );
 
-        mockMvc.perform(multipart("/api/v1/user/me")
+        mockMvc.perform(multipart("/api/v1/users/me")
                         .file(avatar)
                         .with(request -> {
                             request.setMethod("PATCH");
@@ -173,7 +173,7 @@ class UserControllerTest {
                 "new_password"
         );
 
-        mockMvc.perform(patch("/api/v1/user/me/password")
+        mockMvc.perform(patch("/api/v1/users/me/password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -191,7 +191,7 @@ class UserControllerTest {
                 "new_password"
         );
 
-        mockMvc.perform(patch("/api/v1/user/me/password")
+        mockMvc.perform(patch("/api/v1/users/me/password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -209,7 +209,7 @@ class UserControllerTest {
                 "short"
         );
 
-        mockMvc.perform(patch("/api/v1/user/me/password")
+        mockMvc.perform(patch("/api/v1/users/me/password")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -221,7 +221,7 @@ class UserControllerTest {
     @Test
     @WithMockUser(username = "test@test.com", roles = "STUDENT")
     void deleteCurrentUser_shouldReturn204() throws Exception {
-        mockMvc.perform(delete("/api/v1/user/me")
+        mockMvc.perform(delete("/api/v1/users/me")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -230,7 +230,7 @@ class UserControllerTest {
 
     @Test
     void deleteCurrentUser_whenNotAuthenticated_shouldReturn401() throws Exception {
-        mockMvc.perform(delete("/api/v1/user/me").with(csrf()))
+        mockMvc.perform(delete("/api/v1/users/me").with(csrf()))
                 .andExpect(status().isUnauthorized());
 
         verify(userService, never()).deleteCurrentUser();

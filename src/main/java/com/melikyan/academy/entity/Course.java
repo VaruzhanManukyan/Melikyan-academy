@@ -2,6 +2,8 @@ package com.melikyan.academy.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.SoftDeleteType;
+import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.List;
@@ -12,6 +14,7 @@ import java.time.OffsetDateTime;
 @Setter
 @Entity
 @NoArgsConstructor
+@SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
 @Table(name = "courses",
         uniqueConstraints = {
                 @UniqueConstraint(
