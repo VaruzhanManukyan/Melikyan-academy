@@ -10,13 +10,13 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 public record UpdateLessonRequest(
-        @Min(value = 1, message = "lesson.orderIndex.min")
+        @Min(value = 1, message = "{lesson.orderIndex.min}")
         Integer orderIndex,
 
-        @Size(max = 50, message = "lesson.title.size")
+        @Size(max = 50, message = "{lesson.title.size}")
         String title,
 
-        @Size(max = 500, message = "lesson.description.size")
+        @Size(max = 500, message = "{lesson.description.size}")
         String description,
 
         SessionType sessionType,

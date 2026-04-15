@@ -7,10 +7,10 @@ import java.util.Map;
 import java.util.UUID;
 
 public record UpdateHomeworkTaskRequest(
-        @Min(value = 1, message = "homeworkTask.orderIndex.min")
+        @Min(value = 1, message = "{homeworkTask.orderIndex.min}")
         Integer orderIndex,
 
-        @Min(value = 1, message = "homeworkTask.point.min")
+        @Min(value = 1, message = "{homeworkTask.point.min}")
         Integer point,
 
         TaskType type,

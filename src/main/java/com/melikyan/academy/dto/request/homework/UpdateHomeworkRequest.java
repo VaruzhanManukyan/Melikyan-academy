@@ -8,10 +8,10 @@ import java.util.UUID;
 import java.time.OffsetDateTime;
 
 public record UpdateHomeworkRequest(
-        @Min(value = 1, message = "homework.orderIndex.min")
+        @Min(value = 1, message = "{homework.orderIndex.min}")
         Integer orderIndex,
 
-        @Size(max = 50, message = "homework.title.size")
+        @Size(max = 50, message = "{homework.title.size}")
         String title,
 
         String description,

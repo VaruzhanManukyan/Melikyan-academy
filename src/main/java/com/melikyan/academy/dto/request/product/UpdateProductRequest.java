@@ -9,8 +9,8 @@ import java.util.UUID;
 import java.math.BigDecimal;
 
 public record UpdateProductRequest(
-        @DecimalMin(value = "0.00", inclusive = true, message = "product.price.min")
-        @Digits(integer = 10, fraction = 2, message = "product.price.digits")
+        @Digits(integer = 10, fraction = 2, message = "{product.price.digits}")
+        @DecimalMin(value = "0.00", inclusive = true, message = "{product.price.min}")
         BigDecimal price,
 
         @JsonProperty("is_private")

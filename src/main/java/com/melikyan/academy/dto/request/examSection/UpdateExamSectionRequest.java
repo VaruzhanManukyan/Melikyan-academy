@@ -7,10 +7,10 @@ import java.time.Duration;
 import java.util.UUID;
 
 public record UpdateExamSectionRequest(
-        @Min(value = 1, message = "examSection.orderIndex.min")
+        @Min(value = 1, message = "{examSection.orderIndex.min}")
         Integer orderIndex,
 
-        @Size(max = 255, message = "examSection.title.size")
+        @Size(max = 255, message = "{examSection.title.size}")
         String title,
 
         String description,

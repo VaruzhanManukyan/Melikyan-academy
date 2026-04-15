@@ -9,26 +9,26 @@ import java.util.UUID;
 import java.time.Duration;
 
 public record CreateExamTaskRequest(
-        @NotNull(message = "examTask.orderIndex.notNull")
-        @Min(value = 1, message = "examTask.orderIndex.min")
+        @NotNull(message = "{examTask.orderIndex.notNull}")
+        @Min(value = 1, message = "{examTask.orderIndex.min}")
         Integer orderIndex,
 
-        @NotNull(message = "examTask.point.notNull")
-        @Min(value = 1, message = "examTask.point.min")
+        @NotNull(message = "{examTask.point.notNull}")
+        @Min(value = 1, message = "{examTask.point.min}")
         Integer point,
 
-        @NotNull(message = "examTask.type.notNull")
+        @NotNull(message = "{examTask.type.notNull}")
         TaskType type,
 
         Duration duration,
 
-        @NotNull(message = "examTask.contentPayload.notNull")
+        @NotNull(message = "{examTask.contentPayload.notNull}")
         Map<String, Object> contentPayload,
 
-        @NotNull(message = "examTask.sectionId.notNull")
+        @NotNull(message = "{examTask.sectionId.notNull}")
         UUID sectionId,
 
-        @NotNull(message = "examTask.createdById.notNull")
+        @NotNull(message = "{examTask.createdById.notNull}")
         UUID createdById
 ) {
 }

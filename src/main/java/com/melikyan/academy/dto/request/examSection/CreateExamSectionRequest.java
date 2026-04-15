@@ -9,19 +9,19 @@ import java.time.Duration;
 import java.util.UUID;
 
 public record CreateExamSectionRequest(
-        @NotNull(message = "examSection.orderIndex.notNull")
-        @Min(value = 1, message = "examSection.orderIndex.min")
+        @NotNull(message = "{examSection.orderIndex.notNull}")
+        @Min(value = 1, message = "{examSection.orderIndex.min}")
         Integer orderIndex,
 
-        @NotBlank(message = "examSection.title.notBlank")
-        @Size(max = 255, message = "examSection.title.size")
+        @NotBlank(message = "{examSection.title.notBlank}")
+        @Size(max = 255, message = "{examSection.title.size}")
         String title,
 
         String description,
 
         Duration duration,
 
-        @NotNull(message = "examSection.examId.notNull")
+        @NotNull(message = "{examSection.examId.notNull}")
         UUID examId,
 
         UUID createdById

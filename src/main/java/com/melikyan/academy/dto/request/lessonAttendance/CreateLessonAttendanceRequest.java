@@ -8,13 +8,13 @@ import java.util.UUID;
 public record CreateLessonAttendanceRequest(
         String note,
 
-        @NotNull(message = "lessonAttendance.status.notNull")
+        @NotNull(message = "{lessonAttendance.status.notNull}")
         AttendanceStatus status,
 
-        @NotNull(message = "lessonAttendance.userId.notNull")
+        @NotNull(message = "{lessonAttendance.userId.notNull}")
         UUID userId,
 
-        @NotNull(message = "lessonAttendance.lessonId.notNull")
+        @NotNull(message = "{lessonAttendance.lessonId.notNull}")
         UUID lessonId
 ) {
 }

@@ -10,27 +10,27 @@ import java.util.UUID;
 import java.time.OffsetDateTime;
 
 public record CreateCourseRequest(
-        @NotBlank(message = "course.title.notBlank")
-        @Size(max = 50, message = "course.title.size")
+        @NotBlank(message = "{course.title.notBlank}")
+        @Size(max = 50, message = "{course.title.size}")
         String title,
 
-        @Size(max = 500, message = "course.description.size")
+        @Size(max = 500, message = "{course.description.size}")
         String description,
 
-        @NotNull(message = "course.type.notNull")
+        @NotNull(message = "{course.type.notNull}")
         PurchasableType type,
 
-        @NotNull(message = "course.startDate.notNull")
+        @NotNull(message = "{course.startDate.notNull}")
         OffsetDateTime startDate,
 
-        @NotNull(message = "course.durationWeeks.notNull")
-        @Min(value = 1, message = "course.durationWeeks.min")
+        @NotNull(message = "{course.durationWeeks.notNull}")
+        @Min(value = 1, message = "{course.durationWeeks.min}")
         Integer durationWeeks,
 
-        @NotNull(message = "course.categoryId.notNull")
+        @NotNull(message = "{course.categoryId.notNull}")
         UUID categoryId,
 
-        @NotNull(message = "course.createdById.notNull")
+        @NotNull(message = "{course.createdById.notNull}")
         UUID createdById
 ) {
 }
