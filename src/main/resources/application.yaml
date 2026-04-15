@@ -56,7 +56,7 @@ server:
 security:
   remember-me:
     validity-seconds: 2592000
-    hmac-secret: "CHANGE_THIS_TO_A_LONG_RANDOM_SECRET"
+    hmac-secret: ${REMEMBER_ME_HMAC_SECRET}
     cookie-secure: false
 
 springdoc:
