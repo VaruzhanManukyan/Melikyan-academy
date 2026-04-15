@@ -16,6 +16,7 @@ public record UpdateLessonRequest(
         @Size(max = 50, message = "lesson.title.size")
         String title,
 
+        @Size(max = 500, message = "lesson.description.size")
         String description,
 
         SessionType sessionType,

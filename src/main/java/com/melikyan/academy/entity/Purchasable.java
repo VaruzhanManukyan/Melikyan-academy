@@ -49,10 +49,10 @@ public class Purchasable extends BaseEntity {
     @OneToMany(mappedBy = "purchasable")
     private List<UserProcess> userProcess;
 
-    @OneToOne(mappedBy = "purchasable")
+    @OneToOne(mappedBy = "purchasable", fetch = FetchType.LAZY)
     private Course course;
 
-    @OneToOne(mappedBy = "purchasable")
+    @OneToOne(mappedBy = "purchasable", fetch = FetchType.LAZY)
     private Exam exam;
 
     @OneToMany(mappedBy = "purchasable")

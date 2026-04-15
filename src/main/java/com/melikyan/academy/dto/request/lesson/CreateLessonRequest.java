@@ -12,35 +12,36 @@ import java.time.Duration;
 import java.time.OffsetDateTime;
 
 public record CreateLessonRequest(
-        @NotNull(message = "lesson.orderIndex.notNull")
-        @Min(value = 1, message = "lesson.orderIndex.min")
+        @NotNull(message = "{lesson.orderIndex.notNull}")
+        @Min(value = 1, message = "{lesson.orderIndex.min}")
         Integer orderIndex,
 
-        @NotBlank(message = "lesson.title.notBlank")
-        @Size(max = 50, message = "lesson.title.size")
+        @NotBlank(message = "{lesson.title.notBlank}")
+        @Size(max = 50, message = "{lesson.title.size}")
         String title,
 
+        @Size(max = 500, message = "{lesson.description.size}")
         String description,
 
-        @NotNull(message = "lesson.sessionType.notNull")
+        @NotNull(message = "{lesson.sessionType.notNull}")
         SessionType sessionType,
 
-        @NotBlank(message = "lesson.valueUrl.notBlank")
+        @NotBlank(message = "{lesson.valueUrl.notBlank}")
         String valueUrl,
 
-        @NotNull(message = "lesson.state.notNull")
+        @NotNull(message = "{lesson.state.notNull}")
         SessionState state,
 
-        @NotNull(message = "lesson.startsAt.notNull")
+        @NotNull(message = "{lesson.startsAt.notNull}")
         OffsetDateTime startsAt,
 
-        @NotNull(message = "lesson.duration.notNull")
+        @NotNull(message = "{lesson.duration.notNull}")
         Duration duration,
 
-        @NotNull(message = "lesson.courseId.notNull")
+        @NotNull(message = "{lesson.courseId.notNull}")
         UUID courseId,
 
-        @NotNull(message = "lesson.createdById.notNull")
+        @NotNull(message = "{lesson.createdById.notNull}")
         UUID createdById
 ) {
 }

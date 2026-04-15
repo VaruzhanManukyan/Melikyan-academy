@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/courses")
 public class CourseController {
-
     private final CourseService courseService;
 
     @PostMapping
@@ -26,7 +25,8 @@ public class CourseController {
     public ResponseEntity<CourseResponse> create(
             @Valid @RequestBody CreateCourseRequest request
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
                 .body(courseService.create(request));
     }
 

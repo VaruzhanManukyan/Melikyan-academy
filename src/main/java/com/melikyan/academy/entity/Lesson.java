@@ -58,6 +58,7 @@ public class Lesson extends BaseEntity {
     @Column(name = "starts_at", nullable = false)
     private OffsetDateTime startsAt;
 
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     @Column(name = "duration", nullable = false, columnDefinition = "interval")
     private Duration duration;
 
