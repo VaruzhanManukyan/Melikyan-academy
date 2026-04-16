@@ -36,7 +36,13 @@ public class HomeworkController {
     }
 
     @GetMapping
-    public ResponseEntity<List<HomeworkResponse>> getAll() {
+    public ResponseEntity<List<HomeworkResponse>> getAll(
+            @RequestParam(required = false) UUID lessonId
+    ) {
+        if (lessonId != null) {
+            return ResponseEntity.ok(homeworkService.getAllByLessonId(lessonId));
+        }
+
         return ResponseEntity.ok(homeworkService.getAll());
     }
 

@@ -58,7 +58,7 @@ public class HomeworkService {
                 ));
     }
 
-    private Lesson getLessonEntityById(UUID id) {
+    private Lesson getLessonById(UUID id) {
         return lessonRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -98,14 +98,35 @@ public class HomeworkService {
         }
     }
 
+    private void validateTitleUnique(UUID lessonId, String title) {
+        if (homeworkRepository.existsByLessonIdAndTitleIgnoreCase(lessonId, title)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Homework with title '" + title +
+                            "' already exists in lesson " + lessonId
+            );
+        }
+    }
+
+    private void validateTitleUnique(UUID lessonId, String title, UUID homeworkId) {
+        if (homeworkRepository.existsByLessonIdAndTitleIgnoreCaseAndIdNot(lessonId, title, homeworkId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Homework with title '" + title +
+                            "' already exists in lesson " + lessonId
+            );
+        }
+    }
+
     public HomeworkResponse create(CreateHomeworkRequest request) {
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
 
+        validateTitleUnique(request.lessonId(), normalizedTitle);
         validateOrderIndexUnique(request.lessonId(), request.orderIndex());
 
         User createdBy = getUserById(request.createdById());
-        Lesson lesson = getLessonEntityById(request.lessonId());
+        Lesson lesson = getLessonById(request.lessonId());
 
         Homework homework = new Homework();
         homework.setTitle(normalizedTitle);
@@ -132,6 +153,14 @@ public class HomeworkService {
         return homeworkMapper.toResponseList(homeworks);
     }
 
+    @Transactional(readOnly = true)
+    public List<HomeworkResponse> getAllByLessonId(UUID lessonId) {
+        getLessonById(lessonId);
+        List<Homework> homeworks = homeworkRepository
+                .findByLessonIdOrderByOrderIndexDesc(lessonId);
+        return homeworkMapper.toResponseList(homeworks);
+    }
+
     public HomeworkResponse update(UUID id, UpdateHomeworkRequest request) {
         Homework homework = getHomeworkEntityById(id);
 
@@ -149,12 +178,14 @@ public class HomeworkService {
         }
 
         if (request.lessonId() != null) {
-            Lesson lesson = getLessonEntityById(request.lessonId());
+            Lesson lesson = getLessonById(request.lessonId());
             homework.setLesson(lesson);
         }
 
         if (request.title() != null) {
-            homework.setTitle(normalizeTitle(request.title()));
+            String normalizedTitle = normalizeTitle(request.title());
+            validateTitleUnique(targetLessonId, normalizedTitle, homework.getId());
+            homework.setTitle(normalizedTitle);
         }
 
         if (request.description() != null) {

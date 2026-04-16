@@ -28,7 +28,6 @@ public class HomeworkTaskService {
     private final HomeworkTaskMapper homeworkTaskMapper;
     private final HomeworkTaskRepository homeworkTaskRepository;
 
-
     private User getUserById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -110,9 +109,9 @@ public class HomeworkTaskService {
     @Transactional(readOnly = true)
     public List<HomeworkTaskResponse> getAllByHomeworkId(UUID homeworkId) {
         getHomeworkById(homeworkId);
-        List<HomeworkTask> homeworkTask = homeworkTaskRepository
+        List<HomeworkTask> homeworkTasks = homeworkTaskRepository
                 .findAllByHomeworkIdOrderByOrderIndexAsc(homeworkId);
-        return homeworkTaskMapper.toResponseList(homeworkTask);
+        return homeworkTaskMapper.toResponseList(homeworkTasks);
     }
 
     public HomeworkTaskResponse update(UUID id, UpdateHomeworkTaskRequest request) {
