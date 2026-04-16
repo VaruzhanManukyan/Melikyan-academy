@@ -31,9 +31,7 @@ public class HomeworkController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HomeworkResponse> getById(
-            @PathVariable UUID id
-    ) {
+    public ResponseEntity<HomeworkResponse> getById(@PathVariable UUID id) {
         return ResponseEntity.ok(homeworkService.getById(id));
     }
 
@@ -53,9 +51,7 @@ public class HomeworkController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'PROFESSOR')")
-    public ResponseEntity<HomeworkResponse> delete(
-            @PathVariable UUID id
-    ) {
+    public ResponseEntity<HomeworkResponse> delete(@PathVariable UUID id) {
         homeworkService.delete(id);
         return ResponseEntity.noContent().build();
     }
