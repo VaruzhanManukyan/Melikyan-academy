@@ -50,6 +50,19 @@ public class LessonService {
         return normalizedDescription.isBlank() ? null : normalizedDescription;
     }
 
+    private String normalizeValueUrl(String valueUrl) {
+        String normalizedValueUrl = valueUrl.trim();
+
+        if (normalizedValueUrl.isBlank()) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Lesson valueUrl must not be blank"
+            );
+        }
+
+        return normalizedValueUrl;
+    }
+
     private User getUserById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -74,17 +87,28 @@ public class LessonService {
                 ));
     }
 
-    private String normalizeValueUrl(String valueUrl) {
-        String normalizedValueUrl = valueUrl.trim();
-
-        if (normalizedValueUrl.isBlank()) {
+    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex) {
+        if (lessonRepository.existsByCourseIdAndOrderIndex(lessonId, orderIndex)) {
             throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Lesson valueUrl must not be blank"
+                    HttpStatus.CONFLICT,
+                    "Lesson with order index " + orderIndex +
+                            " already exists in course " + lessonId
             );
         }
+    }
 
-        return normalizedValueUrl;
+    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex, UUID homeworkId) {
+        if (lessonRepository.existsByCourseIdAndOrderIndexAndIdNot(
+                lessonId,
+                orderIndex,
+                homeworkId
+        )) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Lesson with order index " + orderIndex +
+                            " already exists in course " + lessonId
+            );
+        }
     }
 
     public LessonResponse create(CreateLessonRequest request) {
@@ -92,13 +116,7 @@ public class LessonService {
         String normalizedDescription = normalizeDescription(request.description());
         String normalizedValueUrl = normalizeValueUrl(request.valueUrl());
 
-        if (lessonRepository.existsByCourseIdAndOrderIndex(request.courseId(), request.orderIndex())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Lesson with order index " + request.orderIndex() +
-                            " already exists in course " + request.courseId()
-            );
-        }
+        validateOrderIndexUnique(request.courseId(), request.orderIndex());
 
         User createdBy = getUserById(request.createdById());
         Course course = getCourseEntityById(request.courseId());
@@ -138,23 +156,13 @@ public class LessonService {
                 ? request.courseId()
                 : lesson.getCourse().getId();
 
-        int targetOrderIndex = request.orderIndex() != null
+        Integer targetOrderIndex = request.orderIndex() != null
                 ? request.orderIndex()
                 : lesson.getOrderIndex();
 
-        boolean orderIndexConflict =
-                lessonRepository.existsByCourseIdAndOrderIndexAndIdNot(
-                        targetCourseId,
-                        targetOrderIndex,
-                        id
-                );
-
-        if (orderIndexConflict) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT,
-                    "Lesson with order index " + targetOrderIndex
-                            + " already exists in course " + targetCourseId
-            );
+        if (!targetCourseId.equals(lesson.getCourse().getId())
+                || !targetOrderIndex.equals(lesson.getOrderIndex())) {
+            validateOrderIndexUnique(targetCourseId, targetOrderIndex, lesson.getId());
         }
 
         if (request.orderIndex() != null) {

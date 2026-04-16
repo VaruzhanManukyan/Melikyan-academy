@@ -63,7 +63,7 @@ class CategoryServiceTest {
         when(categoryRepository.existsByTitleIgnoreCase("Backend")).thenReturn(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(categoryMapper.toEntity(request)).thenReturn(category);
-        when(categoryRepository.save(category)).thenReturn(savedCategory);
+        when(categoryRepository.saveAndFlush(category)).thenReturn(savedCategory);
         when(categoryMapper.toResponse(savedCategory)).thenReturn(response);
 
         CategoryResponse result = categoryService.create(request);
@@ -77,7 +77,7 @@ class CategoryServiceTest {
         verify(categoryRepository).existsByTitleIgnoreCase("Backend");
         verify(userRepository).findById(userId);
         verify(categoryMapper).toEntity(request);
-        verify(categoryRepository).save(category);
+        verify(categoryRepository).saveAndFlush(category);
         verify(categoryMapper).toResponse(savedCategory);
     }
 
@@ -103,7 +103,7 @@ class CategoryServiceTest {
 
         verify(categoryRepository).existsByTitleIgnoreCase("Backend");
         verify(userRepository, never()).findById(any());
-        verify(categoryRepository, never()).save(any());
+        verify(categoryRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -129,7 +129,7 @@ class CategoryServiceTest {
 
         verify(categoryRepository).existsByTitleIgnoreCase("Backend");
         verify(userRepository).findById(userId);
-        verify(categoryRepository, never()).save(any());
+        verify(categoryRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -217,7 +217,7 @@ class CategoryServiceTest {
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(categoryRepository.existsByTitleIgnoreCase("New Title")).thenReturn(false);
-        when(categoryRepository.save(category)).thenReturn(savedCategory);
+        when(categoryRepository.saveAndFlush(category)).thenReturn(savedCategory);
         when(categoryMapper.toResponse(savedCategory)).thenReturn(response);
 
         CategoryResponse result = categoryService.update(categoryId, request);
@@ -229,7 +229,7 @@ class CategoryServiceTest {
 
         verify(categoryRepository).findById(categoryId);
         verify(categoryRepository).existsByTitleIgnoreCase("New Title");
-        verify(categoryRepository).save(category);
+        verify(categoryRepository).saveAndFlush(category);
         verify(categoryMapper).toResponse(savedCategory);
     }
 
@@ -257,7 +257,7 @@ class CategoryServiceTest {
         assertEquals("400 BAD_REQUEST \"Category title cannot be blank\"", exception.getMessage());
 
         verify(categoryRepository).findById(categoryId);
-        verify(categoryRepository, never()).save(any());
+        verify(categoryRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -286,7 +286,7 @@ class CategoryServiceTest {
 
         verify(categoryRepository).findById(categoryId);
         verify(categoryRepository).existsByTitleIgnoreCase("Existing Title");
-        verify(categoryRepository, never()).save(any());
+        verify(categoryRepository, never()).saveAndFlush(any());
     }
 
     @Test
@@ -306,7 +306,7 @@ class CategoryServiceTest {
         CategoryResponse response = mock(CategoryResponse.class);
 
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
-        when(categoryRepository.save(category)).thenReturn(category);
+        when(categoryRepository.saveAndFlush(category)).thenReturn(category);
         when(categoryMapper.toResponse(category)).thenReturn(response);
 
         CategoryResponse result = categoryService.update(categoryId, request);
@@ -317,7 +317,7 @@ class CategoryServiceTest {
 
         verify(categoryRepository).findById(categoryId);
         verify(categoryRepository, never()).existsByTitleIgnoreCase(any());
-        verify(categoryRepository).save(category);
+        verify(categoryRepository).saveAndFlush(category);
         verify(categoryMapper).toResponse(category);
     }
 

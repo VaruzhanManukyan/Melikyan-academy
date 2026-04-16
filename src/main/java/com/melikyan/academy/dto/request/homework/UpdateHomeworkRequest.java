@@ -14,6 +14,7 @@ public record UpdateHomeworkRequest(
         @Size(max = 50, message = "{homework.title.size}")
         String title,
 
+        @Size(max = 500, message = "{homework.description.size}")
         String description,
 
         OffsetDateTime dueDate,

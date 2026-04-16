@@ -77,9 +77,9 @@ CREATE TABLE categories
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at  TIMESTAMP WITHOUT TIME ZONE,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID        NOT NULL,
-    id          UUID        NOT NULL,
-    title       VARCHAR(50) NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    title       VARCHAR(50)                 NOT NULL,
     description VARCHAR(255),
     CONSTRAINT categories_pkey PRIMARY KEY (id)
 );
@@ -91,38 +91,38 @@ CREATE TABLE certificates
     expiry_date      TIMESTAMP WITHOUT TIME ZONE,
     issue_date       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id               UUID         NOT NULL,
-    purchasable_id   UUID         NOT NULL,
-    user_id          UUID         NOT NULL,
-    certificate_code VARCHAR(255) NOT NULL,
+    id               UUID                        NOT NULL,
+    purchasable_id   UUID                        NOT NULL,
+    user_id          UUID                        NOT NULL,
+    certificate_code VARCHAR(255)                NOT NULL,
     pdf_url          VARCHAR(255),
-    metadata         JSONB        NOT NULL,
+    metadata         JSONB                       NOT NULL,
     CONSTRAINT certificates_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE courses
 (
-    duration_weeks INTEGER NOT NULL,
+    duration_weeks INTEGER                     NOT NULL,
     start_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE,
-    id             UUID    NOT NULL,
-    purchasable_id UUID    NOT NULL,
+    id             UUID                        NOT NULL,
+    purchasable_id UUID                        NOT NULL,
     CONSTRAINT courses_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE exam_sections
 (
-    duration INTERVAL,
-    order_index INTEGER      NOT NULL,
+    duration    INTERVAL,
+    order_index INTEGER                     NOT NULL,
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at  TIMESTAMP WITHOUT TIME ZONE,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID         NOT NULL,
-    exam_id     UUID         NOT NULL,
-    id          UUID         NOT NULL,
+    created_by  UUID                        NOT NULL,
+    exam_id     UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)                NOT NULL,
     CONSTRAINT exam_sections_pkey PRIMARY KEY (id)
 );
 
@@ -131,28 +131,28 @@ CREATE TABLE exam_submissions
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID       NOT NULL,
-    task_id        UUID       NOT NULL,
-    user_id        UUID       NOT NULL,
+    id             UUID                        NOT NULL,
+    task_id        UUID                        NOT NULL,
+    user_id        UUID                        NOT NULL,
     note           VARCHAR(255),
-    answer_payload JSONB      NOT NULL,
-    status         EXAMSTATUS NOT NULL,
+    answer_payload JSONB                       NOT NULL,
+    status         EXAMSTATUS                  NOT NULL,
     CONSTRAINT exam_submissions_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE exam_tasks
 (
-    duration INTERVAL,
-    order_index     INTEGER  NOT NULL,
-    point           INTEGER  NOT NULL,
+    duration        INTERVAL,
+    order_index     INTEGER                     NOT NULL,
+    point           INTEGER                     NOT NULL,
     created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at      TIMESTAMP WITHOUT TIME ZONE,
     updated_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by      UUID     NOT NULL,
-    id              UUID     NOT NULL,
-    section_id      UUID     NOT NULL,
-    type            TASKTYPE NOT NULL,
-    content_payload JSONB    NOT NULL,
+    created_by      UUID                        NOT NULL,
+    id              UUID                        NOT NULL,
+    section_id      UUID                        NOT NULL,
+    type            TASKTYPE                    NOT NULL,
+    content_payload JSONB                       NOT NULL,
     CONSTRAINT exam_tasks_pkey PRIMARY KEY (id)
 );
 
@@ -160,8 +160,8 @@ CREATE TABLE exams
 (
     deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID NOT NULL,
-    purchasable_id UUID NOT NULL,
+    id             UUID                        NOT NULL,
+    purchasable_id UUID                        NOT NULL,
     CONSTRAINT exams_pkey PRIMARY KEY (id)
 );
 
@@ -170,27 +170,27 @@ CREATE TABLE homework_submissions
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID           NOT NULL,
-    task_id        UUID           NOT NULL,
-    user_id        UUID           NOT NULL,
+    id             UUID                        NOT NULL,
+    task_id        UUID                        NOT NULL,
+    user_id        UUID                        NOT NULL,
     note           VARCHAR(255),
-    answer_payload JSONB          NOT NULL,
-    status         HOMEWORKSTATUS NOT NULL,
+    answer_payload JSONB                       NOT NULL,
+    status         HOMEWORKSTATUS              NOT NULL,
     CONSTRAINT homework_submissions_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE homework_tasks
 (
-    order_index     INTEGER  NOT NULL,
-    point           INTEGER  NOT NULL,
+    order_index     INTEGER                     NOT NULL,
+    point           INTEGER                     NOT NULL,
     created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at      TIMESTAMP WITHOUT TIME ZONE,
     updated_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by      UUID     NOT NULL,
-    homework_id     UUID     NOT NULL,
-    id              UUID     NOT NULL,
-    payload_content JSONB    NOT NULL,
-    type            TASKTYPE NOT NULL,
+    created_by      UUID                        NOT NULL,
+    homework_id     UUID                        NOT NULL,
+    id              UUID                        NOT NULL,
+    payload_content JSONB                       NOT NULL,
+    type            TASKTYPE                    NOT NULL,
     CONSTRAINT homework_tasks_pkey PRIMARY KEY (id)
 );
 
@@ -198,27 +198,27 @@ CREATE TABLE homework_translations
 (
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID         NOT NULL,
-    homework_id UUID         NOT NULL,
-    id          UUID         NOT NULL,
-    code        VARCHAR(2)   NOT NULL,
+    created_by  UUID                        NOT NULL,
+    homework_id UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    code        VARCHAR(2)                  NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)                NOT NULL,
     CONSTRAINT homework_translations_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE homeworks
 (
-    is_published BOOLEAN     NOT NULL,
-    order_index  INTEGER     NOT NULL,
+    is_published BOOLEAN                     NOT NULL,
+    order_index  INTEGER                     NOT NULL,
     created_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at   TIMESTAMP WITHOUT TIME ZONE,
     due_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by   UUID        NOT NULL,
-    id           UUID        NOT NULL,
-    lesson_id    UUID        NOT NULL,
-    title        VARCHAR(50) NOT NULL,
+    created_by   UUID                        NOT NULL,
+    id           UUID                        NOT NULL,
+    lesson_id    UUID                        NOT NULL,
+    title        VARCHAR(50)                 NOT NULL,
     description  VARCHAR(255),
     CONSTRAINT homeworks_pkey PRIMARY KEY (id)
 );
@@ -228,9 +228,9 @@ CREATE TABLE languages
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITHOUT TIME ZONE,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by UUID        NOT NULL,
-    name       VARCHAR(50) NOT NULL,
-    code       VARCHAR(2)  NOT NULL,
+    created_by UUID                        NOT NULL,
+    name       VARCHAR(50)                 NOT NULL,
+    code       VARCHAR(2)                  NOT NULL,
     CONSTRAINT languages_pkey PRIMARY KEY (code)
 );
 
@@ -239,11 +239,11 @@ CREATE TABLE lesson_attendances
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITHOUT TIME ZONE,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id         UUID             NOT NULL,
-    lesson_id  UUID             NOT NULL,
-    user_id    UUID             NOT NULL,
+    id         UUID                        NOT NULL,
+    lesson_id  UUID                        NOT NULL,
+    user_id    UUID                        NOT NULL,
     note       VARCHAR(255),
-    status     ATTENDANCESTATUS NOT NULL,
+    status     ATTENDANCESTATUS            NOT NULL,
     CONSTRAINT lesson_attendances_pkey PRIMARY KEY (id)
 );
 
@@ -251,40 +251,40 @@ CREATE TABLE lesson_translations
 (
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID         NOT NULL,
-    id          UUID         NOT NULL,
-    lesson_id   UUID         NOT NULL,
-    code        VARCHAR(2)   NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    lesson_id   UUID                        NOT NULL,
+    code        VARCHAR(2)                  NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)                NOT NULL,
     CONSTRAINT lesson_translations_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE lessons
 (
-    duration INTERVAL NOT NULL,
-    order_index INTEGER      NOT NULL,
+    duration    INTERVAL                    NOT NULL,
+    order_index INTEGER                     NOT NULL,
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at  TIMESTAMP WITHOUT TIME ZONE,
     starts_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    course_id   UUID         NOT NULL,
-    created_by  UUID         NOT NULL,
-    id          UUID         NOT NULL,
-    title       VARCHAR(50)  NOT NULL,
+    course_id   UUID                        NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    title       VARCHAR(50)                 NOT NULL,
     description VARCHAR(255),
-    value_url   VARCHAR(255) NOT NULL,
-    type        SESSIONTYPE  NOT NULL,
-    state       SESSIONSTATE NOT NULL,
+    value_url   VARCHAR(255)                NOT NULL,
+    type        SESSIONTYPE                 NOT NULL,
+    state       SESSIONSTATE                NOT NULL,
     CONSTRAINT lessons_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE product_purchasables
 (
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID NOT NULL,
-    product_id     UUID NOT NULL,
-    purchasable_id UUID NOT NULL,
+    id             UUID                        NOT NULL,
+    product_id     UUID                        NOT NULL,
+    purchasable_id UUID                        NOT NULL,
     CONSTRAINT product_purchasables_pkey PRIMARY KEY (id)
 );
 
@@ -293,11 +293,11 @@ CREATE TABLE product_registrations
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at     TIMESTAMP WITHOUT TIME ZONE,
     updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID               NOT NULL,
-    product_id     UUID               NOT NULL,
+    id             UUID                        NOT NULL,
+    product_id     UUID                        NOT NULL,
     transaction_id UUID,
-    user_id        UUID               NOT NULL,
-    status         REGISTRATIONSTATUS NOT NULL,
+    user_id        UUID                        NOT NULL,
+    status         REGISTRATIONSTATUS          NOT NULL,
     CONSTRAINT product_registrations_pkey PRIMARY KEY (id)
 );
 
@@ -305,27 +305,27 @@ CREATE TABLE product_translations
 (
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID         NOT NULL,
-    id          UUID         NOT NULL,
-    product_id  UUID         NOT NULL,
-    code        VARCHAR(2)   NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    product_id  UUID                        NOT NULL,
+    code        VARCHAR(2)                  NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)                NOT NULL,
     CONSTRAINT product_translations_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE products
 (
     is_private  BOOLEAN,
-    price       numeric(10, 2)  NOT NULL,
+    price       numeric(10, 2)              NOT NULL,
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at  TIMESTAMP WITHOUT TIME ZONE,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID            NOT NULL,
-    id          UUID            NOT NULL,
-    title       VARCHAR(50)     NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    title       VARCHAR(50)                 NOT NULL,
     description VARCHAR(255),
-    type        PURCHASABLETYPE NOT NULL,
+    type        PURCHASABLETYPE             NOT NULL,
     CONSTRAINT products_pkey PRIMARY KEY (id)
 );
 
@@ -334,9 +334,9 @@ CREATE TABLE professors
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITHOUT TIME ZONE,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    course_id  UUID NOT NULL,
-    id         UUID NOT NULL,
-    user_id    UUID NOT NULL,
+    course_id  UUID                        NOT NULL,
+    id         UUID                        NOT NULL,
+    user_id    UUID                        NOT NULL,
     CONSTRAINT professors_pkey PRIMARY KEY (id)
 );
 
@@ -344,12 +344,12 @@ CREATE TABLE purchasable_translations
 (
     created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by     UUID         NOT NULL,
-    id             UUID         NOT NULL,
-    purchasable_id UUID         NOT NULL,
-    code           VARCHAR(2)   NOT NULL,
+    created_by     UUID                        NOT NULL,
+    id             UUID                        NOT NULL,
+    purchasable_id UUID                        NOT NULL,
+    code           VARCHAR(2)                  NOT NULL,
     description    VARCHAR(255),
-    title          VARCHAR(255) NOT NULL,
+    title          VARCHAR(255)                NOT NULL,
     CONSTRAINT purchasable_translations_pkey PRIMARY KEY (id)
 );
 
@@ -358,12 +358,12 @@ CREATE TABLE purchasables
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at  TIMESTAMP WITHOUT TIME ZONE,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    category_id UUID            NOT NULL,
-    created_by  UUID            NOT NULL,
-    id          UUID            NOT NULL,
-    title       VARCHAR(50)     NOT NULL,
+    category_id UUID                        NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    title       VARCHAR(50)                 NOT NULL,
     description VARCHAR(255),
-    type        PURCHASABLETYPE NOT NULL,
+    type        PURCHASABLETYPE             NOT NULL,
     CONSTRAINT purchasables_pkey PRIMARY KEY (id)
 );
 
@@ -373,10 +373,10 @@ CREATE TABLE remember_me_tokens
     expires_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     last_used_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id           UUID        NOT NULL,
-    user_id      UUID        NOT NULL,
-    selector     VARCHAR(64) NOT NULL,
-    token_hash   VARCHAR(64) NOT NULL,
+    id           UUID                        NOT NULL,
+    user_id      UUID                        NOT NULL,
+    selector     VARCHAR(64)                 NOT NULL,
+    token_hash   VARCHAR(64)                 NOT NULL,
     CONSTRAINT remember_me_tokens_pkey PRIMARY KEY (id)
 );
 
@@ -384,40 +384,40 @@ CREATE TABLE section_translations
 (
     created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID         NOT NULL,
-    id          UUID         NOT NULL,
-    section_id  UUID         NOT NULL,
-    code        VARCHAR(2)   NOT NULL,
+    created_by  UUID                        NOT NULL,
+    id          UUID                        NOT NULL,
+    section_id  UUID                        NOT NULL,
+    code        VARCHAR(2)                  NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255) NOT NULL,
+    title       VARCHAR(255)                NOT NULL,
     CONSTRAINT section_translations_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE transactions
 (
-    amount           numeric(10, 2)           NOT NULL,
+    amount           numeric(10, 2)              NOT NULL,
     created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id               UUID                     NOT NULL,
-    product_id       UUID                     NOT NULL,
-    user_id          UUID                     NOT NULL,
-    currency         VARCHAR(3) DEFAULT 'USD' NOT NULL,
-    payment_method   PAYMENTMETHOD            NOT NULL,
-    status           TRANSACTIONSTATUS        NOT NULL,
-    transaction_type TRANSACTIONTYPE          NOT NULL,
+    id               UUID                        NOT NULL,
+    product_id       UUID                        NOT NULL,
+    user_id          UUID                        NOT NULL,
+    currency         VARCHAR(3) DEFAULT 'USD'    NOT NULL,
+    payment_method   PAYMENTMETHOD               NOT NULL,
+    status           TRANSACTIONSTATUS           NOT NULL,
+    transaction_type TRANSACTIONTYPE             NOT NULL,
     CONSTRAINT transactions_pkey PRIMARY KEY (id)
 );
 
 CREATE TABLE user_processes
 (
-    current_step      INTEGER NOT NULL,
+    current_step      INTEGER                     NOT NULL,
     score_accumulated numeric(10, 2),
-    total_steps       INTEGER NOT NULL,
+    total_steps       INTEGER                     NOT NULL,
     created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     last_accessed_at  TIMESTAMP WITHOUT TIME ZONE,
     updated_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id                UUID    NOT NULL,
-    purchasable_id    UUID    NOT NULL,
-    user_id           UUID    NOT NULL,
+    id                UUID                        NOT NULL,
+    purchasable_id    UUID                        NOT NULL,
+    user_id           UUID                        NOT NULL,
     CONSTRAINT user_processes_pkey PRIMARY KEY (id)
 );
 
@@ -426,14 +426,14 @@ CREATE TABLE users
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     deleted_at TIMESTAMP WITHOUT TIME ZONE,
     updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id         UUID         NOT NULL,
-    first_name VARCHAR(50)  NOT NULL,
-    last_name  VARCHAR(50)  NOT NULL,
+    id         UUID                        NOT NULL,
+    first_name VARCHAR(50)                 NOT NULL,
+    last_name  VARCHAR(50)                 NOT NULL,
     avatar_url VARCHAR(255),
     bio        VARCHAR(255),
-    email      VARCHAR(255) NOT NULL,
-    password   VARCHAR(255) NOT NULL,
-    role       ROLE         NOT NULL,
+    email      VARCHAR(255)                NOT NULL,
+    password   VARCHAR(255)                NOT NULL,
+    role       ROLE                        NOT NULL,
     CONSTRAINT users_pkey PRIMARY KEY (id)
 );
 
@@ -482,11 +482,21 @@ CREATE UNIQUE INDEX uk_professor_user_course_active
 CREATE UNIQUE INDEX uk_categories_title_active
     ON categories (title) WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uk_purchasable_title_active
-    ON purchasables (title) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX uk_purchasable_type_title_active
+    ON purchasables (type, title)
+    WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uk_lesson_title_active
-    ON lessons (title) WHERE deleted_at IS NULL;
+CREATE UNIQUE INDEX uk_lesson_course_title_active
+    ON lessons (course_id, title)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_homework_lesson_title_active
+    ON homeworks (lesson_id, title)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uk_section_exam_title_active
+    ON exam_sections (exam_id, title)
+    WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_product_translation_code ON product_translations (code);
 

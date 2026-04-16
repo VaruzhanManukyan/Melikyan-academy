@@ -18,6 +18,7 @@ public record CreateHomeworkRequest(
         @Size(max = 50, message = "{homework.title.size}")
         String title,
 
+        @Size(max = 500, message = "{homework.description.size}")
         String description,
 
         @NotNull(message = "{homework.dueDate.notNull}")
