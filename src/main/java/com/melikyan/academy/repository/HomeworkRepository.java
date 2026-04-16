@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Repository
 public interface HomeworkRepository extends JpaRepository<Homework, UUID> {
-    List<Homework> findByLessonIdOrderByOrderIndexDesc(UUID lessonId);
+    List<Homework> findByLessonIdOrderByOrderIndexAsc(UUID lessonId);
 
     boolean existsByLessonIdAndOrderIndex(UUID id, Integer orderIndex);
 

@@ -71,7 +71,7 @@ public class LessonService {
                 ));
     }
 
-    private Course getCourseEntityById(UUID id) {
+    private Course getCourseById(UUID id) {
         return courseRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
@@ -111,15 +111,36 @@ public class LessonService {
         }
     }
 
+    private void validateTitleUnique(UUID courseId, String title) {
+        if (lessonRepository.existsByCourseIdAndTitleIgnoreCase(courseId, title)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Lesson with title '" + title +
+                            "' already exists in course " + courseId
+            );
+        }
+    }
+
+    private void validateTitleUnique(UUID courseId, String title, UUID lessonId) {
+        if (lessonRepository.existsByCourseIdAndTitleIgnoreCaseAndIdNot(courseId, title, lessonId)) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Lesson with title '" + title +
+                            "' already exists in Course " + courseId
+            );
+        }
+    }
+
     public LessonResponse create(CreateLessonRequest request) {
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
         String normalizedValueUrl = normalizeValueUrl(request.valueUrl());
 
+        validateTitleUnique(request.courseId(), normalizedTitle);
         validateOrderIndexUnique(request.courseId(), request.orderIndex());
 
         User createdBy = getUserById(request.createdById());
-        Course course = getCourseEntityById(request.courseId());
+        Course course = getCourseById(request.courseId());
 
         Lesson lesson = new Lesson();
         lesson.setOrderIndex(request.orderIndex());
@@ -149,6 +170,14 @@ public class LessonService {
         return lessonMapper.toResponseList(lessons);
     }
 
+    @Transactional(readOnly = true)
+    public List<LessonResponse> getByCourseId(UUID courseId) {
+        getCourseById(courseId);
+        List<Lesson> lessons = lessonRepository
+                .findByCourseIdOrderByOrderIndexAsc(courseId);
+        return lessonMapper.toResponseList(lessons);
+    }
+
     public LessonResponse update(UUID id, UpdateLessonRequest request) {
         Lesson lesson = getLessonEntityById(id);
 
@@ -170,7 +199,9 @@ public class LessonService {
         }
 
         if (request.title() != null) {
-            lesson.setTitle(normalizeTitle(request.title()));
+            String normalizedTitle = normalizeTitle(request.title());
+            validateTitleUnique(targetCourseId, normalizedTitle, lesson.getId());
+            lesson.setTitle(normalizedTitle);
         }
 
         if (request.description() != null) {
@@ -198,7 +229,7 @@ public class LessonService {
         }
 
         if (request.courseId() != null) {
-            Course course = getCourseEntityById(request.courseId());
+            Course course = getCourseById(request.courseId());
             lesson.setCourse(course);
         }
 

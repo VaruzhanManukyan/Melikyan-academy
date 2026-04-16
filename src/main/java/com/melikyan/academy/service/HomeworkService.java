@@ -157,7 +157,7 @@ public class HomeworkService {
     public List<HomeworkResponse> getAllByLessonId(UUID lessonId) {
         getLessonById(lessonId);
         List<Homework> homeworks = homeworkRepository
-                .findByLessonIdOrderByOrderIndexDesc(lessonId);
+                .findByLessonIdOrderByOrderIndexAsc(lessonId);
         return homeworkMapper.toResponseList(homeworks);
     }
 

@@ -36,7 +36,13 @@ public class LessonController {
     }
 
     @GetMapping
-    public ResponseEntity<List<LessonResponse>> getAll() {
+    public ResponseEntity<List<LessonResponse>> getAll(
+            @RequestParam(required = false) UUID courseId
+    ) {
+        if (courseId != null) {
+            return ResponseEntity.ok(lessonService.getByCourseId(courseId));
+        }
+
         return ResponseEntity.ok(lessonService.getAll());
     }
 
