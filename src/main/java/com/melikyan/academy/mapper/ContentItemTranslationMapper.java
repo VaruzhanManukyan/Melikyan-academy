@@ -1,33 +1,33 @@
 package com.melikyan.academy.mapper;
 
 import org.mapstruct.*;
-import com.melikyan.academy.entity.PurchasableTranslation;
+import com.melikyan.academy.entity.ContentItemTranslation;
 import com.melikyan.academy.dto.response.purchasableTranslation.PurchasableTranslationResponse;
-import com.melikyan.academy.dto.request.purchasableTranslation.CreatePurchasableTranslationRequest;
+import com.melikyan.academy.dto.request.purchasableTranslation.CreateContentItemTranslationRequest;
 import com.melikyan.academy.dto.request.purchasableTranslation.UpdatePurchasableTranslationRequest;
 
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface PurchasableTranslationMapper {
+public interface ContentItemTranslationMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "createdItem", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    PurchasableTranslation toEntity(CreatePurchasableTranslationRequest request);
+    ContentItemTranslation toEntity(CreateContentItemTranslationRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "createdItem", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromRequest(UpdatePurchasableTranslationRequest request, @MappingTarget PurchasableTranslation translation);
+    void updateEntityFromRequest(UpdatePurchasableTranslationRequest request, @MappingTarget ContentItemTranslation translation);
 
-    @Mapping(target = "purchasableId", source = "purchasable.id")
+    @Mapping(target = "contentId", source = "purchasable.id")
     @Mapping(target = "createdById", source = "createdBy.id")
-    PurchasableTranslationResponse toResponse(PurchasableTranslation translation);
+    PurchasableTranslationResponse toResponse(ContentItemTranslation translation);
 
-    List<PurchasableTranslationResponse> toResponseList(List<PurchasableTranslation> translations);
+    List<PurchasableTranslationResponse> toResponseList(List<ContentItemTranslation> translations);
 }

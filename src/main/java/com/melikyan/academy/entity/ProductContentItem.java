@@ -33,7 +33,7 @@ public class ProductPurchasable {
 
     @ManyToOne
     @JoinColumn(name = "purchasable_id", nullable = false)
-    private Purchasable purchasable;
+    private ContentItem contentItem;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

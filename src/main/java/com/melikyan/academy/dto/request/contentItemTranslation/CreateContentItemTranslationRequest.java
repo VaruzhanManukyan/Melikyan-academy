@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
 
 import java.util.UUID;
 
-public record CreatePurchasableTranslationRequest(
+public record CreateContentItemTranslationRequest(
         @NotBlank(message = "{purchasableTranslation.title.notBlank}")
         @Size(max = 255, message = "{purchasableTranslation.title.size}")
         String title,
@@ -20,7 +20,7 @@ public record CreatePurchasableTranslationRequest(
         String code,
 
         @NotNull(message = "{purchasableTranslation.purchasableId.notNull}")
-        UUID purchasableId,
+        UUID contentItemId,
 
         @NotNull(message = "{purchasableTranslation.createdById.notNull}")
         UUID createdById

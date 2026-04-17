@@ -1,4 +1,4 @@
-package com.melikyan.academy.dto.response.purchasable;
+package com.melikyan.academy.dto.response.contentItem;
 
 import com.melikyan.academy.entity.enums.PurchasableType;
 

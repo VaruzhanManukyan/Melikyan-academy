@@ -31,7 +31,7 @@ public class PurchasableTranslation extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "purchasable_id", nullable = false)
-    private Purchasable purchasable;
+    private ContentItem contentItem;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
