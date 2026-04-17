@@ -15,7 +15,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface CourseMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "professors", ignore = true)
     @Mapping(target = "lessons", ignore = true)
@@ -23,22 +23,21 @@ public interface CourseMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "professors", ignore = true)
     @Mapping(target = "lessons", ignore = true)
     void updateEntityFromRequest(UpdateCourseRequest request, @MappingTarget Course course);
 
     @Mapping(target = "id", source = "id")
-    @Mapping(target = "purchasableId", source = "purchasable.id")
-    @Mapping(target = "title", source = "purchasable.title")
-    @Mapping(target = "description", source = "purchasable.description")
-    @Mapping(target = "type", source = "purchasable.type")
-    @Mapping(target = "categoryId", source = "purchasable.category.id")
-    @Mapping(target = "createdById", source = "purchasable.createdBy.id")
+    @Mapping(target = "contentItemId", source = "contentItem.id")
+    @Mapping(target = "title", source = "contentItem.title")
+    @Mapping(target = "description", source = "contentItem.description")
+    @Mapping(target = "type", source = "contentItem.type")
+    @Mapping(target = "createdById", source = "contentItem.createdBy.id")
     @Mapping(target = "startDate", source = "startDate")
     @Mapping(target = "durationWeeks", source = "durationWeeks")
-    @Mapping(target = "createdAt", source = "purchasable.createdAt")
+    @Mapping(target = "createdAt", source = "contentItem.createdAt")
     @Mapping(target = "updatedAt", source = "updatedAt")
     CourseResponse toResponse(Course course);
 

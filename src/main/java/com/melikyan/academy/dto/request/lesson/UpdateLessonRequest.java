@@ -1,7 +1,7 @@
 package com.melikyan.academy.dto.request.lesson;
 
-import com.melikyan.academy.entity.enums.SessionType;
-import com.melikyan.academy.entity.enums.SessionState;
+import com.melikyan.academy.entity.enums.LessonState;
+import com.melikyan.academy.entity.enums.LessonType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
@@ -19,11 +19,11 @@ public record UpdateLessonRequest(
         @Size(max = 500, message = "{lesson.description.size}")
         String description,
 
-        SessionType sessionType,
+        LessonType lessonType,
 
         String valueUrl,
 
-        SessionState state,
+        LessonState state,
 
         OffsetDateTime startsAt,
 

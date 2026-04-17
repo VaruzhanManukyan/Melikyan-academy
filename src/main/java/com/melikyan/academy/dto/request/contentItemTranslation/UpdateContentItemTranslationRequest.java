@@ -1,9 +1,9 @@
-package com.melikyan.academy.dto.request.purchasableTranslation;
+package com.melikyan.academy.dto.request.contentItemTranslation;
 
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Pattern;
 
-public record UpdatePurchasableTranslationRequest(
+public record UpdateContentItemTranslationRequest(
         @Size(max = 255, message = "{purchasableTranslation.title.size}")
         String title,
 

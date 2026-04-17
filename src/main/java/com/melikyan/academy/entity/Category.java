@@ -30,5 +30,5 @@ public class Category extends BaseEntity {
     private User createdBy;
 
     @OneToMany(mappedBy = "category")
-    private List<Purchasable> purchasables;
+    private List<Product> products;
 }

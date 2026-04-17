@@ -22,7 +22,7 @@ import java.time.OffsetDateTime;
         name = "certificates",
         indexes = {
                 @Index(name = "idx_certificate_user_id", columnList = "user_id"),
-                @Index(name = "idx_certificate_purchasable_id", columnList = "purchasable_id")
+                @Index(name = "idx_certificate_content_item_id", columnList = "content_item_id")
         }
 )
 public class Certificate extends BaseEntity {
@@ -47,6 +47,6 @@ public class Certificate extends BaseEntity {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "purchasable_id", nullable = false)
-    private Purchasable purchasable;
+    @JoinColumn(name = "content_item_id", nullable = false)
+    private ContentItem contentItem;
 }

@@ -1,7 +1,7 @@
 package com.melikyan.academy.dto.request.lesson;
 
-import com.melikyan.academy.entity.enums.SessionType;
-import com.melikyan.academy.entity.enums.SessionState;
+import com.melikyan.academy.entity.enums.LessonType;
+import com.melikyan.academy.entity.enums.LessonState;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
@@ -24,13 +24,13 @@ public record CreateLessonRequest(
         String description,
 
         @NotNull(message = "{lesson.sessionType.notNull}")
-        SessionType sessionType,
+        LessonType lessonType,
 
         @NotBlank(message = "{lesson.valueUrl.notBlank}")
         String valueUrl,
 
         @NotNull(message = "{lesson.state.notNull}")
-        SessionState state,
+        LessonState state,
 
         @NotNull(message = "{lesson.startsAt.notNull}")
         OffsetDateTime startsAt,

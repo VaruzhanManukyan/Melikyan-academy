@@ -5,7 +5,7 @@ import java.util.UUID;
 
 public record ExamResponse(
         UUID id,
-        UUID purchasableId,
+        UUID contentItemId,
         OffsetDateTime updatedAt
 ) {
 }

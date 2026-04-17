@@ -1,10 +1,10 @@
 package com.melikyan.academy.controller;
 
+import com.melikyan.academy.entity.enums.ContentItemType;
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import com.melikyan.academy.service.CourseService;
 import org.springframework.test.web.servlet.MockMvc;
-import com.melikyan.academy.entity.enums.PurchasableType;
 import org.springframework.context.annotation.FilterType;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.dto.response.course.CourseResponse;
@@ -83,7 +83,7 @@ class CourseControllerTest {
         CreateCourseRequest request = new CreateCourseRequest(
                 "Java Backend Fundamentals",
                 "Spring Boot, JPA, Security",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 startDate,
                 12,
                 categoryId,
@@ -94,7 +94,7 @@ class CourseControllerTest {
                 courseId,
                 "Java Backend Fundamentals",
                 "Spring Boot, JPA, Security",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 12,
                 startDate,
                 categoryId,
@@ -139,7 +139,7 @@ class CourseControllerTest {
                 courseId,
                 "Java Backend Fundamentals",
                 "Spring Boot, JPA, Security",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 12,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 categoryId,
@@ -177,7 +177,7 @@ class CourseControllerTest {
                 firstId,
                 "Java Backend Fundamentals",
                 "Spring Boot course",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 12,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 categoryId,
@@ -191,7 +191,7 @@ class CourseControllerTest {
                 secondId,
                 "Algorithms",
                 "Data structures and algorithms",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 10,
                 OffsetDateTime.parse("2026-06-01T10:00:00+04:00"),
                 categoryId,
@@ -229,7 +229,7 @@ class CourseControllerTest {
         UpdateCourseRequest request = new UpdateCourseRequest(
                 "Advanced Java",
                 "Updated description",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
                 16,
                 categoryId
@@ -239,7 +239,7 @@ class CourseControllerTest {
                 courseId,
                 "Advanced Java",
                 "Updated description",
-                PurchasableType.COURSE,
+                ContentItemType.COURSE,
                 16,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
                 categoryId,

@@ -1,6 +1,7 @@
 package com.melikyan.academy.dto.response.product;
 
-import com.melikyan.academy.dto.response.purchasable.PurchasableShortResponse;
+import com.melikyan.academy.dto.response.category.CategoryShortResponse;
+import com.melikyan.academy.dto.response.contentItem.ContentItemShortResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,7 +14,8 @@ public record ProductResponse(
         String description,
         BigDecimal price,
         boolean isPrivate,
-        List<PurchasableShortResponse> purchasables,
+        List<ContentItemShortResponse> contetItems,
+        CategoryShortResponse category,
         UUID createdById,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt

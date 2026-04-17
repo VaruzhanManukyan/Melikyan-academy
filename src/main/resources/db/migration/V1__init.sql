@@ -4,12 +4,12 @@ CREATE TYPE ROLE AS ENUM (
     'STUDENT'
     );
 
-CREATE TYPE TRANSACTIONTYPE AS ENUM (
+CREATE TYPE TRANSACTION_TYPE AS ENUM (
     'PAYMENT',
     'REFUND'
     );
 
-CREATE TYPE TRANSACTIONSTATUS AS ENUM (
+CREATE TYPE TRANSACTION_STATUS AS ENUM (
     'CANCELLED',
     'FAILED',
     'PENDING',
@@ -17,670 +17,769 @@ CREATE TYPE TRANSACTIONSTATUS AS ENUM (
     'SUCCESS'
     );
 
-CREATE TYPE PAYMENTMETHOD AS ENUM (
+CREATE TYPE PAYMENT_METHOD AS ENUM (
     'CARD',
     'CASH',
     'PAYPAL',
     'STRIPE'
     );
 
-CREATE TYPE REGISTRATIONSTATUS AS ENUM (
+CREATE TYPE REGISTRATION_STATUS AS ENUM (
     'ACTIVE',
     'EXPIRED',
     'SUSPENDED'
     );
 
-CREATE TYPE PURCHASABLETYPE AS ENUM (
+CREATE TYPE CONTENT_ITEM_TYPE AS ENUM (
     'COURSE',
     'EXAM'
     );
 
-CREATE TYPE ATTENDANCESTATUS AS ENUM (
+CREATE TYPE ATTENDANCE_STATUS AS ENUM (
     'ATTENDED',
     'ENROLLED',
     'MISSED'
     );
 
-CREATE TYPE SESSIONSTATE AS ENUM (
+CREATE TYPE LESSON_STATE AS ENUM (
     'CANCELED',
     'COMPLETED',
     'ONGOING',
     'SCHEDULED'
     );
 
-CREATE TYPE SESSIONTYPE AS ENUM (
+CREATE TYPE LESSON_TYPE AS ENUM (
     'MEET_LINK',
     'VIDEO_LINK'
     );
 
-CREATE TYPE TASKTYPE AS ENUM (
+CREATE TYPE TASK_TYPE AS ENUM (
     'CODE',
     'ESSAY',
     'FILE_UPLOAD',
     'QUIZ'
     );
 
-CREATE TYPE HOMEWORKSTATUS AS ENUM (
+CREATE TYPE HOMEWORK_STATUS AS ENUM (
     'FAILED',
     'PASSED',
     'PENDING_REVIEW'
     );
 
-CREATE TYPE EXAMSTATUS AS ENUM (
+CREATE TYPE EXAM_STATUS AS ENUM (
     'FAILED',
     'PASSED',
     'PENDING_REVIEW'
     );
+
+CREATE TYPE PRODUCT_TYPE AS ENUM (
+    'SINGLE',
+    'PACKAGE'
+    );
+
+CREATE TABLE users
+(
+    id         UUID         NOT NULL,
+    email      VARCHAR(255) NOT NULL,
+    password   VARCHAR(255) NOT NULL,
+    first_name VARCHAR(50)  NOT NULL,
+    last_name  VARCHAR(50)  NOT NULL,
+    role       ROLE         NOT NULL,
+    bio        VARCHAR(255),
+    avatar_url VARCHAR(255),
+    created_at TIMESTAMPTZ  NOT NULL,
+    updated_at TIMESTAMPTZ  NOT NULL,
+    deleted_at TIMESTAMPTZ,
+
+    CONSTRAINT pk_users PRIMARY KEY (id),
+    CONSTRAINT chk_users_email_not_blank
+        CHECK (btrim(email) <> ''),
+    CONSTRAINT chk_users_password_not_blank
+        CHECK (btrim(password) <> ''),
+    CONSTRAINT chk_users_first_name_not_blank
+        CHECK (btrim(first_name) <> ''),
+    CONSTRAINT chk_users_last_name_not_blank
+        CHECK (btrim(last_name) <> '')
+);
 
 CREATE TABLE categories
 (
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    title       VARCHAR(50)                 NOT NULL,
+    id          UUID        NOT NULL,
+    title       VARCHAR(50) NOT NULL,
     description VARCHAR(255),
-    CONSTRAINT categories_pkey PRIMARY KEY (id)
-);
+    created_by  UUID        NOT NULL,
+    created_at  TIMESTAMPTZ NOT NULL,
+    updated_at  TIMESTAMPTZ NOT NULL,
+    deleted_at  TIMESTAMPTZ,
 
-CREATE TABLE certificates
-(
-    created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at       TIMESTAMP WITHOUT TIME ZONE,
-    expiry_date      TIMESTAMP WITHOUT TIME ZONE,
-    issue_date       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id               UUID                        NOT NULL,
-    purchasable_id   UUID                        NOT NULL,
-    user_id          UUID                        NOT NULL,
-    certificate_code VARCHAR(255)                NOT NULL,
-    pdf_url          VARCHAR(255),
-    metadata         JSONB                       NOT NULL,
-    CONSTRAINT certificates_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE courses
-(
-    duration_weeks INTEGER                     NOT NULL,
-    start_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE,
-    id             UUID                        NOT NULL,
-    purchasable_id UUID                        NOT NULL,
-    CONSTRAINT courses_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE exam_sections
-(
-    duration    INTERVAL,
-    order_index INTEGER                     NOT NULL,
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    exam_id     UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    description VARCHAR(255),
-    title       VARCHAR(255)                NOT NULL,
-    CONSTRAINT exam_sections_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE exam_submissions
-(
-    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID                        NOT NULL,
-    task_id        UUID                        NOT NULL,
-    user_id        UUID                        NOT NULL,
-    note           VARCHAR(255),
-    answer_payload JSONB                       NOT NULL,
-    status         EXAMSTATUS                  NOT NULL,
-    CONSTRAINT exam_submissions_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE exam_tasks
-(
-    duration        INTERVAL,
-    order_index     INTEGER                     NOT NULL,
-    point           INTEGER                     NOT NULL,
-    created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at      TIMESTAMP WITHOUT TIME ZONE,
-    updated_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by      UUID                        NOT NULL,
-    id              UUID                        NOT NULL,
-    section_id      UUID                        NOT NULL,
-    type            TASKTYPE                    NOT NULL,
-    content_payload JSONB                       NOT NULL,
-    CONSTRAINT exam_tasks_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE exams
-(
-    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID                        NOT NULL,
-    purchasable_id UUID                        NOT NULL,
-    CONSTRAINT exams_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE homework_submissions
-(
-    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID                        NOT NULL,
-    task_id        UUID                        NOT NULL,
-    user_id        UUID                        NOT NULL,
-    note           VARCHAR(255),
-    answer_payload JSONB                       NOT NULL,
-    status         HOMEWORKSTATUS              NOT NULL,
-    CONSTRAINT homework_submissions_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE homework_tasks
-(
-    order_index     INTEGER                     NOT NULL,
-    point           INTEGER                     NOT NULL,
-    created_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at      TIMESTAMP WITHOUT TIME ZONE,
-    updated_at      TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by      UUID                        NOT NULL,
-    homework_id     UUID                        NOT NULL,
-    id              UUID                        NOT NULL,
-    payload_content JSONB                       NOT NULL,
-    type            TASKTYPE                    NOT NULL,
-    CONSTRAINT homework_tasks_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE homework_translations
-(
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    homework_id UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    code        VARCHAR(2)                  NOT NULL,
-    description VARCHAR(255),
-    title       VARCHAR(255)                NOT NULL,
-    CONSTRAINT homework_translations_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE homeworks
-(
-    is_published BOOLEAN                     NOT NULL,
-    order_index  INTEGER                     NOT NULL,
-    created_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at   TIMESTAMP WITHOUT TIME ZONE,
-    due_date     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by   UUID                        NOT NULL,
-    id           UUID                        NOT NULL,
-    lesson_id    UUID                        NOT NULL,
-    title        VARCHAR(50)                 NOT NULL,
-    description  VARCHAR(255),
-    CONSTRAINT homeworks_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE languages
-(
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by UUID                        NOT NULL,
-    name       VARCHAR(50)                 NOT NULL,
-    code       VARCHAR(2)                  NOT NULL,
-    CONSTRAINT languages_pkey PRIMARY KEY (code)
-);
-
-CREATE TABLE lesson_attendances
-(
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id         UUID                        NOT NULL,
-    lesson_id  UUID                        NOT NULL,
-    user_id    UUID                        NOT NULL,
-    note       VARCHAR(255),
-    status     ATTENDANCESTATUS            NOT NULL,
-    CONSTRAINT lesson_attendances_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE lesson_translations
-(
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    lesson_id   UUID                        NOT NULL,
-    code        VARCHAR(2)                  NOT NULL,
-    description VARCHAR(255),
-    title       VARCHAR(255)                NOT NULL,
-    CONSTRAINT lesson_translations_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE lessons
-(
-    duration    INTERVAL                    NOT NULL,
-    order_index INTEGER                     NOT NULL,
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at  TIMESTAMP WITHOUT TIME ZONE,
-    starts_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    course_id   UUID                        NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    title       VARCHAR(50)                 NOT NULL,
-    description VARCHAR(255),
-    value_url   VARCHAR(255)                NOT NULL,
-    type        SESSIONTYPE                 NOT NULL,
-    state       SESSIONSTATE                NOT NULL,
-    CONSTRAINT lessons_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE product_purchasables
-(
-    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID                        NOT NULL,
-    product_id     UUID                        NOT NULL,
-    purchasable_id UUID                        NOT NULL,
-    CONSTRAINT product_purchasables_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE product_registrations
-(
-    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at     TIMESTAMP WITHOUT TIME ZONE,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id             UUID                        NOT NULL,
-    product_id     UUID                        NOT NULL,
-    transaction_id UUID,
-    user_id        UUID                        NOT NULL,
-    status         REGISTRATIONSTATUS          NOT NULL,
-    CONSTRAINT product_registrations_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE product_translations
-(
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    product_id  UUID                        NOT NULL,
-    code        VARCHAR(2)                  NOT NULL,
-    description VARCHAR(255),
-    title       VARCHAR(255)                NOT NULL,
-    CONSTRAINT product_translations_pkey PRIMARY KEY (id)
+    CONSTRAINT pk_categories PRIMARY KEY (id),
+    CONSTRAINT chk_categories_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_categories_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
 CREATE TABLE products
 (
-    is_private  BOOLEAN,
-    price       numeric(10, 2)              NOT NULL,
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    title       VARCHAR(50)                 NOT NULL,
+    id          UUID           NOT NULL,
+    title       VARCHAR(50),
     description VARCHAR(255),
-    type        PURCHASABLETYPE             NOT NULL,
-    CONSTRAINT products_pkey PRIMARY KEY (id)
+    type        PRODUCT_TYPE   NOT NULL DEFAULT 'SINGLE',
+    price       NUMERIC(10, 2) NOT NULL,
+    is_private  BOOLEAN        NOT NULL DEFAULT FALSE,
+    category_id UUID           NOT NULL,
+    created_by  UUID           NOT NULL,
+    created_at  TIMESTAMPTZ    NOT NULL,
+    updated_at  TIMESTAMPTZ    NOT NULL,
+    deleted_at  TIMESTAMPTZ,
+
+    CONSTRAINT pk_products PRIMARY KEY (id),
+    CONSTRAINT chk_products_title_valid
+        CHECK (
+            (type = 'PACKAGE' AND title IS NOT NULL AND btrim(title) <> '')
+                OR
+            (type = 'SINGLE' AND (title IS NULL OR btrim(title) <> ''))
+            ),
+    CONSTRAINT chk_products_price_positive
+        CHECK (price > 0),
+    CONSTRAINT fk_products_category_id__categories
+        FOREIGN KEY (category_id) REFERENCES categories (id),
+    CONSTRAINT fk_products_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
-CREATE TABLE professors
+CREATE TABLE languages
 (
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    course_id  UUID                        NOT NULL,
-    id         UUID                        NOT NULL,
-    user_id    UUID                        NOT NULL,
-    CONSTRAINT professors_pkey PRIMARY KEY (id)
-);
+    code       VARCHAR(2)  NOT NULL,
+    name       VARCHAR(50) NOT NULL,
+    created_by UUID        NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
+    deleted_at TIMESTAMPTZ,
 
-CREATE TABLE purchasable_translations
-(
-    created_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at     TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by     UUID                        NOT NULL,
-    id             UUID                        NOT NULL,
-    purchasable_id UUID                        NOT NULL,
-    code           VARCHAR(2)                  NOT NULL,
-    description    VARCHAR(255),
-    title          VARCHAR(255)                NOT NULL,
-    CONSTRAINT purchasable_translations_pkey PRIMARY KEY (id)
-);
-
-CREATE TABLE purchasables
-(
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    category_id UUID                        NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    title       VARCHAR(50)                 NOT NULL,
-    description VARCHAR(255),
-    type        PURCHASABLETYPE             NOT NULL,
-    CONSTRAINT purchasables_pkey PRIMARY KEY (id)
+    CONSTRAINT pk_languages PRIMARY KEY (code),
+    CONSTRAINT chk_languages_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_languages_name_not_blank
+        CHECK (btrim(name) <> ''),
+    CONSTRAINT fk_languages_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
 CREATE TABLE remember_me_tokens
 (
-    created_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    expires_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    last_used_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at   TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id           UUID                        NOT NULL,
-    user_id      UUID                        NOT NULL,
-    selector     VARCHAR(64)                 NOT NULL,
-    token_hash   VARCHAR(64)                 NOT NULL,
-    CONSTRAINT remember_me_tokens_pkey PRIMARY KEY (id)
+    id           UUID        NOT NULL,
+    selector     VARCHAR(64) NOT NULL,
+    token_hash   VARCHAR(255) NOT NULL,
+    expires_at   TIMESTAMPTZ NOT NULL,
+    last_used_at TIMESTAMPTZ NOT NULL,
+    user_id      UUID        NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL,
+    updated_at   TIMESTAMPTZ NOT NULL,
+
+    CONSTRAINT pk_remember_me_tokens PRIMARY KEY (id),
+    CONSTRAINT uq_remember_me_tokens_selector UNIQUE (selector),
+    CONSTRAINT chk_remember_me_tokens_selector_not_blank
+        CHECK (btrim(selector) <> ''),
+    CONSTRAINT chk_remember_me_tokens_token_hash_not_blank
+        CHECK (btrim(token_hash) <> ''),
+    CONSTRAINT fk_remember_me_tokens_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
+);
+
+CREATE TABLE content_items
+(
+    id          UUID              NOT NULL,
+    type        CONTENT_ITEM_TYPE NOT NULL,
+    title       VARCHAR(50)       NOT NULL,
+    description VARCHAR(255),
+    created_by  UUID              NOT NULL,
+    created_at  TIMESTAMPTZ       NOT NULL,
+    updated_at  TIMESTAMPTZ       NOT NULL,
+    deleted_at  TIMESTAMPTZ,
+
+    CONSTRAINT pk_content_items PRIMARY KEY (id),
+    CONSTRAINT chk_content_items_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_content_items_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE courses
+(
+    id              UUID        NOT NULL,
+    duration_weeks  INTEGER     NOT NULL,
+    start_date      TIMESTAMPTZ NOT NULL,
+    content_item_id UUID        NOT NULL,
+    updated_at      TIMESTAMPTZ,
+    deleted_at      TIMESTAMPTZ,
+
+    CONSTRAINT pk_courses PRIMARY KEY (id),
+    CONSTRAINT uq_courses_content_item_id UNIQUE (content_item_id),
+    CONSTRAINT chk_courses_duration_weeks_positive
+        CHECK (duration_weeks > 0),
+    CONSTRAINT fk_courses_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id) ON DELETE CASCADE
+);
+
+CREATE TABLE exams
+(
+    id              UUID        NOT NULL,
+    content_item_id UUID        NOT NULL,
+    updated_at      TIMESTAMPTZ NOT NULL,
+    deleted_at      TIMESTAMPTZ,
+
+    CONSTRAINT pk_exams PRIMARY KEY (id),
+    CONSTRAINT uq_exams_content_item_id UNIQUE (content_item_id),
+    CONSTRAINT fk_exams_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id) ON DELETE CASCADE
+);
+
+CREATE TABLE professors
+(
+    id         UUID        NOT NULL,
+    user_id    UUID        NOT NULL,
+    course_id  UUID        NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL,
+    deleted_at TIMESTAMPTZ,
+
+    CONSTRAINT pk_professors PRIMARY KEY (id),
+    CONSTRAINT fk_professors_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    CONSTRAINT fk_professors_course_id__courses
+        FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE CASCADE
+);
+
+CREATE TABLE lessons
+(
+    id          UUID         NOT NULL,
+    order_index INTEGER      NOT NULL,
+    type        LESSON_TYPE  NOT NULL,
+    state       LESSON_STATE NOT NULL DEFAULT 'SCHEDULED',
+    title       VARCHAR(50)  NOT NULL,
+    description VARCHAR(255),
+    value_url   VARCHAR(255) NOT NULL,
+    duration    INTERVAL     NOT NULL,
+    starts_at   TIMESTAMPTZ  NOT NULL,
+    course_id   UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+    deleted_at  TIMESTAMPTZ,
+
+    CONSTRAINT pk_lessons PRIMARY KEY (id),
+    CONSTRAINT chk_lessons_order_index_positive
+        CHECK (order_index > 0),
+    CONSTRAINT chk_lessons_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT chk_lessons_value_url_not_blank
+        CHECK (btrim(value_url) <> ''),
+    CONSTRAINT chk_lessons_duration_positive
+        CHECK (duration > INTERVAL '0'),
+    CONSTRAINT fk_lessons_course_id__courses
+        FOREIGN KEY (course_id) REFERENCES courses (id),
+    CONSTRAINT fk_lessons_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE lesson_attendances
+(
+    id         UUID              NOT NULL,
+    status     ATTENDANCE_STATUS NOT NULL,
+    note       VARCHAR(255),
+    user_id    UUID              NOT NULL,
+    lesson_id  UUID              NOT NULL,
+    created_at TIMESTAMPTZ       NOT NULL,
+    updated_at TIMESTAMPTZ       NOT NULL,
+    deleted_at TIMESTAMPTZ,
+
+    CONSTRAINT pk_lesson_attendances PRIMARY KEY (id),
+    CONSTRAINT fk_lesson_attendances_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_lesson_attendances_lesson_id__lessons
+        FOREIGN KEY (lesson_id) REFERENCES lessons (id)
+);
+
+CREATE TABLE lesson_translations
+(
+    id          UUID         NOT NULL,
+    code        VARCHAR(2)   NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    lesson_id   UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+
+    CONSTRAINT pk_lesson_translations PRIMARY KEY (id),
+    CONSTRAINT uq_lesson_translations_lesson_id_code
+        UNIQUE (lesson_id, code),
+    CONSTRAINT chk_lesson_translations_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_lesson_translations_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_lesson_translations_lesson_id__lessons
+        FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE CASCADE,
+    CONSTRAINT fk_lesson_translations_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE homeworks
+(
+    id           UUID        NOT NULL,
+    order_index  INTEGER     NOT NULL,
+    title        VARCHAR(50) NOT NULL,
+    description  VARCHAR(255),
+    is_published BOOLEAN     NOT NULL DEFAULT FALSE,
+    due_date     TIMESTAMPTZ NOT NULL,
+    lesson_id    UUID        NOT NULL,
+    created_by   UUID        NOT NULL,
+    created_at   TIMESTAMPTZ NOT NULL,
+    updated_at   TIMESTAMPTZ NOT NULL,
+    deleted_at   TIMESTAMPTZ,
+
+    CONSTRAINT pk_homeworks PRIMARY KEY (id),
+    CONSTRAINT chk_homeworks_order_index_positive
+        CHECK (order_index > 0),
+    CONSTRAINT chk_homeworks_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_homeworks_lesson_id__lessons
+        FOREIGN KEY (lesson_id) REFERENCES lessons (id),
+    CONSTRAINT fk_homeworks_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE homework_tasks
+(
+    id              UUID        NOT NULL,
+    order_index     INTEGER     NOT NULL,
+    type            TASK_TYPE   NOT NULL,
+    point           INTEGER     NOT NULL,
+    payload_content JSONB       NOT NULL,
+    homework_id     UUID        NOT NULL,
+    created_by      UUID        NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL,
+    updated_at      TIMESTAMPTZ NOT NULL,
+    deleted_at      TIMESTAMPTZ,
+
+    CONSTRAINT pk_homework_tasks PRIMARY KEY (id),
+    CONSTRAINT chk_homework_tasks_order_index_positive
+        CHECK (order_index > 0),
+    CONSTRAINT chk_homework_tasks_point_positive
+        CHECK (point > 0),
+    CONSTRAINT fk_homework_tasks_homework_id__homeworks
+        FOREIGN KEY (homework_id) REFERENCES homeworks (id),
+    CONSTRAINT fk_homework_tasks_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE homework_submissions
+(
+    id             UUID            NOT NULL,
+    status         HOMEWORK_STATUS NOT NULL DEFAULT 'PENDING_REVIEW',
+    note           VARCHAR(255),
+    answer_payload JSONB           NOT NULL,
+    task_id        UUID            NOT NULL,
+    user_id        UUID            NOT NULL,
+    created_at     TIMESTAMPTZ     NOT NULL,
+    updated_at     TIMESTAMPTZ     NOT NULL,
+    deleted_at     TIMESTAMPTZ,
+
+    CONSTRAINT pk_homework_submissions PRIMARY KEY (id),
+    CONSTRAINT fk_homework_submissions_task_id__homework_tasks
+        FOREIGN KEY (task_id) REFERENCES homework_tasks (id),
+    CONSTRAINT fk_homework_submissions_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id)
+);
+
+CREATE TABLE homework_translations
+(
+    id          UUID         NOT NULL,
+    code        VARCHAR(2)   NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    homework_id UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+
+    CONSTRAINT pk_homework_translations PRIMARY KEY (id),
+    CONSTRAINT uq_homework_translations_homework_id_code
+        UNIQUE (homework_id, code),
+    CONSTRAINT chk_homework_translations_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_homework_translations_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_homework_translations_homework_id__homeworks
+        FOREIGN KEY (homework_id) REFERENCES homeworks (id) ON DELETE CASCADE,
+    CONSTRAINT fk_homework_translations_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE exam_sections
+(
+    id          UUID         NOT NULL,
+    order_index INTEGER      NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    duration    INTERVAL,
+    exam_id     UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+    deleted_at  TIMESTAMPTZ,
+
+    CONSTRAINT pk_exam_sections PRIMARY KEY (id),
+    CONSTRAINT chk_exam_sections_order_index_positive
+        CHECK (order_index > 0),
+    CONSTRAINT chk_exam_sections_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT chk_exam_sections_duration_positive
+        CHECK (duration IS NULL OR duration > INTERVAL '0'),
+    CONSTRAINT fk_exam_sections_exam_id__exams
+        FOREIGN KEY (exam_id) REFERENCES exams (id),
+    CONSTRAINT fk_exam_sections_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE exam_tasks
+(
+    id              UUID        NOT NULL,
+    order_index     INTEGER     NOT NULL,
+    type            TASK_TYPE   NOT NULL,
+    duration        INTERVAL,
+    point           INTEGER     NOT NULL,
+    content_payload JSONB       NOT NULL,
+    section_id      UUID        NOT NULL,
+    created_by      UUID        NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL,
+    updated_at      TIMESTAMPTZ NOT NULL,
+    deleted_at      TIMESTAMPTZ,
+
+    CONSTRAINT pk_exam_tasks PRIMARY KEY (id),
+    CONSTRAINT chk_exam_tasks_order_index_positive
+        CHECK (order_index > 0),
+    CONSTRAINT chk_exam_tasks_point_positive
+        CHECK (point > 0),
+    CONSTRAINT chk_exam_tasks_duration_positive
+        CHECK (duration IS NULL OR duration > INTERVAL '0'),
+    CONSTRAINT fk_exam_tasks_section_id__exam_sections
+        FOREIGN KEY (section_id) REFERENCES exam_sections (id),
+    CONSTRAINT fk_exam_tasks_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE exam_submissions
+(
+    id             UUID        NOT NULL,
+    status         EXAM_STATUS NOT NULL,
+    note           VARCHAR(255),
+    answer_payload JSONB       NOT NULL,
+    task_id        UUID        NOT NULL,
+    user_id        UUID        NOT NULL,
+    created_at     TIMESTAMPTZ NOT NULL,
+    updated_at     TIMESTAMPTZ NOT NULL,
+    deleted_at     TIMESTAMPTZ,
+
+    CONSTRAINT pk_exam_submissions PRIMARY KEY (id),
+    CONSTRAINT fk_exam_submissions_task_id__exam_tasks
+        FOREIGN KEY (task_id) REFERENCES exam_tasks (id),
+    CONSTRAINT fk_exam_submissions_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id)
 );
 
 CREATE TABLE section_translations
 (
-    created_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    updated_at  TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    created_by  UUID                        NOT NULL,
-    id          UUID                        NOT NULL,
-    section_id  UUID                        NOT NULL,
-    code        VARCHAR(2)                  NOT NULL,
+    id          UUID         NOT NULL,
+    code        VARCHAR(2)   NOT NULL,
+    title       VARCHAR(255) NOT NULL,
     description VARCHAR(255),
-    title       VARCHAR(255)                NOT NULL,
-    CONSTRAINT section_translations_pkey PRIMARY KEY (id)
+    section_id  UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+
+    CONSTRAINT pk_section_translations PRIMARY KEY (id),
+    CONSTRAINT uq_section_translations_section_id_code
+        UNIQUE (section_id, code),
+    CONSTRAINT chk_section_translations_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_section_translations_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_section_translations_section_id__exam_sections
+        FOREIGN KEY (section_id) REFERENCES exam_sections (id) ON DELETE CASCADE,
+    CONSTRAINT fk_section_translations_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE product_content_items
+(
+    id              UUID        NOT NULL,
+    product_id      UUID        NOT NULL,
+    content_item_id UUID        NOT NULL,
+    created_at      TIMESTAMPTZ NOT NULL,
+
+    CONSTRAINT pk_product_content_items PRIMARY KEY (id),
+    CONSTRAINT uq_product_content_items_product_id_content_item_id
+        UNIQUE (product_id, content_item_id),
+    CONSTRAINT fk_product_content_items_product_id__products
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    CONSTRAINT fk_product_content_items_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id) ON DELETE CASCADE
 );
 
 CREATE TABLE transactions
 (
-    amount           numeric(10, 2)              NOT NULL,
-    created_at       TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id               UUID                        NOT NULL,
-    product_id       UUID                        NOT NULL,
-    user_id          UUID                        NOT NULL,
-    currency         VARCHAR(3) DEFAULT 'USD'    NOT NULL,
-    payment_method   PAYMENTMETHOD               NOT NULL,
-    status           TRANSACTIONSTATUS           NOT NULL,
-    transaction_type TRANSACTIONTYPE             NOT NULL,
-    CONSTRAINT transactions_pkey PRIMARY KEY (id)
+    id               UUID               NOT NULL,
+    status           TRANSACTION_STATUS NOT NULL,
+    payment_method   PAYMENT_METHOD     NOT NULL,
+    transaction_type TRANSACTION_TYPE   NOT NULL,
+    amount           NUMERIC(10, 2)     NOT NULL,
+    currency         VARCHAR(3)         NOT NULL DEFAULT 'USD',
+    user_id          UUID               NOT NULL,
+    product_id       UUID               NOT NULL,
+    created_at       TIMESTAMPTZ        NOT NULL,
+
+    CONSTRAINT pk_transactions PRIMARY KEY (id),
+    CONSTRAINT chk_transactions_amount_positive
+        CHECK (amount > 0),
+    CONSTRAINT chk_transactions_currency_not_blank
+        CHECK (btrim(currency) <> ''),
+    CONSTRAINT fk_transactions_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_transactions_product_id__products
+        FOREIGN KEY (product_id) REFERENCES products (id)
+);
+
+CREATE TABLE product_registrations
+(
+    id             UUID                NOT NULL,
+    status         REGISTRATION_STATUS NOT NULL DEFAULT 'ACTIVE',
+    user_id        UUID                NOT NULL,
+    product_id     UUID                NOT NULL,
+    transaction_id UUID,
+    created_at     TIMESTAMPTZ         NOT NULL,
+    updated_at     TIMESTAMPTZ         NOT NULL,
+    deleted_at     TIMESTAMPTZ,
+
+    CONSTRAINT pk_product_registrations PRIMARY KEY (id),
+    CONSTRAINT fk_product_registrations_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_product_registrations_product_id__products
+        FOREIGN KEY (product_id) REFERENCES products (id),
+    CONSTRAINT fk_product_registrations_transaction_id__transactions
+        FOREIGN KEY (transaction_id) REFERENCES transactions (id)
+);
+
+CREATE TABLE product_translations
+(
+    id          UUID         NOT NULL,
+    code        VARCHAR(2)   NOT NULL,
+    title       VARCHAR(255) NOT NULL,
+    description VARCHAR(255),
+    product_id  UUID         NOT NULL,
+    created_by  UUID         NOT NULL,
+    created_at  TIMESTAMPTZ  NOT NULL,
+    updated_at  TIMESTAMPTZ  NOT NULL,
+
+    CONSTRAINT pk_product_translations PRIMARY KEY (id),
+    CONSTRAINT uq_product_translations_product_id_code
+        UNIQUE (product_id, code),
+    CONSTRAINT chk_product_translations_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_product_translations_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_product_translations_product_id__products
+        FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE CASCADE,
+    CONSTRAINT fk_product_translations_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE content_item_translations
+(
+    id              UUID         NOT NULL,
+    code            VARCHAR(2)   NOT NULL,
+    title           VARCHAR(255) NOT NULL,
+    description     VARCHAR(255),
+    content_item_id UUID         NOT NULL,
+    created_by      UUID         NOT NULL,
+    created_at      TIMESTAMPTZ  NOT NULL,
+    updated_at      TIMESTAMPTZ  NOT NULL,
+
+    CONSTRAINT pk_content_item_translations PRIMARY KEY (id),
+    CONSTRAINT uq_content_item_translations_content_item_id_code
+        UNIQUE (content_item_id, code),
+    CONSTRAINT chk_content_item_translations_code_not_blank
+        CHECK (btrim(code) <> ''),
+    CONSTRAINT chk_content_item_translations_title_not_blank
+        CHECK (btrim(title) <> ''),
+    CONSTRAINT fk_content_item_translations_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id) ON DELETE CASCADE,
+    CONSTRAINT fk_content_item_translations_created_by__users
+        FOREIGN KEY (created_by) REFERENCES users (id)
+);
+
+CREATE TABLE certificates
+(
+    id               UUID         NOT NULL,
+    issue_date       TIMESTAMPTZ  NOT NULL,
+    expiry_date      TIMESTAMPTZ,
+    pdf_url          VARCHAR(255),
+    metadata         JSONB        NOT NULL,
+    certificate_code VARCHAR(255) NOT NULL,
+    user_id          UUID         NOT NULL,
+    content_item_id  UUID         NOT NULL,
+    issued_by        UUID         NOT NULL,
+    created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ  NOT NULL,
+    deleted_at       TIMESTAMPTZ,
+
+    CONSTRAINT pk_certificates PRIMARY KEY (id),
+    CONSTRAINT chk_certificates_certificate_code_not_blank
+        CHECK (btrim(certificate_code) <> ''),
+    CONSTRAINT chk_certificates_expiry_after_issue
+        CHECK (expiry_date IS NULL OR expiry_date > issue_date),
+    CONSTRAINT fk_certificates_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_certificates_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id),
+    CONSTRAINT fk_certificates_issued_by__users
+        FOREIGN KEY (issued_by) REFERENCES users (id)
 );
 
 CREATE TABLE user_processes
 (
-    current_step      INTEGER                     NOT NULL,
-    score_accumulated numeric(10, 2),
-    total_steps       INTEGER                     NOT NULL,
-    created_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    last_accessed_at  TIMESTAMP WITHOUT TIME ZONE,
-    updated_at        TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id                UUID                        NOT NULL,
-    purchasable_id    UUID                        NOT NULL,
-    user_id           UUID                        NOT NULL,
-    CONSTRAINT user_processes_pkey PRIMARY KEY (id)
+    id                UUID        NOT NULL,
+    total_steps       INTEGER     NOT NULL,
+    current_step      INTEGER     NOT NULL,
+    last_accessed_at  TIMESTAMPTZ,
+    score_accumulated NUMERIC(10, 2),
+    user_id           UUID        NOT NULL,
+    content_item_id   UUID        NOT NULL,
+    created_at        TIMESTAMPTZ NOT NULL,
+    updated_at        TIMESTAMPTZ NOT NULL,
+
+    CONSTRAINT pk_user_processes PRIMARY KEY (id),
+    CONSTRAINT uq_user_processes_user_id_content_item_id
+        UNIQUE (user_id, content_item_id),
+    CONSTRAINT chk_user_processes_total_steps_positive
+        CHECK (total_steps > 0),
+    CONSTRAINT chk_user_processes_current_step_non_negative
+        CHECK (current_step >= 0),
+    CONSTRAINT chk_user_processes_current_step_lte_total_steps
+        CHECK (current_step <= total_steps),
+    CONSTRAINT chk_user_processes_score_accumulated_non_negative
+        CHECK (score_accumulated IS NULL OR score_accumulated >= 0),
+    CONSTRAINT fk_user_processes_user_id__users
+        FOREIGN KEY (user_id) REFERENCES users (id),
+    CONSTRAINT fk_user_processes_content_item_id__content_items
+        FOREIGN KEY (content_item_id) REFERENCES content_items (id)
 );
 
-CREATE TABLE users
-(
-    created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    deleted_at TIMESTAMP WITHOUT TIME ZONE,
-    updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    id         UUID                        NOT NULL,
-    first_name VARCHAR(50)                 NOT NULL,
-    last_name  VARCHAR(50)                 NOT NULL,
-    avatar_url VARCHAR(255),
-    bio        VARCHAR(255),
-    email      VARCHAR(255)                NOT NULL,
-    password   VARCHAR(255)                NOT NULL,
-    role       ROLE                        NOT NULL,
-    CONSTRAINT users_pkey PRIMARY KEY (id)
-);
-
-ALTER TABLE courses
-    ADD CONSTRAINT courses_purchasable_id_key UNIQUE (purchasable_id);
-
-ALTER TABLE exams
-    ADD CONSTRAINT exams_purchasable_id_key UNIQUE (purchasable_id);
-
-ALTER TABLE remember_me_tokens
-    ADD CONSTRAINT remember_me_tokens_selector_key UNIQUE (selector);
-
-ALTER TABLE remember_me_tokens
-    ADD CONSTRAINT remember_me_token_user_key UNIQUE (user_id);
-
-ALTER TABLE product_purchasables
-    ADD CONSTRAINT uk_product_purchasable UNIQUE (product_id, purchasable_id);
-
-ALTER TABLE user_processes
-    ADD CONSTRAINT uk_user_process_user_purchsable UNIQUE (user_id, purchasable_id);
-
-CREATE UNIQUE INDEX uk_users_email_active
-    ON users (email) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_exam_section_order_index_exam_active
-    ON exam_sections (exam_id, order_index) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_exam_task_order_index_section_active
-    ON exam_tasks (section_id, order_index) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_homework_order_index_lesson_active
-    ON homeworks (lesson_id, order_index) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_homework_task_order_index_homework_active
-    ON homework_tasks (homework_id, order_index) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_lesson_order_index_course_active
-    ON lessons (course_id, order_index) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_product_registration_user_product_active
-    ON product_registrations (user_id, product_id) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_professor_user_course_active
-    ON professors (user_id, course_id) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_categories_title_active
-    ON categories (title) WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uk_purchasable_type_title_active
-    ON purchasables (type, title)
+CREATE UNIQUE INDEX uidx_users_email__active
+    ON users (email)
     WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uk_lesson_course_title_active
+CREATE UNIQUE INDEX uidx_categories_title__active
+    ON categories (title)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_content_items_type_title__active
+    ON content_items (type, title)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_professors_user_id_course_id__active
+    ON professors (user_id, course_id)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_lessons_course_id_order_index__active
+    ON lessons (course_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_lessons_course_id_title__active
     ON lessons (course_id, title)
     WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uk_homework_lesson_title_active
+CREATE UNIQUE INDEX uidx_homeworks_lesson_id_order_index__active
+    ON homeworks (lesson_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_homeworks_lesson_id_title__active
     ON homeworks (lesson_id, title)
     WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uk_section_exam_title_active
+CREATE UNIQUE INDEX uidx_homework_tasks_homework_id_order_index__active
+    ON homework_tasks (homework_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_exam_sections_exam_id_order_index__active
+    ON exam_sections (exam_id, order_index)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_exam_sections_exam_id_title__active
     ON exam_sections (exam_id, title)
     WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_product_translation_code ON product_translations (code);
+CREATE UNIQUE INDEX uidx_exam_tasks_section_id_order_index__active
+    ON exam_tasks (section_id, order_index)
+    WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_purchasable_translation_code ON purchasable_translations (code);
+CREATE UNIQUE INDEX uidx_product_registrations_user_id_product_id__active
+    ON product_registrations (user_id, product_id)
+    WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_remember_me_token_expires_at ON remember_me_tokens (expires_at);
+CREATE UNIQUE INDEX uidx_certificates_certificate_code__active
+    ON certificates (certificate_code)
+    WHERE deleted_at IS NULL;
 
-CREATE INDEX idx_section_translation_code ON section_translations (code);
+CREATE INDEX idx_products_category_id
+    ON products (category_id);
 
-ALTER TABLE lessons
-    ADD CONSTRAINT fk17ucc7gjfjddsyi0gvstkqeat FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE NO ACTION;
+CREATE INDEX idx_certificates_user_id
+    ON certificates (user_id);
 
-ALTER TABLE certificates
-    ADD CONSTRAINT fk2dq3nyt5ohrjjgon1gov34pe FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
+CREATE INDEX idx_certificates_content_item_id
+    ON certificates (content_item_id);
 
-CREATE INDEX idx_certificate_purchasable_id ON certificates (purchasable_id);
+CREATE INDEX idx_exam_sections_exam_id
+    ON exam_sections (exam_id);
 
-ALTER TABLE lesson_translations
-    ADD CONSTRAINT fk2v8n4bc3hwsmbiys5tf86f7d0 FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE NO ACTION;
+CREATE INDEX idx_exam_submissions_task_id
+    ON exam_submissions (task_id);
 
-CREATE INDEX uk_lesson_translation_lesson_id ON lesson_translations (lesson_id);
+CREATE INDEX idx_exam_submissions_user_id
+    ON exam_submissions (user_id);
 
-ALTER TABLE exam_submissions
-    ADD CONSTRAINT fk34h9a5v9c8o3m7v0r9bhqvlsv FOREIGN KEY (task_id) REFERENCES exam_tasks (id) ON DELETE NO ACTION;
+CREATE INDEX idx_homework_submissions_task_id
+    ON homework_submissions (task_id);
 
-CREATE INDEX idx_exam_submissions_task_id ON exam_submissions (task_id);
+CREATE INDEX idx_homework_submissions_user_id
+    ON homework_submissions (user_id);
 
-ALTER TABLE purchasables
-    ADD CONSTRAINT fk45afgnj5p4pmmd97txhc8e11k FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
+CREATE INDEX idx_lesson_attendances_lesson_id
+    ON lesson_attendances (lesson_id);
 
-ALTER TABLE courses
-    ADD CONSTRAINT fk47hchcresx01fk14rg056eta6 FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
+CREATE INDEX idx_lesson_attendances_user_id
+    ON lesson_attendances (user_id);
 
-ALTER TABLE lessons
-    ADD CONSTRAINT fk5dunsor7s6dt8g0hvt28r422q FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
+CREATE INDEX idx_product_content_items_content_item_id
+    ON product_content_items (content_item_id);
 
-ALTER TABLE categories
-    ADD CONSTRAINT fk5yfru0au6kpyqs4tonky5vfne FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
+CREATE INDEX idx_product_registrations_transaction_id
+    ON product_registrations (transaction_id);
 
-ALTER TABLE professors
-    ADD CONSTRAINT fk6vp5482314kllcbx5dss173ph FOREIGN KEY (course_id) REFERENCES courses (id) ON DELETE NO ACTION;
+CREATE INDEX idx_content_item_translations_code
+    ON content_item_translations (code);
 
-ALTER TABLE exam_sections
-    ADD CONSTRAINT fk6xh5uoyt87amqhmx40wgdjmic FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
+CREATE INDEX idx_remember_me_tokens_expires_at
+    ON remember_me_tokens (expires_at);
 
-ALTER TABLE homework_translations
-    ADD CONSTRAINT fk7trw9kci7njdca9n7jd08v587 FOREIGN KEY (homework_id) REFERENCES homeworks (id) ON DELETE NO ACTION;
+CREATE INDEX idx_remember_me_tokens_user_id
+    ON remember_me_tokens (user_id);
 
-CREATE INDEX idx_homework_translation_homework_id ON homework_translations (homework_id);
+CREATE INDEX idx_transactions_product_id
+    ON transactions (product_id);
 
-ALTER TABLE exam_tasks
-    ADD CONSTRAINT fk88k96lnyagjatu3hf52bfr497 FOREIGN KEY (section_id) REFERENCES exam_sections (id) ON DELETE NO ACTION;
-
-ALTER TABLE exam_submissions
-    ADD CONSTRAINT fk8uff6g6nes0c0ndr1s8lpop5f FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_exam_submissions_user_id ON exam_submissions (user_id);
-
-ALTER TABLE exam_sections
-    ADD CONSTRAINT fk9f071ketmsh5txvih16uifs15 FOREIGN KEY (exam_id) REFERENCES exams (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_exam_section_exam_id ON exam_sections (exam_id);
-
-ALTER TABLE product_purchasables
-    ADD CONSTRAINT fk9xs89bejewgq1floqsns0a6br FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE NO ACTION;
-
-ALTER TABLE transactions
-    ADD CONSTRAINT fkcdpkn7bkq15bjvlw9mo46l9ft FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_transaction_product_id ON transactions (product_id);
-
-ALTER TABLE lesson_translations
-    ADD CONSTRAINT fkci2dki2eyk5esg2p9emch5lw2 FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE certificates
-    ADD CONSTRAINT fkd3f6enpb3p3xovee9klklf05r FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_certificate_user_id ON certificates (user_id);
-
-ALTER TABLE homework_tasks
-    ADD CONSTRAINT fkeec9wygl4yqm00fgs9aq9e6p1 FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE purchasable_translations
-    ADD CONSTRAINT fkelcnl32ekugfpk6tdild5vt6q FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_purchasable_translation_purchasable_id ON purchasable_translations (purchasable_id);
-
-ALTER TABLE homework_tasks
-    ADD CONSTRAINT fkfufl2t8wie21geq7dnsbrqloo FOREIGN KEY (homework_id) REFERENCES homeworks (id) ON DELETE NO ACTION;
-
-ALTER TABLE user_processes
-    ADD CONSTRAINT fkfw71dtfc0sg226earbl3ihf9m FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
-
-ALTER TABLE product_purchasables
-    ADD CONSTRAINT fkgck009mv241i8ank7c1tacdeg FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
-
-ALTER TABLE languages
-    ADD CONSTRAINT fkhlgtg1bdn7aptabt0eovlct61 FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE lesson_attendances
-    ADD CONSTRAINT fkhlvrdq9v6k411spm1bmqol734 FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_lesson_attendance_lesson_id ON lesson_attendances (lesson_id);
-
-ALTER TABLE product_registrations
-    ADD CONSTRAINT fkhpquilnfb0qu6qi9bq1xkwqil FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE lesson_attendances
-    ADD CONSTRAINT fkjs6un555qqw1a2muowsqumc4g FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_lesson_attendance_user_id ON lesson_attendances (user_id);
-
-ALTER TABLE exam_tasks
-    ADD CONSTRAINT fkk2d5ipolb3kpm4v24p3a36c63 FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE product_registrations
-    ADD CONSTRAINT fkkfn7r0xif8tbokrghgnbitbqr FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE NO ACTION;
-
-ALTER TABLE homeworks
-    ADD CONSTRAINT fkkt5ecyq4ovj1qrnvh3pow2aoc FOREIGN KEY (lesson_id) REFERENCES lessons (id) ON DELETE NO ACTION;
-
-ALTER TABLE products
-    ADD CONSTRAINT fkl0lce8i162ldn9n01t2a6lcix FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE purchasables
-    ADD CONSTRAINT fklaitcxhllurft1bm5nivmqjyw FOREIGN KEY (category_id) REFERENCES categories (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_purchasable_category_id ON purchasables (category_id);
-
-ALTER TABLE exams
-    ADD CONSTRAINT fklcbi4316wt46k033xmrwhn4gs FOREIGN KEY (purchasable_id) REFERENCES purchasables (id) ON DELETE NO ACTION;
-
-ALTER TABLE professors
-    ADD CONSTRAINT fklq1bc4wecor3b2lr0whjiimy8 FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE product_translations
-    ADD CONSTRAINT fkn8aifokvlqtmaoriv3st4tk7x FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE remember_me_tokens
-    ADD CONSTRAINT fknq7xt95sjsy8spceb2x7dhilg FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_remember_me_token_user_id ON remember_me_tokens (user_id);
-
-ALTER TABLE homework_translations
-    ADD CONSTRAINT fkojl0s3lusk7oirnmgxmmc8xyw FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE product_translations
-    ADD CONSTRAINT fkom5nwwno2wotmalniq34w627y FOREIGN KEY (product_id) REFERENCES products (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_product_translation_product_id ON product_translations (product_id);
-
-ALTER TABLE homeworks
-    ADD CONSTRAINT fkpxvah0n3qfiqai9wsijwmotub FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE purchasable_translations
-    ADD CONSTRAINT fkq1cel3133bt8kjvsjpicbgjxm FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE section_translations
-    ADD CONSTRAINT fkq4i3as3p26t2oiyfqebmm7tj FOREIGN KEY (created_by) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE user_processes
-    ADD CONSTRAINT fkqog4sbq5o1pqyf56wkaohl8ym FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-ALTER TABLE transactions
-    ADD CONSTRAINT fkqwv7rmvc8va8rep7piikrojds FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_transaction_user_id ON transactions (user_id);
-
-ALTER TABLE section_translations
-    ADD CONSTRAINT fkrf3q252um26shvr5jlkn83g9c FOREIGN KEY (section_id) REFERENCES exam_sections (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_section_translation_section_id ON section_translations (section_id);
-
-ALTER TABLE homework_submissions
-    ADD CONSTRAINT fkrsi0ojxyrlyga9t0rfr9f3d0 FOREIGN KEY (task_id) REFERENCES homework_tasks (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_homework_submission_task_id ON homework_submissions (task_id);
-
-ALTER TABLE product_registrations
-    ADD CONSTRAINT fkt127ikiah8xmo1tva586smy98 FOREIGN KEY (transaction_id) REFERENCES transactions (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_product_registration_transaction_id ON product_registrations (transaction_id);
-
-ALTER TABLE homework_submissions
-    ADD CONSTRAINT fkt6djgatws7xxgcrrptuogn6ka FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE NO ACTION;
-
-CREATE INDEX idx_homework_submission_user_id ON homework_submissions (user_id);
+CREATE INDEX idx_transactions_user_id
+    ON transactions (user_id);

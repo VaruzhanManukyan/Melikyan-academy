@@ -1,14 +1,14 @@
-package com.melikyan.academy.dto.response.purchasableTranslation;
+package com.melikyan.academy.dto.response.contentItemTranslation;
 
 import java.util.UUID;
 import java.time.OffsetDateTime;
 
-public record PurchasableTranslationResponse(
+public record ContentItemTranslationResponse(
         UUID id,
         String title,
         String description,
         String code,
-        UUID purchasableId,
+        UUID contentItemId,
         UUID createdById,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt

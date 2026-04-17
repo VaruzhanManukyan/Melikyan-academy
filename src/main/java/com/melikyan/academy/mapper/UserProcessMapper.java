@@ -16,7 +16,7 @@ import java.util.List;
 public interface UserProcessMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     UserProcess toEntity(CreateUserProcessRequest request);
@@ -24,13 +24,13 @@ public interface UserProcessMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromRequest(UpdateUserProcessRequest request, @MappingTarget UserProcess userProcess);
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "purchasableId", source = "purchasable.id")
+    @Mapping(target = "contentItemId", source = "contentItem.id")
     UserProcessResponse toResponse(UserProcess userProcess);
 
     List<UserProcessResponse> toResponseList(List<UserProcess> userProcesses);

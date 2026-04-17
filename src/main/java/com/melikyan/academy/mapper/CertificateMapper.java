@@ -16,7 +16,7 @@ import java.util.List;
 public interface CertificateMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     Certificate toEntity(CreateCertificateRequest request);
@@ -24,13 +24,13 @@ public interface CertificateMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     void updateEntityFromRequest(UpdateCertificateRequest request, @MappingTarget Certificate certificate);
 
     @Mapping(target = "userId", source = "user.id")
-    @Mapping(target = "purchasableId", source = "purchasable.id")
+    @Mapping(target = "contentItemId", source = "contentItem.id")
     CertificateResponse toResponse(Certificate certificate);
 
     List<CertificateResponse> toResponseList(List<Certificate> certificates);

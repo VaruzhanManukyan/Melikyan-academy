@@ -1,7 +1,7 @@
 package com.melikyan.academy.dto.response.lesson;
 
-import com.melikyan.academy.entity.enums.SessionType;
-import com.melikyan.academy.entity.enums.SessionState;
+import com.melikyan.academy.entity.enums.LessonType;
+import com.melikyan.academy.entity.enums.LessonState;
 
 import java.util.UUID;
 import java.time.Duration;
@@ -12,9 +12,9 @@ public record LessonResponse(
         Integer orderIndex,
         String title,
         String description,
-        SessionType sessionType,
+        LessonType lessonType,
         String valueUrl,
-        SessionState state,
+        LessonState state,
         OffsetDateTime startsAt,
         Duration duration,
         UUID courseId,

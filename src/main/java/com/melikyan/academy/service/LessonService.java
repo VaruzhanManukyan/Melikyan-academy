@@ -146,7 +146,7 @@ public class LessonService {
         lesson.setOrderIndex(request.orderIndex());
         lesson.setTitle(normalizedTitle);
         lesson.setDescription(normalizedDescription);
-        lesson.setSessionType(request.sessionType());
+        lesson.setLessonType(request.lessonType());
         lesson.setValueUrl(normalizedValueUrl);
         lesson.setState(request.state());
         lesson.setStartsAt(request.startsAt());
@@ -208,8 +208,8 @@ public class LessonService {
             lesson.setDescription(normalizeDescription(request.description()));
         }
 
-        if (request.sessionType() != null) {
-            lesson.setSessionType(request.sessionType());
+        if (request.lessonType() != null) {
+            lesson.setLessonType(request.lessonType());
         }
 
         if (request.valueUrl() != null) {

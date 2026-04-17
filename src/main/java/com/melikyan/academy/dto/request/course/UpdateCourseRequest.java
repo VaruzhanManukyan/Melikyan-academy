@@ -1,6 +1,6 @@
 package com.melikyan.academy.dto.request.course;
 
-import com.melikyan.academy.entity.enums.PurchasableType;
+import com.melikyan.academy.entity.enums.ContentItemType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
@@ -14,7 +14,7 @@ public record UpdateCourseRequest(
         @Size(max = 500, message = "{course.description.size}")
         String description,
 
-        PurchasableType type,
+        ContentItemType type,
 
         OffsetDateTime startDate,
 

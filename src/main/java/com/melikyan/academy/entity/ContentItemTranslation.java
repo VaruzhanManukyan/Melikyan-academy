@@ -13,13 +13,13 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @Table(
-        name = "purchasable_translations",
+        name = "content_item_translations",
         indexes = {
-                @Index(name = "idx_purchasable_translation_code", columnList = "code"),
-                @Index(name = "idx_purchasable_translation_purchasable_id", columnList = "purchasable_id")
+                @Index(name = "idx_content_item_translation_code", columnList = "code"),
+                @Index(name = "idx_content_item_translation_content_item_id", columnList = "content_item_id")
         }
 )
-public class PurchasableTranslation extends BaseEntity {
+public class ContentItemTranslation extends BaseEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
@@ -30,7 +30,7 @@ public class PurchasableTranslation extends BaseEntity {
     private String code;
 
     @ManyToOne
-    @JoinColumn(name = "purchasable_id", nullable = false)
+    @JoinColumn(name = "content_item_id", nullable = false)
     private ContentItem contentItem;
 
     @ManyToOne

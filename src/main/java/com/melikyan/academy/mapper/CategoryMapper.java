@@ -14,7 +14,6 @@ public interface CategoryMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "purchasables", ignore = true)
     Category toEntity(CreateCategoryRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -22,7 +21,6 @@ public interface CategoryMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "purchasables", ignore = true)
     void updateEntity(@MappingTarget Category category, UpdateCategoryRequest request);
 
     @Mapping(target = "createdById", source = "createdBy.id")

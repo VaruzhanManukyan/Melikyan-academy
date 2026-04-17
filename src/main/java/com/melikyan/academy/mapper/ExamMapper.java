@@ -15,19 +15,19 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface ExamMapper {
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "examSections", ignore = true)
     Exam toEntity(CreateExamRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "purchasable", ignore = true)
+    @Mapping(target = "contentItem", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "examSections", ignore = true)
     void updateEntityFromRequest(UpdateExamRequest request, @MappingTarget Exam exam);
 
-    @Mapping(target = "purchasableId", source = "purchasable.id")
+    @Mapping(target = "contentItemId", source = "contentItem.id")
     ExamResponse toResponse(Exam exam);
 
     List<ExamResponse> toResponseList(List<Exam> exams);

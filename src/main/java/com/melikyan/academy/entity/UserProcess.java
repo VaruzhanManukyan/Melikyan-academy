@@ -19,8 +19,8 @@ import java.time.OffsetDateTime;
         name = "user_processes",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_user_process_user_purchsable",
-                        columnNames = {"user_id", "purchasable_id"}
+                        name = "uk_user_process_user_content_item",
+                        columnNames = {"user_id", "content_item_id"}
                 )
         }
 )
@@ -39,8 +39,8 @@ public class UserProcess extends BaseEntity {
     private User user;
 
     @ManyToOne
-    @JoinColumn(name = "purchasable_id", nullable = false)
-    private Purchasable purchasable;
+    @JoinColumn(name = "content_item_id", nullable = false)
+    private ContentItem contentItem;
 
     @Column(name = "last_accessed_at")
     private OffsetDateTime lastAccessedAt;

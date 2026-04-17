@@ -1,11 +1,11 @@
 package com.melikyan.academy.entity;
 
+import com.melikyan.academy.entity.enums.ProductType;
 import lombok.*;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntity;
-import com.melikyan.academy.entity.enums.PurchasableType;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -18,8 +18,13 @@ import java.math.BigDecimal;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
-@Table(name = "products")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
+@Table(
+        name = "products",
+        indexes = {
+                @Index(name = "idx_product_category_id", columnList = "category_id")
+        }
+)
 public class Product extends BaseEntity {
     @Column(name = "title", nullable = false, length = 50)
     private String title;
@@ -29,8 +34,8 @@ public class Product extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
-    @Column(name = "type", nullable = false)
-    private PurchasableType type;
+    @Column(name = "type")
+    private ProductType type;
 
     @Column(name = "price", precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
@@ -38,12 +43,16 @@ public class Product extends BaseEntity {
     @Column(name = "is_private")
     private Boolean isPrivate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductPurchasable> purchasables;
+    private List<ProductContentItem> productContentItems;
 
     @OneToMany(mappedBy = "product")
     private List<Transaction> transactions;

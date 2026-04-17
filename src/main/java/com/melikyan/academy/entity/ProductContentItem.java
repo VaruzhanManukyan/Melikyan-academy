@@ -14,15 +14,15 @@ import java.time.LocalDateTime;
 @Entity
 @NoArgsConstructor
 @Table(
-        name = "product_purchasables",
+        name = "product_content_items",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_product_purchasable",
-                        columnNames = {"product_id", "purchasable_id"}
+                        name = "uk_product_content_item",
+                        columnNames = {"product_id", "content_item_id"}
                 )
         }
 )
-public class ProductPurchasable {
+public class ProductContentItem {
     @Id
     @GeneratedValue
     private UUID id;
@@ -32,7 +32,7 @@ public class ProductPurchasable {
     private Product product;
 
     @ManyToOne
-    @JoinColumn(name = "purchasable_id", nullable = false)
+    @JoinColumn(name = "content_item_id", nullable = false)
     private ContentItem contentItem;
 
     @CreationTimestamp

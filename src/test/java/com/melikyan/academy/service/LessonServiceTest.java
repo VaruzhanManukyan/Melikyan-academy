@@ -1,14 +1,14 @@
 package com.melikyan.academy.service;
 
+import com.melikyan.academy.entity.enums.LessonState;
+import com.melikyan.academy.entity.enums.LessonType;
 import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
 import com.melikyan.academy.entity.Lesson;
 import com.melikyan.academy.mapper.LessonMapper;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.melikyan.academy.entity.enums.SessionType;
 import com.melikyan.academy.repository.UserRepository;
-import com.melikyan.academy.entity.enums.SessionState;
 import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.repository.LessonRepository;
 import org.springframework.web.server.ResponseStatusException;
@@ -75,9 +75,9 @@ class LessonServiceTest {
         lesson.setOrderIndex(1);
         lesson.setTitle("Lesson title");
         lesson.setDescription("Lesson description");
-        lesson.setSessionType(SessionType.MEET_LINK);
+        lesson.setLessonType(LessonType.MEET_LINK);
         lesson.setValueUrl("https://meet.google.com/test");
-        lesson.setState(SessionState.SCHEDULED);
+        lesson.setState(LessonState.SCHEDULED);
         lesson.setStartsAt(OffsetDateTime.parse("2026-04-20T14:00:00+04:00"));
         lesson.setDuration(Duration.ofMinutes(90));
         lesson.setCourse(course);
@@ -91,9 +91,9 @@ class LessonServiceTest {
                 1,
                 "  Introduction to Spring  ",
                 "  First lesson  ",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "  https://meet.google.com/test  ",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -125,8 +125,8 @@ class LessonServiceTest {
         assertEquals("Introduction to Spring", savedLesson.getTitle());
         assertEquals("First lesson", savedLesson.getDescription());
         assertEquals("https://meet.google.com/test", savedLesson.getValueUrl());
-        assertEquals(SessionType.MEET_LINK, savedLesson.getSessionType());
-        assertEquals(SessionState.SCHEDULED, savedLesson.getState());
+        assertEquals(LessonType.MEET_LINK, savedLesson.getLessonType());
+        assertEquals(LessonState.SCHEDULED, savedLesson.getState());
         assertEquals(course, savedLesson.getCourse());
         assertEquals(user, savedLesson.getCreatedBy());
     }
@@ -138,9 +138,9 @@ class LessonServiceTest {
                 1,
                 "Lesson",
                 "Desc",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/test",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -165,9 +165,9 @@ class LessonServiceTest {
                 1,
                 "   ",
                 "Desc",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/test",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -224,9 +224,9 @@ class LessonServiceTest {
                 2,
                 "  Updated title  ",
                 "  Updated description  ",
-                SessionType.VIDEO_LINK,
+                LessonType.VIDEO_LINK,
                 "  https://youtube.com/test  ",
-                SessionState.ONGOING,
+                LessonState.ONGOING,
                 OffsetDateTime.parse("2026-04-22T16:00:00+04:00"),
                 Duration.ofMinutes(60),
                 courseId
@@ -246,9 +246,9 @@ class LessonServiceTest {
         assertEquals(2, lesson.getOrderIndex());
         assertEquals("Updated title", lesson.getTitle());
         assertEquals("Updated description", lesson.getDescription());
-        assertEquals(SessionType.VIDEO_LINK, lesson.getSessionType());
+        assertEquals(LessonType.VIDEO_LINK, lesson.getLessonType());
         assertEquals("https://youtube.com/test", lesson.getValueUrl());
-        assertEquals(SessionState.ONGOING, lesson.getState());
+        assertEquals(LessonState.ONGOING, lesson.getState());
         assertEquals(OffsetDateTime.parse("2026-04-22T16:00:00+04:00"), lesson.getStartsAt());
         assertEquals(Duration.ofMinutes(60), lesson.getDuration());
     }

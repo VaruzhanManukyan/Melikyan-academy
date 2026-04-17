@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntity;
-import com.melikyan.academy.entity.enums.PurchasableType;
+import com.melikyan.academy.entity.enums.ContentItemType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -19,18 +19,13 @@ import java.util.List;
 @Entity
 @SuperBuilder
 @NoArgsConstructor
+@Table(name = "content_items")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-@Table(
-        name = "purchasables",
-        indexes = {
-                @Index(name = "idx_purchasable_category_id", columnList = "category_id")
-        }
-)
-public class Purchasable extends BaseEntity {
+public class ContentItem extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
-    private PurchasableType type;
+    private ContentItemType type;
 
     @Column(name = "title", nullable = false, length = 50)
     private String title;
@@ -39,28 +34,24 @@ public class Purchasable extends BaseEntity {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    @ManyToOne
     @JoinColumn(name = "created_by",  nullable = false)
     private User createdBy;
 
-    @OneToMany(mappedBy = "purchasable")
+    @OneToMany(mappedBy = "contentItem")
     private List<UserProcess> userProcess;
 
-    @OneToOne(mappedBy = "purchasable", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "contentItem", fetch = FetchType.LAZY)
     private Course course;
 
-    @OneToOne(mappedBy = "purchasable", fetch = FetchType.LAZY)
+    @OneToOne(mappedBy = "contentItem", fetch = FetchType.LAZY)
     private Exam exam;
 
-    @OneToMany(mappedBy = "purchasable")
+    @OneToMany(mappedBy = "contentItem")
     private List<Certificate> certificates;
 
-    @OneToMany(mappedBy = "purchasable")
-    private List<ProductPurchasable> products;
+    @OneToMany(mappedBy = "contentItem")
+    private List<ProductContentItem> products;
 
-    @OneToMany(mappedBy = "purchasable")
-    private List<PurchasableTranslation> purchasableTranslations;
+    @OneToMany(mappedBy = "contentItem")
+    private List<ContentItemTranslation> contentItemTranslations;
 }

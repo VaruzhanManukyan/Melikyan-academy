@@ -1,11 +1,11 @@
 package com.melikyan.academy.controller;
 
+import com.melikyan.academy.entity.enums.LessonState;
+import com.melikyan.academy.entity.enums.LessonType;
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 import com.melikyan.academy.service.LessonService;
 import org.springframework.test.web.servlet.MockMvc;
-import com.melikyan.academy.entity.enums.SessionType;
-import com.melikyan.academy.entity.enums.SessionState;
 import org.springframework.context.annotation.FilterType;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.dto.response.lesson.LessonResponse;
@@ -82,9 +82,9 @@ class LessonControllerTest {
                 1,
                 "Introduction to Spring",
                 "First lesson",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/test",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -101,7 +101,7 @@ class LessonControllerTest {
                 .andExpect(jsonPath("$.orderIndex").value(1))
                 .andExpect(jsonPath("$.title").value("Introduction to Spring"))
                 .andExpect(jsonPath("$.description").value("First lesson"))
-                .andExpect(jsonPath("$.sessionType").value("MEET_LINK"))
+                .andExpect(jsonPath("$.lessonType").value("MEET_LINK"))
                 .andExpect(jsonPath("$.valueUrl").value("https://meet.google.com/test"))
                 .andExpect(jsonPath("$.state").value("SCHEDULED"))
                 .andExpect(jsonPath("$.courseId").value(courseId.toString()))
@@ -119,9 +119,9 @@ class LessonControllerTest {
                 1,
                 "Lesson 1",
                 "Desc 1",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/one",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -135,9 +135,9 @@ class LessonControllerTest {
                 2,
                 "Lesson 2",
                 "Desc 2",
-                SessionType.VIDEO_LINK,
+                LessonType.VIDEO_LINK,
                 "https://youtube.com/test",
-                SessionState.COMPLETED,
+                LessonState.COMPLETED,
                 OffsetDateTime.parse("2026-04-21T14:00:00+04:00"),
                 Duration.ofMinutes(60),
                 courseId,
@@ -168,7 +168,7 @@ class LessonControllerTest {
                   "orderIndex": 1,
                   "title": "Introduction to Spring",
                   "description": "First lesson",
-                  "sessionType": "MEET_LINK",
+                  "lessonType": "MEET_LINK",
                   "valueUrl": "https://meet.google.com/test",
                   "state": "SCHEDULED",
                   "startsAt": "2026-04-20T14:00:00+04:00",
@@ -183,9 +183,9 @@ class LessonControllerTest {
                 1,
                 "Introduction to Spring",
                 "First lesson",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/test",
-                SessionState.SCHEDULED,
+                LessonState.SCHEDULED,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,
@@ -229,9 +229,9 @@ class LessonControllerTest {
                 1,
                 "Updated Spring Lesson",
                 "Updated description",
-                SessionType.MEET_LINK,
+                LessonType.MEET_LINK,
                 "https://meet.google.com/updated",
-                SessionState.ONGOING,
+                LessonState.ONGOING,
                 OffsetDateTime.parse("2026-04-20T14:00:00+04:00"),
                 Duration.ofMinutes(90),
                 courseId,

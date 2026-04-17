@@ -1,6 +1,6 @@
 package com.melikyan.academy.entity.enums;
 
-public enum SessionState {
+public enum LessonState {
     SCHEDULED,
     ONGOING,
     COMPLETED,

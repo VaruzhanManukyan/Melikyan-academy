@@ -1,11 +1,11 @@
 package com.melikyan.academy.entity;
 
+import com.melikyan.academy.entity.enums.LessonState;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntity;
-import com.melikyan.academy.entity.enums.SessionType;
-import com.melikyan.academy.entity.enums.SessionState;
+import com.melikyan.academy.entity.enums.LessonType;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -45,7 +45,7 @@ public class Lesson extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "type", nullable = false)
-    private SessionType sessionType;
+    private LessonType lessonType;
 
     @Column(name = "value_url", nullable = false)
     private String valueUrl;
@@ -53,7 +53,7 @@ public class Lesson extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JdbcTypeCode(SqlTypes.NAMED_ENUM)
     @Column(name = "state", nullable = false)
-    private SessionState state;
+    private LessonState state;
 
     @Column(name = "starts_at", nullable = false)
     private OffsetDateTime startsAt;

@@ -12,7 +12,7 @@ public record CertificateResponse(
         Map<String, Object> metadata,
         String pdfUrl,
         UUID userId,
-        UUID purchasableId,
+        UUID contentItemId,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {

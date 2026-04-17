@@ -18,8 +18,8 @@ import java.time.OffsetDateTime;
 @Table(name = "courses",
         uniqueConstraints = {
                 @UniqueConstraint(
-                        name = "uk_course_purchasable",
-                        columnNames = {"purchasable_id"}
+                        name = "uk_course_content_item",
+                        columnNames = {"content_item_id"}
                 )
         }
 )
@@ -35,8 +35,8 @@ public class Course {
     private Integer durationWeeks;
 
     @OneToOne
-    @JoinColumn(name = "purchasable_id", nullable = false)
-    private Purchasable purchasable;
+    @JoinColumn(name = "content_item_id", nullable = false)
+    private ContentItem contentItem;
 
     @UpdateTimestamp
     @Column(name = "updated_at")

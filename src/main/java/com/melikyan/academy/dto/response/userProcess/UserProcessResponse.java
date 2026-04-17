@@ -10,7 +10,7 @@ public record UserProcessResponse(
         Integer totalSteps,
         BigDecimal scoreAccumulated,
         UUID userId,
-        UUID purchasableId,
+        UUID contentItemId,
         OffsetDateTime lastAccessedAt,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt

@@ -33,7 +33,7 @@ public class RememberMeToken extends BaseEntity {
     @Column(name = "selector", nullable = false, length = 64)
     private String selector;
 
-    @Column(name = "token_hash", nullable = false, length = 64)
+    @Column(name = "token_hash", nullable = false, length = 255)
     private String tokenHash;
 
     @ManyToOne(fetch = FetchType.LAZY)

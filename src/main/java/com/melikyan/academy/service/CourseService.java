@@ -1,14 +1,14 @@
 package com.melikyan.academy.service;
 
+import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
+import com.melikyan.academy.entity.enums.ContentItemType;
 import org.springframework.http.HttpStatus;
 import com.melikyan.academy.entity.Category;
-import com.melikyan.academy.entity.Purchasable;
 import com.melikyan.academy.mapper.CourseMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
-import com.melikyan.academy.entity.enums.PurchasableType;
 import com.melikyan.academy.repository.CategoryRepository;
 import com.melikyan.academy.repository.PurchasableRepository;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,8 +54,8 @@ public class CourseService {
         return normalizedDescription.isBlank() ? null : normalizedDescription;
     }
 
-    private void validateCreateType(PurchasableType type) {
-        if (type != PurchasableType.COURSE) {
+    private void validateCreateType(ContentItemType type) {
+        if (type != ContentItemType.COURSE) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Type must be COURSE for course creation"
@@ -63,8 +63,8 @@ public class CourseService {
         }
     }
 
-    private void validateUpdateType(PurchasableType type) {
-        if (type != null && type != PurchasableType.COURSE) {
+    private void validateUpdateType(ContentItemType type) {
+        if (type != null && type != ContentItemType.COURSE) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Course type cannot be changed to another type"
@@ -110,19 +110,17 @@ public class CourseService {
         }
 
         User createdBy = getUserById(request.createdById());
-        Category category = getCategoryById(request.categoryId());
 
-        Purchasable purchasable = new Purchasable();
-        purchasable.setTitle(normalizedTitle);
-        purchasable.setDescription(normalizedDescription);
-        purchasable.setType(PurchasableType.COURSE);
-        purchasable.setCategory(category);
-        purchasable.setCreatedBy(createdBy);
+        ContentItem contentItem = new ContentItem();
+        contentItem.setTitle(normalizedTitle);
+        contentItem.setDescription(normalizedDescription);
+        contentItem.setType(ContentItemType.COURSE);
+        contentItem.setCreatedBy(createdBy);
 
-        Purchasable savedPurchasable = purchasableRepository.save(purchasable);
+        ContentItem savedContentItem = purchasableRepository.save(contentItem);
 
         Course course = new Course();
-        course.setPurchasable(savedPurchasable);
+        course.setContentItem(savedContentItem);
         course.setStartDate(request.startDate());
         course.setDurationWeeks(request.durationWeeks());
 
@@ -145,30 +143,25 @@ public class CourseService {
 
     public CourseResponse update(UUID id, UpdateCourseRequest request) {
         Course course = getCourseEntityById(id);
-        Purchasable purchasable = course.getPurchasable();
+        ContentItem contentItem = course.getContentItem();
 
         validateUpdateType(request.type());
 
         if (request.title() != null) {
             String normalizedTitle = normalizeTitle(request.title());
 
-            if (purchasableRepository.existsByTitleIgnoreCaseAndIdNot(normalizedTitle, purchasable.getId())) {
+            if (purchasableRepository.existsByTitleIgnoreCaseAndIdNot(normalizedTitle, contentItem.getId())) {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Course with this title already exists"
                 );
             }
 
-            purchasable.setTitle(normalizedTitle);
+            contentItem.setTitle(normalizedTitle);
         }
 
         if (request.description() != null) {
-            purchasable.setDescription(normalizeDescription(request.description()));
-        }
-
-        if (request.categoryId() != null) {
-            Category category = getCategoryById(request.categoryId());
-            purchasable.setCategory(category);
+            contentItem.setDescription(normalizeDescription(request.description()));
         }
 
         if (request.startDate() != null) {
@@ -186,9 +179,9 @@ public class CourseService {
 
     public void delete(UUID id) {
         Course course = getCourseEntityById(id);
-        Purchasable purchasable = course.getPurchasable();
+        ContentItem contentItem = course.getContentItem();
 
         courseRepository.delete(course);
-        purchasableRepository.delete(purchasable);
+        purchasableRepository.delete(contentItem);
     }
 }
