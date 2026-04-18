@@ -27,9 +27,6 @@ public record CreateCourseRequest(
         @Min(value = 1, message = "{course.durationWeeks.min}")
         Integer durationWeeks,
 
-        @NotNull(message = "{course.categoryId.notNull}")
-        UUID categoryId,
-
         @NotNull(message = "{course.createdById.notNull}")
         UUID createdById
 ) {

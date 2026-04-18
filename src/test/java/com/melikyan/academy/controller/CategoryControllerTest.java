@@ -53,7 +53,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 )
 @AutoConfigureMockMvc(addFilters = false)
 class CategoryControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 

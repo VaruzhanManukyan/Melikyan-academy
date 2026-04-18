@@ -54,7 +54,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 )
 @AutoConfigureMockMvc(addFilters = false)
 class CourseControllerTest {
-
     @Autowired
     private MockMvc mockMvc;
 
@@ -72,9 +71,8 @@ class CourseControllerTest {
     @DisplayName("POST /api/v1/courses -> should create course and return 201")
     void create_shouldReturnCreatedCourse() throws Exception {
         UUID courseId = UUID.randomUUID();
-        UUID categoryId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
-        UUID purchasableId = UUID.randomUUID();
+        UUID contentItemId = UUID.randomUUID();
 
         OffsetDateTime startDate = OffsetDateTime.parse("2026-05-01T10:00:00+04:00");
         OffsetDateTime createdAt = OffsetDateTime.parse("2026-04-14T12:00:00+04:00");
@@ -86,7 +84,6 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 startDate,
                 12,
-                categoryId,
                 createdById
         );
 
@@ -97,9 +94,8 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 12,
                 startDate,
-                categoryId,
                 createdById,
-                purchasableId,
+                contentItemId,
                 createdAt,
                 updatedAt
         );
@@ -118,9 +114,8 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.type").value("COURSE"))
                 .andExpect(jsonPath("$.durationWeeks").value(12))
                 .andExpect(jsonPath("$.startDate").value(toUtcString(startDate)))
-                .andExpect(jsonPath("$.categoryId").value(categoryId.toString()))
                 .andExpect(jsonPath("$.createdById").value(createdById.toString()))
-                .andExpect(jsonPath("$.purchasableId").value(purchasableId.toString()))
+                .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()))
                 .andExpect(jsonPath("$.createdAt").value(toUtcString(createdAt)))
                 .andExpect(jsonPath("$.updatedAt").value(toUtcString(updatedAt)));
 
@@ -133,7 +128,7 @@ class CourseControllerTest {
         UUID courseId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
-        UUID purchasableId = UUID.randomUUID();
+        UUID contentItemId = UUID.randomUUID();
 
         CourseResponse response = new CourseResponse(
                 courseId,
@@ -142,9 +137,8 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 12,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
-                categoryId,
                 createdById,
-                purchasableId,
+                contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-14T12:30:00+04:00")
         );
@@ -158,7 +152,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.id").value(courseId.toString()))
                 .andExpect(jsonPath("$.title").value("Java Backend Fundamentals"))
                 .andExpect(jsonPath("$.type").value("COURSE"))
-                .andExpect(jsonPath("$.purchasableId").value(purchasableId.toString()));
+                .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()));
 
         verify(courseService).getById(courseId);
     }
@@ -168,10 +162,9 @@ class CourseControllerTest {
     void getAll_shouldReturnAllCourses() throws Exception {
         UUID firstId = UUID.randomUUID();
         UUID secondId = UUID.randomUUID();
-        UUID categoryId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
-        UUID firstPurchasableId = UUID.randomUUID();
-        UUID secondPurchasableId = UUID.randomUUID();
+        UUID firsContentItemId = UUID.randomUUID();
+        UUID secondContentItemId = UUID.randomUUID();
 
         CourseResponse first = new CourseResponse(
                 firstId,
@@ -180,9 +173,8 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 12,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
-                categoryId,
                 createdById,
-                firstPurchasableId,
+                firsContentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-14T12:30:00+04:00")
         );
@@ -194,9 +186,8 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 10,
                 OffsetDateTime.parse("2026-06-01T10:00:00+04:00"),
-                categoryId,
                 createdById,
-                secondPurchasableId,
+                secondContentItemId,
                 OffsetDateTime.parse("2026-04-15T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-15T12:30:00+04:00")
         );
@@ -210,10 +201,10 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(firstId.toString()))
                 .andExpect(jsonPath("$[0].title").value("Java Backend Fundamentals"))
-                .andExpect(jsonPath("$[0].purchasableId").value(firstPurchasableId.toString()))
+                .andExpect(jsonPath("$[0].contentItemId").value(firsContentItemId.toString()))
                 .andExpect(jsonPath("$[1].id").value(secondId.toString()))
                 .andExpect(jsonPath("$[1].title").value("Algorithms"))
-                .andExpect(jsonPath("$[1].purchasableId").value(secondPurchasableId.toString()));
+                .andExpect(jsonPath("$[1].contentItemId").value(secondContentItemId.toString()));
 
         verify(courseService).getAll();
     }
@@ -224,15 +215,14 @@ class CourseControllerTest {
         UUID courseId = UUID.randomUUID();
         UUID categoryId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
-        UUID purchasableId = UUID.randomUUID();
+        UUID contentItemId = UUID.randomUUID();
 
         UpdateCourseRequest request = new UpdateCourseRequest(
                 "Advanced Java",
                 "Updated description",
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                16,
-                categoryId
+                16
         );
 
         CourseResponse response = new CourseResponse(
@@ -242,9 +232,8 @@ class CourseControllerTest {
                 ContentItemType.COURSE,
                 16,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                categoryId,
                 createdById,
-                purchasableId,
+                contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-16T14:00:00+04:00")
         );
@@ -262,7 +251,7 @@ class CourseControllerTest {
                 .andExpect(jsonPath("$.title").value("Advanced Java"))
                 .andExpect(jsonPath("$.description").value("Updated description"))
                 .andExpect(jsonPath("$.durationWeeks").value(16))
-                .andExpect(jsonPath("$.purchasableId").value(purchasableId.toString()));
+                .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()));
 
         verify(courseService).update(eq(courseId), any(UpdateCourseRequest.class));
     }

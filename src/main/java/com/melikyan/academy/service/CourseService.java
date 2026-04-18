@@ -10,7 +10,7 @@ import com.melikyan.academy.mapper.CourseMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.repository.CategoryRepository;
-import com.melikyan.academy.repository.PurchasableRepository;
+import com.melikyan.academy.repository.ContentItemRepository;
 import org.springframework.web.server.ResponseStatusException;
 import com.melikyan.academy.dto.response.course.CourseResponse;
 import com.melikyan.academy.dto.request.course.UpdateCourseRequest;
@@ -30,7 +30,7 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final CategoryRepository categoryRepository;
-    private final PurchasableRepository purchasableRepository;
+    private final ContentItemRepository contentItemRepository;
 
     private String normalizeTitle(String title) {
         String normalizedTitle = title.trim();
@@ -102,7 +102,7 @@ public class CourseService {
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
 
-        if (purchasableRepository.existsByTitleIgnoreCase(normalizedTitle)) {
+        if (contentItemRepository.existsByTitleIgnoreCase(normalizedTitle)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Course with this title already exists"
@@ -117,7 +117,7 @@ public class CourseService {
         contentItem.setType(ContentItemType.COURSE);
         contentItem.setCreatedBy(createdBy);
 
-        ContentItem savedContentItem = purchasableRepository.save(contentItem);
+        ContentItem savedContentItem = contentItemRepository.save(contentItem);
 
         Course course = new Course();
         course.setContentItem(savedContentItem);
@@ -150,7 +150,7 @@ public class CourseService {
         if (request.title() != null) {
             String normalizedTitle = normalizeTitle(request.title());
 
-            if (purchasableRepository.existsByTitleIgnoreCaseAndIdNot(normalizedTitle, contentItem.getId())) {
+            if (contentItemRepository.existsByTitleIgnoreCaseAndIdNot(normalizedTitle, contentItem.getId())) {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Course with this title already exists"
@@ -182,6 +182,6 @@ public class CourseService {
         ContentItem contentItem = course.getContentItem();
 
         courseRepository.delete(course);
-        purchasableRepository.delete(contentItem);
+        contentItemRepository.delete(contentItem);
     }
 }

@@ -18,6 +18,6 @@ public record UpdateCertificateRequest(
 
         String pdfUrl,
 
-        UUID purchasableId
+        UUID contentItemId
 ) {
 }

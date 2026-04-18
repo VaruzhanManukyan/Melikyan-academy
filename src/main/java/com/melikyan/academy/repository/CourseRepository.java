@@ -13,17 +13,15 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
     @EntityGraph(attributePaths = {
-            "purchasable",
-            "purchasable.category",
-            "purchasable.createdBy"
+            "contentItem",
+            "contentItem.createdBy"
     })
     @Query("SELECT course FROM Course course WHERE course.id = :id")
     Optional<Course> findDetailedById(UUID id);
 
     @EntityGraph(attributePaths = {
-            "purchasable",
-            "purchasable.category",
-            "purchasable.createdBy"
+            "contentItem",
+            "contentItem.createdBy"
     })
     @Query("SELECT course FROM Course course")
     List<Course> findAllDetailed();

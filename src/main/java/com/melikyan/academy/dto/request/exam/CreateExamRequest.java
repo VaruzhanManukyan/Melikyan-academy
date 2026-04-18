@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 
 public record CreateExamRequest(
-        @NotNull(message = "{exam.purchasableId.notNull}")
-        UUID purchasableId
+        @NotNull(message = "{exam.contentItemId.notNull}")
+        UUID contentItemId
 ) {
 }

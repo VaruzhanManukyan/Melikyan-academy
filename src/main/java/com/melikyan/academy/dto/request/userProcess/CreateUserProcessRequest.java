@@ -21,8 +21,8 @@ public record CreateUserProcessRequest(
         @NotNull(message = "{userProcess.userId.notNull}")
         UUID userId,
 
-        @NotNull(message = "{userProcess.purchasableId.notNull}")
-        UUID purchasableId,
+        @NotNull(message = "{userProcess.contentItemId.notNull}")
+        UUID contentItemId,
 
         OffsetDateTime lastAccessedAt
 ) {

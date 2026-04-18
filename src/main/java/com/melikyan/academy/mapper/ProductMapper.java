@@ -18,7 +18,7 @@ public interface ProductMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "purchasables", ignore = true)
+    @Mapping(target = "contentItems", ignore = true)
     Product toEntity(CreateProductRequest request);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
@@ -28,7 +28,7 @@ public interface ProductMapper {
     @Mapping(target = "createdBy", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "purchasables", ignore = true)
+    @Mapping(target = "contentItems", ignore = true)
     void updateEntityFromRequest(UpdateProductRequest request, @MappingTarget Product product);
 
     @Mapping(target = "createdById", source = "createdBy.id")

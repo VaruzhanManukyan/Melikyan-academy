@@ -25,7 +25,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryServiceTest {
-
     @Mock
     private CategoryMapper categoryMapper;
 

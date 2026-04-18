@@ -23,7 +23,7 @@ public record CreateLessonRequest(
         @Size(max = 500, message = "{lesson.description.size}")
         String description,
 
-        @NotNull(message = "{lesson.sessionType.notNull}")
+        @NotNull(message = "{lesson.type.notNull}")
         LessonType lessonType,
 
         @NotBlank(message = "{lesson.valueUrl.notBlank}")

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.UUID;
 
 @Repository
-public interface PurchasableRepository extends JpaRepository<ContentItem, UUID> {
+public interface ContentItemRepository extends JpaRepository<ContentItem, UUID> {
     boolean existsByTitleIgnoreCase(String title);
 
     boolean existsByTitleIgnoreCaseAndIdNot(String title, UUID id);

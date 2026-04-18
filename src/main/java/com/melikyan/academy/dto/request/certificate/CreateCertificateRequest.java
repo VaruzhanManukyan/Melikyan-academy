@@ -26,7 +26,7 @@ public record CreateCertificateRequest(
         @NotNull(message = "{certificate.userId.notNull}")
         UUID userId,
 
-        @NotNull(message = "{certificate.purchasableId.notNull}")
-        UUID purchasableId
+        @NotNull(message = "{certificate.contentItemId.notNull}")
+        UUID contentItemId
 ) {
 }

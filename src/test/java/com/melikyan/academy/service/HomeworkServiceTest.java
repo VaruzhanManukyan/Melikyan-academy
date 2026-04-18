@@ -148,6 +148,7 @@ class HomeworkServiceTest {
         );
 
         when(homeworkRepository.existsByLessonIdAndOrderIndex(lessonId, 1)).thenReturn(true);
+        when(homeworkRepository.existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1")).thenReturn(false);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -160,7 +161,9 @@ class HomeworkServiceTest {
         );
 
         verify(homeworkRepository).existsByLessonIdAndOrderIndex(lessonId, 1);
-        verifyNoMoreInteractions(homeworkRepository);
+        verify(homeworkRepository).existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1");
+        verify(homeworkRepository, never()).saveAndFlush(any(Homework.class));
+
         verifyNoInteractions(userRepository, lessonRepository, homeworkMapper);
     }
 

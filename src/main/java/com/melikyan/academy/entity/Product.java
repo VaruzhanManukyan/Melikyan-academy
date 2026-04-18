@@ -52,7 +52,7 @@ public class Product extends BaseEntity {
     private User createdBy;
 
     @OneToMany(mappedBy = "product")
-    private List<ProductContentItem> productContentItems;
+    private List<ProductContentItem> contentItems;
 
     @OneToMany(mappedBy = "product")
     private List<Transaction> transactions;

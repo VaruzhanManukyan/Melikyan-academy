@@ -15,7 +15,7 @@ public record UpdateUserProcessRequest(
 
         BigDecimal scoreAccumulated,
 
-        UUID purchasableId,
+        UUID contentItemId,
 
         OffsetDateTime lastAccessedAt
 ) {

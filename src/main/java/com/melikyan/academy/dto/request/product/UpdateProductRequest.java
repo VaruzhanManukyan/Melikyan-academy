@@ -23,6 +23,6 @@ public record UpdateProductRequest(
         @JsonProperty("is_private")
         Boolean isPrivate,
 
-        List<UUID> purchasableIds
+        List<UUID> contentItemIds
 ) {
 }

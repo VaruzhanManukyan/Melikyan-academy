@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.repository.CategoryRepository;
-import com.melikyan.academy.repository.PurchasableRepository;
+import com.melikyan.academy.repository.ContentItemRepository;
 import org.springframework.web.server.ResponseStatusException;
 import com.melikyan.academy.dto.response.course.CourseResponse;
 import com.melikyan.academy.dto.request.course.CreateCourseRequest;
@@ -35,7 +35,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class CourseServiceTest {
-
     @Mock
     private CourseMapper courseMapper;
 
@@ -46,44 +45,34 @@ class CourseServiceTest {
     private CourseRepository courseRepository;
 
     @Mock
-    private CategoryRepository categoryRepository;
-
-    @Mock
-    private PurchasableRepository purchasableRepository;
+    private ContentItemRepository contentItemRepository;
 
     @InjectMocks
     private CourseService courseService;
 
     private UUID courseId;
-    private UUID purchasableId;
-    private UUID categoryId;
     private UUID createdById;
+    private UUID contentItemId;
 
     private User user;
-    private Category category;
-    private ContentItem contentItem;
     private Course course;
+    private ContentItem contentItem;
     private CourseResponse response;
 
     @BeforeEach
     void setUp() {
         courseId = UUID.randomUUID();
-        purchasableId = UUID.randomUUID();
-        categoryId = UUID.randomUUID();
+        contentItemId = UUID.randomUUID();
         createdById = UUID.randomUUID();
 
         user = new User();
         user.setId(createdById);
 
-        category = new Category();
-        category.setId(categoryId);
-
         contentItem = new ContentItem();
-        contentItem.setId(purchasableId);
+        contentItem.setId(contentItemId);
         contentItem.setTitle("Java Backend Fundamentals");
         contentItem.setDescription("Spring Boot, JPA, Security");
         contentItem.setType(ContentItemType.COURSE);
-        contentItem.setCategory(category);
         contentItem.setCreatedBy(user);
 
         course = new Course();
@@ -99,9 +88,8 @@ class CourseServiceTest {
                 ContentItemType.COURSE,
                 12,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
-                categoryId,
                 createdById,
-                purchasableId,
+                contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-14T12:30:00+04:00")
         );
@@ -116,14 +104,12 @@ class CourseServiceTest {
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 12,
-                categoryId,
                 createdById
         );
 
-        when(purchasableRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(false);
+        when(contentItemRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(false);
         when(userRepository.findById(createdById)).thenReturn(Optional.of(user));
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
-        when(purchasableRepository.save(any(ContentItem.class))).thenReturn(contentItem);
+        when(contentItemRepository.save(any(ContentItem.class))).thenReturn(contentItem);
         when(courseRepository.saveAndFlush(any(Course.class))).thenReturn(course);
         when(courseMapper.toResponse(course)).thenReturn(response);
 
@@ -132,14 +118,13 @@ class CourseServiceTest {
         assertNotNull(actual);
         assertEquals(response, actual);
 
-        ArgumentCaptor<ContentItem> purchasableCaptor = ArgumentCaptor.forClass(ContentItem.class);
-        verify(purchasableRepository).save(purchasableCaptor.capture());
+        ArgumentCaptor<ContentItem> contentItemCaptor = ArgumentCaptor.forClass(ContentItem.class);
+        verify(contentItemRepository).save(contentItemCaptor.capture());
 
-        ContentItem savedContentItem = purchasableCaptor.getValue();
+        ContentItem savedContentItem = contentItemCaptor.getValue();
         assertEquals("Java Backend Fundamentals", savedContentItem.getTitle());
         assertEquals("Spring Boot, JPA, Security", savedContentItem.getDescription());
         assertEquals(ContentItemType.COURSE, savedContentItem.getType());
-        assertEquals(category, savedContentItem.getCategory());
         assertEquals(user, savedContentItem.getCreatedBy());
 
         ArgumentCaptor<Course> courseCaptor = ArgumentCaptor.forClass(Course.class);
@@ -162,7 +147,6 @@ class CourseServiceTest {
                 ContentItemType.EXAM,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 12,
-                categoryId,
                 createdById
         );
 
@@ -174,7 +158,7 @@ class CourseServiceTest {
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
         assertEquals("Type must be COURSE for course creation", exception.getReason());
 
-        verifyNoInteractions(userRepository, categoryRepository, purchasableRepository, courseRepository, courseMapper);
+        verifyNoInteractions(userRepository, contentItemRepository, courseRepository, courseMapper);
     }
 
     @Test
@@ -186,11 +170,10 @@ class CourseServiceTest {
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 12,
-                categoryId,
                 createdById
         );
 
-        when(purchasableRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(true);
+        when(contentItemRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -200,9 +183,9 @@ class CourseServiceTest {
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
         assertEquals("Course with this title already exists", exception.getReason());
 
-        verify(purchasableRepository).existsByTitleIgnoreCase("Java Backend Fundamentals");
-        verifyNoMoreInteractions(purchasableRepository);
-        verifyNoInteractions(userRepository, categoryRepository, courseRepository, courseMapper);
+        verify(contentItemRepository).existsByTitleIgnoreCase("Java Backend Fundamentals");
+        verifyNoMoreInteractions(contentItemRepository);
+        verifyNoInteractions(userRepository, courseRepository, courseMapper);
     }
 
     @Test
@@ -214,11 +197,10 @@ class CourseServiceTest {
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
                 12,
-                categoryId,
                 createdById
         );
 
-        when(purchasableRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(false);
+        when(contentItemRepository.existsByTitleIgnoreCase("Java Backend Fundamentals")).thenReturn(false);
         when(userRepository.findById(createdById)).thenReturn(Optional.empty());
 
         ResponseStatusException exception = assertThrows(
@@ -230,7 +212,7 @@ class CourseServiceTest {
         assertEquals("User not found with id: " + createdById, exception.getReason());
 
         verify(userRepository).findById(createdById);
-        verifyNoInteractions(categoryRepository, courseRepository, courseMapper);
+        verifyNoInteractions(courseRepository, courseMapper);
     }
 
     @Test
@@ -277,7 +259,6 @@ class CourseServiceTest {
                 OffsetDateTime.parse("2026-06-01T10:00:00+04:00"),
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                UUID.randomUUID(),
                 OffsetDateTime.parse("2026-04-15T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-15T12:30:00+04:00")
         );
@@ -300,17 +281,12 @@ class CourseServiceTest {
     @Test
     @DisplayName("update -> should update course successfully")
     void update_shouldUpdateCourseSuccessfully() {
-        UUID newCategoryId = UUID.randomUUID();
-        Category newCategory = new Category();
-        newCategory.setId(newCategoryId);
-
         UpdateCourseRequest request = new UpdateCourseRequest(
                 "  Advanced Java  ",
                 "  Updated description  ",
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                16,
-                newCategoryId
+                16
         );
 
         Course updatedCourse = new Course();
@@ -326,16 +302,14 @@ class CourseServiceTest {
                 ContentItemType.COURSE,
                 16,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                newCategoryId,
                 createdById,
-                purchasableId,
+                contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-16T14:00:00+04:00")
         );
 
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
-        when(purchasableRepository.existsByTitleIgnoreCaseAndIdNot("Advanced Java", purchasableId)).thenReturn(false);
-        when(categoryRepository.findById(newCategoryId)).thenReturn(Optional.of(newCategory));
+        when(contentItemRepository.existsByTitleIgnoreCaseAndIdNot("Advanced Java", contentItemId)).thenReturn(false);
         when(courseRepository.saveAndFlush(course)).thenReturn(updatedCourse);
         when(courseMapper.toResponse(updatedCourse)).thenReturn(updatedResponse);
 
@@ -344,13 +318,11 @@ class CourseServiceTest {
         assertEquals(updatedResponse, actual);
         assertEquals("Advanced Java", contentItem.getTitle());
         assertEquals("Updated description", contentItem.getDescription());
-        assertEquals(newCategory, contentItem.getCategory());
         assertEquals(request.startDate(), course.getStartDate());
         assertEquals(request.durationWeeks(), course.getDurationWeeks());
 
         verify(courseRepository).findDetailedById(courseId);
-        verify(purchasableRepository).existsByTitleIgnoreCaseAndIdNot("Advanced Java", purchasableId);
-        verify(categoryRepository).findById(newCategoryId);
+        verify(contentItemRepository).existsByTitleIgnoreCaseAndIdNot("Advanced Java", contentItemId);
         verify(courseRepository).saveAndFlush(course);
         verify(courseMapper).toResponse(updatedCourse);
     }
@@ -363,8 +335,7 @@ class CourseServiceTest {
                 "Updated description",
                 ContentItemType.EXAM,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                16,
-                categoryId
+                16
         );
 
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
@@ -379,7 +350,7 @@ class CourseServiceTest {
 
         verify(courseRepository).findDetailedById(courseId);
         verifyNoMoreInteractions(courseRepository);
-        verifyNoInteractions(purchasableRepository, categoryRepository, courseMapper);
+        verifyNoInteractions(contentItemRepository, courseMapper);
     }
 
     @Test
@@ -390,12 +361,11 @@ class CourseServiceTest {
                 "Updated description",
                 ContentItemType.COURSE,
                 OffsetDateTime.parse("2026-06-10T10:00:00+04:00"),
-                16,
-                categoryId
+                16
         );
 
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
-        when(purchasableRepository.existsByTitleIgnoreCaseAndIdNot("Advanced Java", purchasableId)).thenReturn(true);
+        when(contentItemRepository.existsByTitleIgnoreCaseAndIdNot("Advanced Java", contentItemId)).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -406,9 +376,9 @@ class CourseServiceTest {
         assertEquals("Course with this title already exists", exception.getReason());
 
         verify(courseRepository).findDetailedById(courseId);
-        verify(purchasableRepository).existsByTitleIgnoreCaseAndIdNot("Advanced Java", purchasableId);
-        verifyNoMoreInteractions(purchasableRepository);
-        verifyNoInteractions(categoryRepository, courseMapper);
+        verify(contentItemRepository).existsByTitleIgnoreCaseAndIdNot("Advanced Java", contentItemId);
+        verifyNoMoreInteractions(contentItemRepository);
+        verifyNoInteractions(courseMapper);
     }
 
     @Test
@@ -418,7 +388,6 @@ class CourseServiceTest {
                 null,
                 "   ",
                 ContentItemType.COURSE,
-                null,
                 null,
                 null
         );
@@ -437,14 +406,14 @@ class CourseServiceTest {
     }
 
     @Test
-    @DisplayName("delete -> should delete course and purchasable")
-    void delete_shouldDeleteCourseAndPurchasable() {
+    @DisplayName("delete -> should delete course and content item")
+    void delete_shouldDeleteCourseAndContentItem() {
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
 
         courseService.delete(courseId);
 
         verify(courseRepository).findDetailedById(courseId);
         verify(courseRepository).delete(course);
-        verify(purchasableRepository).delete(contentItem);
+        verify(contentItemRepository).delete(contentItem);
     }
 }

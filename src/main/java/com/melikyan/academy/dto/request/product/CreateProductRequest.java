@@ -24,8 +24,8 @@ public record CreateProductRequest(
         @NotNull(message = "{product.isPrivate.notNull}")
         Boolean isPrivate,
 
-        @NotEmpty(message = "{product.purchasableIds.notEmpty}")
-        List<UUID> purchasableIds
+        @NotEmpty(message = "{product.contentItemIds.notEmpty}")
+        List<UUID> contentItemIds
 ) {
 }
 

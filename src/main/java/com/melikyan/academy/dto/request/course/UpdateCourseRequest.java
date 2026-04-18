@@ -19,8 +19,6 @@ public record UpdateCourseRequest(
         OffsetDateTime startDate,
 
         @Min(value = 1, message = "{course.durationWeeks.min}")
-        Integer durationWeeks,
-
-        UUID categoryId
+        Integer durationWeeks
 ) {
 }
