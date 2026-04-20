@@ -1,11 +1,11 @@
 package com.melikyan.academy.controller;
 
-import com.melikyan.academy.entity.enums.LessonState;
-import com.melikyan.academy.entity.enums.LessonType;
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
 import com.melikyan.academy.service.LessonService;
+import com.melikyan.academy.entity.enums.LessonType;
 import org.springframework.test.web.servlet.MockMvc;
+import com.melikyan.academy.entity.enums.LessonState;
 import org.springframework.context.annotation.FilterType;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.dto.response.lesson.LessonResponse;

@@ -1,5 +1,6 @@
 package com.melikyan.academy.dto.response.product;
 
+import com.melikyan.academy.entity.enums.ProductType;
 import com.melikyan.academy.dto.response.category.CategoryShortResponse;
 import com.melikyan.academy.dto.response.contentItem.ContentItemShortResponse;
 
@@ -12,9 +13,10 @@ public record ProductResponse(
         UUID id,
         String title,
         String description,
+        ProductType type,
         BigDecimal price,
         boolean isPrivate,
-        List<ContentItemShortResponse> contetItems,
+        List<ContentItemShortResponse> contentItems,
         CategoryShortResponse category,
         UUID createdById,
         OffsetDateTime createdAt,

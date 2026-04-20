@@ -1,5 +1,6 @@
 package com.melikyan.academy.dto.request.product;
 
+import com.melikyan.academy.entity.enums.ProductType;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,12 +17,16 @@ public record UpdateProductRequest(
         @Size(max = 500, message = "{product.description.size}")
         String description,
 
+        ProductType type,
+
         @Digits(integer = 10, fraction = 2, message = "{product.price.digits}")
         @DecimalMin(value = "0.00", inclusive = true, message = "{product.price.min}")
         BigDecimal price,
 
         @JsonProperty("is_private")
         Boolean isPrivate,
+
+        UUID categoryId,
 
         List<UUID> contentItemIds
 ) {
