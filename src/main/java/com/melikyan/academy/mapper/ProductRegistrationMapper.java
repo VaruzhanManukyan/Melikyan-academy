@@ -1,31 +1,18 @@
 package com.melikyan.academy.mapper;
 
-import org.mapstruct.NullValuePropertyMappingStrategy;
-import com.melikyan.academy.entity.ProductRegistration;
-import com.melikyan.academy.dto.response.productRegister.ProductRegisterResponse;
-import com.melikyan.academy.dto.request.productRegister.CreateProductRegisterRequest;
-import com.melikyan.academy.dto.request.productRegister.UpdateProductRegisterRequest;
+import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.BeanMapping;
-import org.mapstruct.MappingTarget;
+import com.melikyan.academy.entity.ProductRegistration;
+import com.melikyan.academy.dto.response.productRegistration.ProductRegistrationResponse;
 
 import java.util.List;
 
-public interface ProductRegisterMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    ProductRegistration toEntity(CreateProductRegisterRequest request);
+@Mapper(componentModel = "spring")
+public interface ProductRegistrationMapper {
+    @Mapping(target = "userId", source = "user.id")
+    @Mapping(target = "productId", source = "product.id")
+    @Mapping(target = "transactionId", source = "transaction.id")
+    ProductRegistrationResponse toResponse(ProductRegistration productRegistration);
 
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdBy", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromRequest(UpdateProductRegisterRequest request, @MappingTarget ProductRegistration productRegistration);
-
-    ProductRegisterResponse toResponse(ProductRegistration productRegistration);
-
-    List<ProductRegisterResponse> toResponseList(List<ProductRegistration> productRegistrations);
+    List<ProductRegistrationResponse> toResponseList(List<ProductRegistration> productRegistrations);
 }

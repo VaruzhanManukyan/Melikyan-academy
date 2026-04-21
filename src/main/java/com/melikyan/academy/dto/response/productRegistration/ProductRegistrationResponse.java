@@ -1,16 +1,16 @@
-package com.melikyan.academy.dto.response.productRegister;
+package com.melikyan.academy.dto.response.productRegistration;
 
 import com.melikyan.academy.entity.enums.RegistrationStatus;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-public record ProductRegisterResponse(
+public record ProductRegistrationResponse(
         UUID id,
+        RegistrationStatus status,
         UUID productId,
         UUID userId,
         UUID transactionId,
-        RegistrationStatus status,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt
 ) {

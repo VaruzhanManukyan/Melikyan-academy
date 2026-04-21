@@ -1,4 +1,36 @@
 package com.melikyan.academy.repository;
 
-public interface ProductRegistrationRepository {
+import com.melikyan.academy.entity.ProductRegistration;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.EntityGraph;
+
+import java.util.List;
+import java.util.UUID;
+import java.util.Optional;
+
+@Repository
+public interface ProductRegistrationRepository extends JpaRepository<ProductRegistration, UUID> {
+    @EntityGraph(attributePaths = {
+            "user",
+            "product",
+            "transaction"
+    })
+    Optional<ProductRegistration> findDetailedById(UUID id);
+
+    @EntityGraph(attributePaths = {
+            "user",
+            "product",
+            "transaction"
+    })
+    List<ProductRegistration> findAllByUserId(UUID userId);
+
+    @EntityGraph(attributePaths = {
+            "user",
+            "product",
+            "transaction"
+    })
+    List<ProductRegistration> findAllByProductId(UUID productId);
+
+    boolean existsByUserIdAndProductId(UUID userId, UUID productId);
 }
