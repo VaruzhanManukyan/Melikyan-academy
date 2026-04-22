@@ -9,6 +9,7 @@ import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.LessonRepository;
 import com.melikyan.academy.repository.HomeworkRepository;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.melikyan.academy.dto.response.homework.HomeworkResponse;
 import com.melikyan.academy.dto.request.homework.UpdateHomeworkRequest;
 import com.melikyan.academy.dto.request.homework.CreateHomeworkRequest;
@@ -34,7 +35,7 @@ public class HomeworkService {
         if (normalizedTitle.isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Course title must not be blank"
+                    "Homework title must not be blank"
             );
         }
 
@@ -137,8 +138,17 @@ public class HomeworkService {
         homework.setCreatedBy(createdBy);
         homework.setLesson(lesson);
 
-        Homework savedHomework = homeworkRepository.saveAndFlush(homework);
-        return homeworkMapper.toResponse(savedHomework);
+        try {
+            Homework savedHomework = homeworkRepository.saveAndFlush(homework);
+            return homeworkMapper.toResponse(savedHomework);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Homework with such title or order index already exists in this lesson",
+                    exception
+            );
+        }
+
     }
 
     @Transactional(readOnly = true)
@@ -164,27 +174,17 @@ public class HomeworkService {
     public HomeworkResponse update(UUID id, UpdateHomeworkRequest request) {
         Homework homework = getHomeworkEntityById(id);
 
-        UUID targetLessonId = request.lessonId() != null
-                ? request.lessonId()
-                : homework.getLesson().getId();
-
         Integer targetOrderIndex = request.orderIndex() != null
                 ? request.orderIndex()
                 : homework.getOrderIndex();
 
-        if (!targetLessonId.equals(homework.getLesson().getId())
-                || !targetOrderIndex.equals(homework.getOrderIndex())) {
-            validateOrderIndexUnique(targetLessonId, targetOrderIndex, homework.getId());
-        }
-
-        if (request.lessonId() != null) {
-            Lesson lesson = getLessonById(request.lessonId());
-            homework.setLesson(lesson);
+        if (!targetOrderIndex.equals(homework.getOrderIndex())) {
+            validateOrderIndexUnique(homework.getLesson().getId(), targetOrderIndex, homework.getId());
         }
 
         if (request.title() != null) {
             String normalizedTitle = normalizeTitle(request.title());
-            validateTitleUnique(targetLessonId, normalizedTitle, homework.getId());
+            validateTitleUnique(homework.getLesson().getId(), normalizedTitle, homework.getId());
             homework.setTitle(normalizedTitle);
         }
 

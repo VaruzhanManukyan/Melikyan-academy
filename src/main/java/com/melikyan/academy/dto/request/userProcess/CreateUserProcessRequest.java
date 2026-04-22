@@ -12,10 +12,6 @@ public record CreateUserProcessRequest(
         @Min(value = 0, message = "{userProcess.currentStep.min}")
         Integer currentStep,
 
-        @NotNull(message = "{userProcess.totalSteps.notNull}")
-        @Min(value = 1, message = "{userProcess.totalSteps.min}")
-        Integer totalSteps,
-
         BigDecimal scoreAccumulated,
 
         @NotNull(message = "{userProcess.userId.notNull}")

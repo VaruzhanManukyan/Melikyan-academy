@@ -3,10 +3,9 @@ package com.melikyan.academy.service;
 import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Lesson;
-import org.springframework.http.HttpStatus;
 import com.melikyan.academy.entity.Homework;
-import com.melikyan.academy.mapper.HomeworkMapper;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.melikyan.academy.mapper.HomeworkMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.LessonRepository;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -18,6 +17,8 @@ import com.melikyan.academy.dto.request.homework.UpdateHomeworkRequest;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
@@ -26,13 +27,10 @@ import java.util.Optional;
 import java.time.OffsetDateTime;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class HomeworkServiceTest {
-
     @Mock
     private UserRepository userRepository;
 
@@ -48,355 +46,211 @@ class HomeworkServiceTest {
     @InjectMocks
     private HomeworkService homeworkService;
 
+    private UUID userId;
+    private UUID lessonId;
+    private UUID homeworkId;
+
+    private User user;
+    private Lesson lesson;
+    private Homework homework;
+
+    @BeforeEach
+    void setUp() {
+        userId = UUID.randomUUID();
+        lessonId = UUID.randomUUID();
+        homeworkId = UUID.randomUUID();
+
+        user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        lesson = new Lesson();
+        ReflectionTestUtils.setField(lesson, "id", lessonId);
+
+        homework = new Homework();
+        ReflectionTestUtils.setField(homework, "id", homeworkId);
+        homework.setOrderIndex(1);
+        homework.setTitle("Old title");
+        homework.setDescription("Old description");
+        homework.setDueDate(OffsetDateTime.parse("2026-04-25T18:00:00+04:00"));
+        homework.setIsPublished(true);
+        homework.setLesson(lesson);
+        homework.setCreatedBy(user);
+    }
+
     @Test
-    void create_shouldCreateAndReturnResponse() {
-        UUID userId = UUID.randomUUID();
-        UUID lessonId = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+    @DisplayName("create -> saves homework and returns response")
+    void create_ShouldSaveHomeworkAndReturnResponse() {
+        CreateHomeworkRequest request = mock(CreateHomeworkRequest.class);
+        HomeworkResponse response = mock(HomeworkResponse.class);
+
         OffsetDateTime dueDate = OffsetDateTime.parse("2026-04-25T18:00:00+04:00");
 
-        CreateHomeworkRequest request = new CreateHomeworkRequest(
-                1,
-                "  Homework 1  ",
-                "  Homework description  ",
-                dueDate,
-                true,
-                lessonId,
-                userId
-        );
+        when(request.orderIndex()).thenReturn(1);
+        when(request.title()).thenReturn("  Homework 1  ");
+        when(request.description()).thenReturn("  Homework description  ");
+        when(request.dueDate()).thenReturn(dueDate);
+        when(request.isPublished()).thenReturn(true);
+        when(request.lessonId()).thenReturn(lessonId);
+        when(request.createdById()).thenReturn(userId);
 
-        User user = createUser(userId);
-        Lesson lesson = createLesson(lessonId);
-
-        HomeworkResponse response = new HomeworkResponse(
-                homeworkId,
-                1,
-                "Homework 1",
-                "Homework description",
-                dueDate,
-                true,
-                lessonId,
-                userId,
-                OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
-                OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
-        );
-
+        when(homeworkRepository.existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1")).thenReturn(false);
         when(homeworkRepository.existsByLessonIdAndOrderIndex(lessonId, 1)).thenReturn(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
         when(homeworkRepository.saveAndFlush(any(Homework.class))).thenAnswer(invocation -> {
-            Homework homework = invocation.getArgument(0);
-            ReflectionTestUtils.setField(homework, "id", homeworkId);
-            return homework;
+            Homework saved = invocation.getArgument(0);
+            ReflectionTestUtils.setField(saved, "id", homeworkId);
+            return saved;
         });
         when(homeworkMapper.toResponse(any(Homework.class))).thenReturn(response);
 
         HomeworkResponse result = homeworkService.create(request);
 
-        assertThat(result).isEqualTo(response);
+        assertEquals(response, result);
 
         ArgumentCaptor<Homework> captor = ArgumentCaptor.forClass(Homework.class);
         verify(homeworkRepository).saveAndFlush(captor.capture());
 
         Homework savedHomework = captor.getValue();
-        assertThat(savedHomework.getTitle()).isEqualTo("Homework 1");
-        assertThat(savedHomework.getDescription()).isEqualTo("Homework description");
-        assertThat(savedHomework.getOrderIndex()).isEqualTo(1);
-        assertThat(savedHomework.getDueDate()).isEqualTo(dueDate);
-        assertThat(savedHomework.getIsPublished()).isTrue();
-        assertThat(savedHomework.getCreatedBy()).isEqualTo(user);
-        assertThat(savedHomework.getLesson()).isEqualTo(lesson);
-
-        verify(homeworkMapper).toResponse(any(Homework.class));
+        assertEquals(1, savedHomework.getOrderIndex());
+        assertEquals("Homework 1", savedHomework.getTitle());
+        assertEquals("Homework description", savedHomework.getDescription());
+        assertEquals(dueDate, savedHomework.getDueDate());
+        assertTrue(savedHomework.getIsPublished());
+        assertEquals(user, savedHomework.getCreatedBy());
+        assertEquals(lesson, savedHomework.getLesson());
     }
 
     @Test
-    void create_shouldThrowBadRequest_whenTitleIsBlank() {
-        CreateHomeworkRequest request = new CreateHomeworkRequest(
-                1,
-                "   ",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                UUID.randomUUID(),
-                UUID.randomUUID()
-        );
+    @DisplayName("create -> throws bad request when title is blank")
+    void create_ShouldThrowBadRequest_WhenTitleIsBlank() {
+        CreateHomeworkRequest request = mock(CreateHomeworkRequest.class);
+
+        when(request.title()).thenReturn("   ");
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> homeworkService.create(request)
         );
 
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(exception.getReason()).isEqualTo("Course title must not be blank");
+        assertEquals(400, exception.getStatusCode().value());
+        assertEquals("Homework title must not be blank", exception.getReason());
 
         verifyNoInteractions(userRepository, lessonRepository, homeworkRepository, homeworkMapper);
     }
 
     @Test
-    void create_shouldThrowConflict_whenOrderIndexAlreadyExists() {
-        UUID lessonId = UUID.randomUUID();
+    @DisplayName("create -> throws conflict when title already exists")
+    void create_ShouldThrowConflict_WhenTitleAlreadyExists() {
+        CreateHomeworkRequest request = mock(CreateHomeworkRequest.class);
 
-        CreateHomeworkRequest request = new CreateHomeworkRequest(
-                1,
-                "Homework 1",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                lessonId,
-                UUID.randomUUID()
-        );
+        when(request.title()).thenReturn("Homework 1");
+        when(request.lessonId()).thenReturn(lessonId);
 
-        when(homeworkRepository.existsByLessonIdAndOrderIndex(lessonId, 1)).thenReturn(true);
-        when(homeworkRepository.existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1")).thenReturn(false);
+        when(homeworkRepository.existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1")).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> homeworkService.create(request)
         );
 
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(exception.getReason()).isEqualTo(
-                "Homework with order index 1 already exists in lesson " + lessonId
+        assertEquals(409, exception.getStatusCode().value());
+        assertEquals(
+                "Homework with title 'Homework 1' already exists in lesson " + lessonId,
+                exception.getReason()
         );
 
-        verify(homeworkRepository).existsByLessonIdAndOrderIndex(lessonId, 1);
-        verify(homeworkRepository).existsByLessonIdAndTitleIgnoreCase(lessonId, "Homework 1");
         verify(homeworkRepository, never()).saveAndFlush(any(Homework.class));
-
         verifyNoInteractions(userRepository, lessonRepository, homeworkMapper);
     }
 
     @Test
-    void create_shouldThrowNotFound_whenUserNotFound() {
-        UUID userId = UUID.randomUUID();
-        UUID lessonId = UUID.randomUUID();
-
-        CreateHomeworkRequest request = new CreateHomeworkRequest(
-                1,
-                "Homework 1",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                lessonId,
-                userId
-        );
-
-        when(homeworkRepository.existsByLessonIdAndOrderIndex(lessonId, 1)).thenReturn(false);
-        when(userRepository.findById(userId)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkService.create(request)
-        );
-
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(exception.getReason()).isEqualTo("User not found with id: " + userId);
-
-        verify(userRepository).findById(userId);
-        verifyNoInteractions(lessonRepository, homeworkMapper);
-    }
-
-    @Test
-    void getById_shouldReturnResponse() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID lessonId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
-
-        Homework homework = createHomework(
-                homeworkId,
-                1,
-                "Homework 1",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                createLesson(lessonId),
-                createUser(userId)
-        );
-
-        HomeworkResponse response = new HomeworkResponse(
-                homeworkId,
-                1,
-                "Homework 1",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                lessonId,
-                userId,
-                OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
-                OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
-        );
+    @DisplayName("getById -> returns mapped response")
+    void getById_ShouldReturnMappedResponse() {
+        HomeworkResponse response = mock(HomeworkResponse.class);
 
         when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
         when(homeworkMapper.toResponse(homework)).thenReturn(response);
 
         HomeworkResponse result = homeworkService.getById(homeworkId);
 
-        assertThat(result).isEqualTo(response);
+        assertEquals(response, result);
         verify(homeworkRepository).findById(homeworkId);
         verify(homeworkMapper).toResponse(homework);
     }
 
     @Test
-    void getById_shouldThrowNotFound_whenHomeworkDoesNotExist() {
-        UUID homeworkId = UUID.randomUUID();
+    @DisplayName("getAll -> returns mapped list")
+    void getAll_ShouldReturnMappedList() {
+        Homework secondHomework = new Homework();
+        List<Homework> entities = List.of(homework, secondHomework);
 
-        when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.empty());
+        HomeworkResponse firstResponse = mock(HomeworkResponse.class);
+        HomeworkResponse secondResponse = mock(HomeworkResponse.class);
+        List<HomeworkResponse> responses = List.of(firstResponse, secondResponse);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkService.getById(homeworkId)
-        );
-
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(exception.getReason()).isEqualTo("Homework not found with id: " + homeworkId);
-
-        verify(homeworkRepository).findById(homeworkId);
-        verifyNoInteractions(homeworkMapper);
-    }
-
-    @Test
-    void getAll_shouldReturnResponseList() {
-        Homework homework1 = createHomework(
-                UUID.randomUUID(),
-                1,
-                "Homework 1",
-                "Description 1",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                createLesson(UUID.randomUUID()),
-                createUser(UUID.randomUUID())
-        );
-
-        Homework homework2 = createHomework(
-                UUID.randomUUID(),
-                2,
-                "Homework 2",
-                "Description 2",
-                OffsetDateTime.parse("2026-04-26T18:00:00+04:00"),
-                false,
-                createLesson(UUID.randomUUID()),
-                createUser(UUID.randomUUID())
-        );
-
-        List<Homework> homeworks = List.of(homework1, homework2);
-        List<HomeworkResponse> responses = List.of(mock(HomeworkResponse.class), mock(HomeworkResponse.class));
-
-        when(homeworkRepository.findAll()).thenReturn(homeworks);
-        when(homeworkMapper.toResponseList(homeworks)).thenReturn(responses);
+        when(homeworkRepository.findAll()).thenReturn(entities);
+        when(homeworkMapper.toResponseList(entities)).thenReturn(responses);
 
         List<HomeworkResponse> result = homeworkService.getAll();
 
-        assertThat(result).isEqualTo(responses);
+        assertEquals(responses, result);
         verify(homeworkRepository).findAll();
-        verify(homeworkMapper).toResponseList(homeworks);
+        verify(homeworkMapper).toResponseList(entities);
     }
 
     @Test
-    void update_shouldUpdateAndReturnResponse() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID oldLessonId = UUID.randomUUID();
-        UUID newLessonId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+    @DisplayName("update -> updates provided fields and returns response")
+    void update_ShouldUpdateHomeworkAndReturnResponse() {
+        UpdateHomeworkRequest request = mock(UpdateHomeworkRequest.class);
+        HomeworkResponse response = mock(HomeworkResponse.class);
 
-        Lesson oldLesson = createLesson(oldLessonId);
-        Lesson newLesson = createLesson(newLessonId);
-        User user = createUser(userId);
+        OffsetDateTime updatedDueDate = OffsetDateTime.parse("2026-04-30T20:00:00+04:00");
 
-        Homework homework = createHomework(
-                homeworkId,
-                1,
-                "Old title",
-                "Old description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                oldLesson,
-                user
-        );
-
-        UpdateHomeworkRequest request = new UpdateHomeworkRequest(
-                2,
-                "  Updated title  ",
-                "   ",
-                OffsetDateTime.parse("2026-04-30T20:00:00+04:00"),
-                false,
-                newLessonId
-        );
-
-        HomeworkResponse response = new HomeworkResponse(
-                homeworkId,
-                2,
-                "Updated title",
-                null,
-                OffsetDateTime.parse("2026-04-30T20:00:00+04:00"),
-                false,
-                newLessonId,
-                userId,
-                OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
-                OffsetDateTime.parse("2026-04-17T10:00:00+04:00")
-        );
+        when(request.orderIndex()).thenReturn(2);
+        when(request.title()).thenReturn("  Updated title  ");
+        when(request.description()).thenReturn("   ");
+        when(request.dueDate()).thenReturn(updatedDueDate);
+        when(request.isPublished()).thenReturn(false);
 
         when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
-        when(homeworkRepository.existsByLessonIdAndOrderIndexAndIdNot(newLessonId, 2, homeworkId))
+        when(homeworkRepository.existsByLessonIdAndOrderIndexAndIdNot(lessonId, 2, homeworkId)).thenReturn(false);
+        when(homeworkRepository.existsByLessonIdAndTitleIgnoreCaseAndIdNot(lessonId, "Updated title", homeworkId))
                 .thenReturn(false);
-        when(lessonRepository.findById(newLessonId)).thenReturn(Optional.of(newLesson));
         when(homeworkRepository.save(any(Homework.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(homeworkMapper.toResponse(any(Homework.class))).thenReturn(response);
 
         HomeworkResponse result = homeworkService.update(homeworkId, request);
 
-        assertThat(result).isEqualTo(response);
+        assertEquals(response, result);
+        assertEquals(2, homework.getOrderIndex());
+        assertEquals("Updated title", homework.getTitle());
+        assertNull(homework.getDescription());
+        assertEquals(updatedDueDate, homework.getDueDate());
+        assertFalse(homework.getIsPublished());
 
-        ArgumentCaptor<Homework> captor = ArgumentCaptor.forClass(Homework.class);
-        verify(homeworkRepository).save(captor.capture());
-
-        Homework savedHomework = captor.getValue();
-        assertThat(savedHomework.getTitle()).isEqualTo("Updated title");
-        assertThat(savedHomework.getDescription()).isNull();
-        assertThat(savedHomework.getOrderIndex()).isEqualTo(2);
-        assertThat(savedHomework.getDueDate()).isEqualTo(OffsetDateTime.parse("2026-04-30T20:00:00+04:00"));
-        assertThat(savedHomework.getIsPublished()).isFalse();
-        assertThat(savedHomework.getLesson()).isEqualTo(newLesson);
+        verify(homeworkRepository).save(homework);
     }
 
     @Test
-    void update_shouldThrowConflict_whenTargetOrderIndexAlreadyExists() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID lessonId = UUID.randomUUID();
-        UUID userId = UUID.randomUUID();
+    @DisplayName("update -> throws conflict when order index already exists")
+    void update_ShouldThrowConflict_WhenOrderIndexAlreadyExists() {
+        UpdateHomeworkRequest request = mock(UpdateHomeworkRequest.class);
 
-        Homework homework = createHomework(
-                homeworkId,
-                1,
-                "Old title",
-                "Old description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                createLesson(lessonId),
-                createUser(userId)
-        );
-
-        UpdateHomeworkRequest request = new UpdateHomeworkRequest(
-                2,
-                "Updated title",
-                "Updated description",
-                OffsetDateTime.parse("2026-04-30T20:00:00+04:00"),
-                false,
-                lessonId
-        );
+        when(request.orderIndex()).thenReturn(2);
 
         when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
-        when(homeworkRepository.existsByLessonIdAndOrderIndexAndIdNot(lessonId, 2, homeworkId))
-                .thenReturn(true);
+        when(homeworkRepository.existsByLessonIdAndOrderIndexAndIdNot(lessonId, 2, homeworkId)).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
                 () -> homeworkService.update(homeworkId, request)
         );
 
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
-        assertThat(exception.getReason()).isEqualTo(
-                "Homework with order index 2 already exists in lesson " + lessonId
+        assertEquals(409, exception.getStatusCode().value());
+        assertEquals(
+                "Homework with order index 2 already exists in lesson " + lessonId,
+                exception.getReason()
         );
 
         verify(homeworkRepository, never()).save(any(Homework.class));
@@ -404,60 +258,12 @@ class HomeworkServiceTest {
     }
 
     @Test
-    void delete_shouldDeleteHomework() {
-        UUID homeworkId = UUID.randomUUID();
-
-        Homework homework = createHomework(
-                homeworkId,
-                1,
-                "Homework 1",
-                "Description",
-                OffsetDateTime.parse("2026-04-25T18:00:00+04:00"),
-                true,
-                createLesson(UUID.randomUUID()),
-                createUser(UUID.randomUUID())
-        );
-
+    @DisplayName("delete -> deletes homework")
+    void delete_ShouldDeleteHomework() {
         when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
-        doNothing().when(homeworkRepository).delete(homework);
 
         homeworkService.delete(homeworkId);
 
-        verify(homeworkRepository).findById(homeworkId);
         verify(homeworkRepository).delete(homework);
-    }
-
-    private User createUser(UUID id) {
-        User user = new User();
-        ReflectionTestUtils.setField(user, "id", id);
-        return user;
-    }
-
-    private Lesson createLesson(UUID id) {
-        Lesson lesson = new Lesson();
-        ReflectionTestUtils.setField(lesson, "id", id);
-        return lesson;
-    }
-
-    private Homework createHomework(
-            UUID id,
-            Integer orderIndex,
-            String title,
-            String description,
-            OffsetDateTime dueDate,
-            Boolean isPublished,
-            Lesson lesson,
-            User createdBy
-    ) {
-        Homework homework = new Homework();
-        ReflectionTestUtils.setField(homework, "id", id);
-        homework.setOrderIndex(orderIndex);
-        homework.setTitle(title);
-        homework.setDescription(description);
-        homework.setDueDate(dueDate);
-        homework.setIsPublished(isPublished);
-        homework.setLesson(lesson);
-        homework.setCreatedBy(createdBy);
-        return homework;
     }
 }

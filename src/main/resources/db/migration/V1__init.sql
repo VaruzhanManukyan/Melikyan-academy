@@ -168,14 +168,14 @@ CREATE TABLE languages
 
 CREATE TABLE remember_me_tokens
 (
-    id           UUID        NOT NULL,
-    selector     VARCHAR(64) NOT NULL,
+    id           UUID         NOT NULL,
+    selector     VARCHAR(64)  NOT NULL,
     token_hash   VARCHAR(255) NOT NULL,
-    expires_at   TIMESTAMPTZ NOT NULL,
-    last_used_at TIMESTAMPTZ NOT NULL,
-    user_id      UUID        NOT NULL,
-    created_at   TIMESTAMPTZ NOT NULL,
-    updated_at   TIMESTAMPTZ NOT NULL,
+    expires_at   TIMESTAMPTZ  NOT NULL,
+    last_used_at TIMESTAMPTZ  NOT NULL,
+    user_id      UUID         NOT NULL,
+    created_at   TIMESTAMPTZ  NOT NULL,
+    updated_at   TIMESTAMPTZ  NOT NULL,
 
     CONSTRAINT pk_remember_me_tokens PRIMARY KEY (id),
     CONSTRAINT uq_remember_me_tokens_selector UNIQUE (selector),
@@ -193,12 +193,15 @@ CREATE TABLE content_items
     type        CONTENT_ITEM_TYPE NOT NULL,
     title       VARCHAR(50)       NOT NULL,
     description VARCHAR(255),
+    total_steps INTEGER           NOT NULL,
     created_by  UUID              NOT NULL,
     created_at  TIMESTAMPTZ       NOT NULL,
     updated_at  TIMESTAMPTZ       NOT NULL,
     deleted_at  TIMESTAMPTZ,
 
     CONSTRAINT pk_content_items PRIMARY KEY (id),
+    CONSTRAINT chk_content_item_total_steps_positive
+        CHECK (total_steps >= 0),
     CONSTRAINT chk_content_items_title_not_blank
         CHECK (btrim(title) <> ''),
     CONSTRAINT fk_content_items_created_by__users
@@ -651,7 +654,6 @@ CREATE TABLE certificates
 CREATE TABLE user_processes
 (
     id                UUID        NOT NULL,
-    total_steps       INTEGER     NOT NULL,
     current_step      INTEGER     NOT NULL,
     last_accessed_at  TIMESTAMPTZ,
     score_accumulated NUMERIC(10, 2),
@@ -663,12 +665,8 @@ CREATE TABLE user_processes
     CONSTRAINT pk_user_processes PRIMARY KEY (id),
     CONSTRAINT uq_user_processes_user_id_content_item_id
         UNIQUE (user_id, content_item_id),
-    CONSTRAINT chk_user_processes_total_steps_positive
-        CHECK (total_steps > 0),
     CONSTRAINT chk_user_processes_current_step_non_negative
         CHECK (current_step >= 0),
-    CONSTRAINT chk_user_processes_current_step_lte_total_steps
-        CHECK (current_step <= total_steps),
     CONSTRAINT chk_user_processes_score_accumulated_non_negative
         CHECK (score_accumulated IS NULL OR score_accumulated >= 0),
     CONSTRAINT fk_user_processes_user_id__users
@@ -676,6 +674,7 @@ CREATE TABLE user_processes
     CONSTRAINT fk_user_processes_content_item_id__content_items
         FOREIGN KEY (content_item_id) REFERENCES content_items (id)
 );
+
 
 CREATE UNIQUE INDEX uidx_users_email__active
     ON users (email)
@@ -727,7 +726,8 @@ CREATE UNIQUE INDEX uidx_exam_tasks_section_id_order_index__active
 
 CREATE UNIQUE INDEX uidx_product_registrations_user_id_product_id__active
     ON product_registrations (user_id, product_id)
-    WHERE deleted_at IS NULL;
+    WHERE deleted_at IS NULL
+    AND status = 'ACTIVE';
 
 CREATE UNIQUE INDEX uidx_certificates_certificate_code__active
     ON certificates (certificate_code)

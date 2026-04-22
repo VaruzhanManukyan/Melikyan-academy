@@ -9,6 +9,7 @@ import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.repository.LessonRepository;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.melikyan.academy.dto.response.lesson.LessonResponse;
 import com.melikyan.academy.dto.request.lesson.UpdateLessonRequest;
 import com.melikyan.academy.dto.request.lesson.CreateLessonRequest;
@@ -34,7 +35,7 @@ public class LessonService {
         if (normalizedTitle.isBlank()) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "Course title must not be blank"
+                    "Lesson title must not be blank"
             );
         }
 
@@ -126,7 +127,7 @@ public class LessonService {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Lesson with title '" + title +
-                            "' already exists in Course " + courseId
+                            "' already exists in course " + courseId
             );
         }
     }
@@ -154,8 +155,16 @@ public class LessonService {
         lesson.setCourse(course);
         lesson.setCreatedBy(createdBy);
 
-        Lesson savedLesson = lessonRepository.saveAndFlush(lesson);
-        return lessonMapper.toResponse(savedLesson);
+        try {
+            Lesson savedLesson = lessonRepository.saveAndFlush(lesson);
+            return lessonMapper.toResponse(savedLesson);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Lesson with such title or order index already exists in this course",
+                    exception
+            );
+        }
     }
 
     @Transactional(readOnly = true)
@@ -181,17 +190,12 @@ public class LessonService {
     public LessonResponse update(UUID id, UpdateLessonRequest request) {
         Lesson lesson = getLessonEntityById(id);
 
-        UUID targetCourseId = request.courseId() != null
-                ? request.courseId()
-                : lesson.getCourse().getId();
-
         Integer targetOrderIndex = request.orderIndex() != null
                 ? request.orderIndex()
                 : lesson.getOrderIndex();
 
-        if (!targetCourseId.equals(lesson.getCourse().getId())
-                || !targetOrderIndex.equals(lesson.getOrderIndex())) {
-            validateOrderIndexUnique(targetCourseId, targetOrderIndex, lesson.getId());
+        if (!targetOrderIndex.equals(lesson.getOrderIndex())) {
+            validateOrderIndexUnique(lesson.getCourse().getId(), targetOrderIndex, lesson.getId());
         }
 
         if (request.orderIndex() != null) {
@@ -200,7 +204,7 @@ public class LessonService {
 
         if (request.title() != null) {
             String normalizedTitle = normalizeTitle(request.title());
-            validateTitleUnique(targetCourseId, normalizedTitle, lesson.getId());
+            validateTitleUnique(lesson.getCourse().getId(), normalizedTitle, lesson.getId());
             lesson.setTitle(normalizedTitle);
         }
 
@@ -228,13 +232,16 @@ public class LessonService {
             lesson.setDuration(request.duration());
         }
 
-        if (request.courseId() != null) {
-            Course course = getCourseById(request.courseId());
-            lesson.setCourse(course);
+        try {
+            Lesson savedLesson = lessonRepository.saveAndFlush(lesson);
+            return lessonMapper.toResponse(savedLesson);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Lesson with such title or order index already exists in this course",
+                    exception
+            );
         }
-
-        Lesson updatedLesson = lessonRepository.save(lesson);
-        return lessonMapper.toResponse(updatedLesson);
     }
 
     public void delete(UUID id) {

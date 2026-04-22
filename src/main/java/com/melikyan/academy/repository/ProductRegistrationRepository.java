@@ -1,6 +1,7 @@
 package com.melikyan.academy.repository;
 
 import com.melikyan.academy.entity.ProductRegistration;
+import com.melikyan.academy.entity.enums.RegistrationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -32,5 +33,9 @@ public interface ProductRegistrationRepository extends JpaRepository<ProductRegi
     })
     List<ProductRegistration> findAllByProductId(UUID productId);
 
-    boolean existsByUserIdAndProductId(UUID userId, UUID productId);
+    boolean existsByUserIdAndProductIdAndStatus(
+            UUID userId,
+            UUID productId,
+            RegistrationStatus status
+    );
 }

@@ -2,8 +2,8 @@ package com.melikyan.academy.controller;
 
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
-import org.springframework.test.web.servlet.MockMvc;
 import com.melikyan.academy.service.HomeworkService;
+import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.config.Customizer;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.web.SecurityFilterChain;
@@ -243,8 +243,7 @@ class HomeworkControllerTest {
                 "Updated Homework",
                 "Updated description",
                 OffsetDateTime.parse("2026-04-30T20:00:00+04:00"),
-                false,
-                lessonId
+                false
         );
 
         HomeworkResponse response = new HomeworkResponse(
@@ -284,8 +283,7 @@ class HomeworkControllerTest {
                 "Updated Homework",
                 "Updated description",
                 OffsetDateTime.parse("2026-04-30T20:00:00+04:00"),
-                false,
-                UUID.randomUUID()
+                false
         );
 
         mockMvc.perform(patch("/api/v1/homeworks/{id}", id)

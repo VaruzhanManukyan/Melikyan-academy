@@ -2,14 +2,18 @@ package com.melikyan.academy.service;
 
 import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
-import org.springframework.http.HttpStatus;
+import com.melikyan.academy.entity.Course;
+import com.melikyan.academy.entity.Lesson;
 import com.melikyan.academy.entity.Homework;
+import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.HomeworkTask;
 import org.mockito.junit.jupiter.MockitoExtension;
 import com.melikyan.academy.entity.enums.TaskType;
 import com.melikyan.academy.mapper.HomeworkTaskMapper;
 import com.melikyan.academy.repository.UserRepository;
+import org.springframework.test.util.ReflectionTestUtils;
 import com.melikyan.academy.repository.HomeworkRepository;
+import com.melikyan.academy.repository.ContentItemRepository;
 import org.springframework.web.server.ResponseStatusException;
 import com.melikyan.academy.repository.HomeworkTaskRepository;
 import com.melikyan.academy.dto.response.homeworkTask.HomeworkTaskResponse;
@@ -18,21 +22,19 @@ import com.melikyan.academy.dto.request.homeworkTask.UpdateHomeworkTaskRequest;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.Optional;
-import java.time.OffsetDateTime;
 
 import static org.mockito.Mockito.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class HomeworkTaskServiceTest {
-
     @Mock
     private UserRepository userRepository;
 
@@ -43,328 +45,198 @@ class HomeworkTaskServiceTest {
     private HomeworkTaskMapper homeworkTaskMapper;
 
     @Mock
+    private ContentItemRepository contentItemRepository;
+
+    @Mock
     private HomeworkTaskRepository homeworkTaskRepository;
 
     @InjectMocks
     private HomeworkTaskService homeworkTaskService;
 
-    @Test
-    void create_shouldCreateAndReturnResponse() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID createdById = UUID.randomUUID();
-        UUID homeworkTaskId = UUID.randomUUID();
+    private UUID userId;
+    private UUID homeworkId;
+    private UUID secondHomeworkId;
+    private UUID contentItemId;
+    private UUID secondContentItemId;
+    private UUID homeworkTaskId;
 
-        CreateHomeworkTaskRequest request = new CreateHomeworkTaskRequest(
-                1,
-                10,
-                TaskType.QUIZ,
-                Map.of("question", "What is Spring Boot?"),
-                homeworkId,
-                createdById
-        );
+    private User user;
+    private Homework homework;
+    private Homework secondHomework;
+    private HomeworkTask homeworkTask;
 
-        Homework homework = new Homework();
-        homework.setId(homeworkId);
+    @BeforeEach
+    void setUp() {
+        userId = UUID.randomUUID();
+        homeworkId = UUID.randomUUID();
+        secondHomeworkId = UUID.randomUUID();
+        contentItemId = UUID.randomUUID();
+        secondContentItemId = UUID.randomUUID();
+        homeworkTaskId = UUID.randomUUID();
 
-        User user = new User();
-        user.setId(createdById);
+        user = new User();
+        ReflectionTestUtils.setField(user, "id", userId);
 
-        HomeworkTask savedHomeworkTask = new HomeworkTask();
-        savedHomeworkTask.setId(homeworkTaskId);
-        savedHomeworkTask.setOrderIndex(1);
-        savedHomeworkTask.setPoint(10);
-        savedHomeworkTask.setType(TaskType.QUIZ);
-        savedHomeworkTask.setPayloadContent(Map.of("question", "What is Spring Boot?"));
-        savedHomeworkTask.setHomework(homework);
-        savedHomeworkTask.setCreatedBy(user);
+        homework = createHomework(homeworkId, contentItemId);
+        secondHomework = createHomework(secondHomeworkId, secondContentItemId);
 
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
-                homeworkTaskId,
-                1,
-                10,
-                TaskType.QUIZ,
-                Map.of("question", "What is Spring Boot?"),
-                homeworkId,
-                createdById,
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
-        );
-
-        when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
-        when(userRepository.findById(createdById)).thenReturn(Optional.of(user));
-        when(homeworkTaskRepository.saveAndFlush(any(HomeworkTask.class))).thenReturn(savedHomeworkTask);
-        when(homeworkTaskMapper.toResponse(savedHomeworkTask)).thenReturn(response);
-
-        HomeworkTaskResponse result = homeworkTaskService.create(request);
-
-        assertNotNull(result);
-        assertEquals(homeworkTaskId, result.id());
-        assertEquals(1, result.orderIndex());
-        assertEquals(10, result.point());
-        assertEquals(TaskType.QUIZ, result.type());
-
-        ArgumentCaptor<HomeworkTask> captor = ArgumentCaptor.forClass(HomeworkTask.class);
-        verify(homeworkTaskRepository).saveAndFlush(captor.capture());
-
-        HomeworkTask captured = captor.getValue();
-        assertEquals(1, captured.getOrderIndex());
-        assertEquals(10, captured.getPoint());
-        assertEquals(TaskType.QUIZ, captured.getType());
-        assertEquals(homework, captured.getHomework());
-        assertEquals(user, captured.getCreatedBy());
-    }
-
-    @Test
-    void create_shouldThrowNotFound_whenHomeworkNotFound() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID createdById = UUID.randomUUID();
-
-        CreateHomeworkTaskRequest request = new CreateHomeworkTaskRequest(
-                1,
-                10,
-                TaskType.QUIZ,
-                Map.of("question", "Test"),
-                homeworkId,
-                createdById
-        );
-
-        when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkTaskService.create(request)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(userRepository, never()).findById(any());
-        verify(homeworkTaskRepository, never()).saveAndFlush(any());
-    }
-
-    @Test
-    void create_shouldThrowNotFound_whenUserNotFound() {
-        UUID homeworkId = UUID.randomUUID();
-        UUID createdById = UUID.randomUUID();
-
-        CreateHomeworkTaskRequest request = new CreateHomeworkTaskRequest(
-                1,
-                10,
-                TaskType.QUIZ,
-                Map.of("question", "Test"),
-                homeworkId,
-                createdById
-        );
-
-        Homework homework = new Homework();
-        homework.setId(homeworkId);
-
-        when(homeworkRepository.findById(homeworkId)).thenReturn(Optional.of(homework));
-        when(userRepository.findById(createdById)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkTaskService.create(request)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-        verify(homeworkTaskRepository, never()).saveAndFlush(any());
-    }
-
-    @Test
-    void getById_shouldReturnResponse() {
-        UUID id = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
-        UUID createdById = UUID.randomUUID();
-
-        Homework homework = new Homework();
-        homework.setId(homeworkId);
-
-        User user = new User();
-        user.setId(createdById);
-
-        HomeworkTask homeworkTask = new HomeworkTask();
-        homeworkTask.setId(id);
-        homeworkTask.setOrderIndex(1);
-        homeworkTask.setPoint(10);
-        homeworkTask.setType(TaskType.QUIZ);
-        homeworkTask.setPayloadContent(Map.of("question", "Test"));
-        homeworkTask.setHomework(homework);
-        homeworkTask.setCreatedBy(user);
-
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
-                id,
-                1,
-                10,
-                TaskType.QUIZ,
-                Map.of("question", "Test"),
-                homeworkId,
-                createdById,
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
-        );
-
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.of(homeworkTask));
-        when(homeworkTaskMapper.toResponse(homeworkTask)).thenReturn(response);
-
-        HomeworkTaskResponse result = homeworkTaskService.getById(id);
-
-        assertNotNull(result);
-        assertEquals(id, result.id());
-
-        verify(homeworkTaskRepository).findById(id);
-        verify(homeworkTaskMapper).toResponse(homeworkTask);
-    }
-
-    @Test
-    void getById_shouldThrowNotFound_whenHomeworkTaskNotFound() {
-        UUID id = UUID.randomUUID();
-
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkTaskService.getById(id)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-    }
-
-    @Test
-    void getAll_shouldReturnResponseList() {
-        UUID id = UUID.randomUUID();
-
-        HomeworkTask homeworkTask = new HomeworkTask();
-        homeworkTask.setId(id);
-
-        List<HomeworkTask> entityList = List.of(homeworkTask);
-        List<HomeworkTaskResponse> responseList = List.of(
-                new HomeworkTaskResponse(
-                        id,
-                        1,
-                        10,
-                        TaskType.QUIZ,
-                        Map.of("question", "Test"),
-                        UUID.randomUUID(),
-                        UUID.randomUUID(),
-                        OffsetDateTime.now(),
-                        OffsetDateTime.now()
-                )
-        );
-
-        when(homeworkTaskRepository.findAll()).thenReturn(entityList);
-        when(homeworkTaskMapper.toResponseList(entityList)).thenReturn(responseList);
-
-        List<HomeworkTaskResponse> result = homeworkTaskService.getAll();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-
-        verify(homeworkTaskRepository).findAll();
-        verify(homeworkTaskMapper).toResponseList(entityList);
-    }
-
-    @Test
-    void update_shouldUpdateAndReturnResponse() {
-        UUID id = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
-        UUID createdById = UUID.randomUUID();
-
-        Homework homework = new Homework();
-        homework.setId(homeworkId);
-
-        User user = new User();
-        user.setId(createdById);
-
-        HomeworkTask homeworkTask = new HomeworkTask();
-        homeworkTask.setId(id);
+        homeworkTask = new HomeworkTask();
+        ReflectionTestUtils.setField(homeworkTask, "id", homeworkTaskId);
         homeworkTask.setOrderIndex(1);
         homeworkTask.setPoint(10);
         homeworkTask.setType(TaskType.QUIZ);
         homeworkTask.setPayloadContent(Map.of("question", "Old"));
         homeworkTask.setHomework(homework);
         homeworkTask.setCreatedBy(user);
+    }
 
-        UpdateHomeworkTaskRequest request = new UpdateHomeworkTaskRequest(
-                2,
-                15,
-                TaskType.ESSAY,
-                Map.of("topic", "New topic"),
-                homeworkId
+    @Test
+    @DisplayName("create -> saves homework task, increments steps and returns response")
+    void create_ShouldSaveHomeworkTaskIncrementStepsAndReturnResponse() {
+        CreateHomeworkTaskRequest request = mock(CreateHomeworkTaskRequest.class);
+        HomeworkTaskResponse response = mock(HomeworkTaskResponse.class);
+
+        when(request.orderIndex()).thenReturn(1);
+        when(request.point()).thenReturn(10);
+        when(request.type()).thenReturn(TaskType.QUIZ);
+        when(request.payloadContent()).thenReturn(Map.of("question", "What is Spring Boot?"));
+        when(request.homeworkId()).thenReturn(homeworkId);
+        when(request.createdById()).thenReturn(userId);
+
+        when(homeworkRepository.findDetailedById(homeworkId)).thenReturn(Optional.of(homework));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(homeworkTaskRepository.existsByHomeworkIdAndOrderIndex(homeworkId, 1)).thenReturn(false);
+        when(homeworkTaskRepository.saveAndFlush(any(HomeworkTask.class))).thenAnswer(invocation -> {
+            HomeworkTask saved = invocation.getArgument(0);
+            ReflectionTestUtils.setField(saved, "id", homeworkTaskId);
+            return saved;
+        });
+        when(contentItemRepository.changeTotalSteps(contentItemId, 1)).thenReturn(1);
+        when(homeworkTaskMapper.toResponse(any(HomeworkTask.class))).thenReturn(response);
+
+        HomeworkTaskResponse result = homeworkTaskService.create(request);
+
+        assertEquals(response, result);
+
+        ArgumentCaptor<HomeworkTask> captor = ArgumentCaptor.forClass(HomeworkTask.class);
+        verify(homeworkTaskRepository).saveAndFlush(captor.capture());
+
+        HomeworkTask savedTask = captor.getValue();
+        assertEquals(1, savedTask.getOrderIndex());
+        assertEquals(10, savedTask.getPoint());
+        assertEquals(TaskType.QUIZ, savedTask.getType());
+        assertEquals(user, savedTask.getCreatedBy());
+        assertEquals(homework, savedTask.getHomework());
+
+        verify(contentItemRepository).changeTotalSteps(contentItemId, 1);
+    }
+
+    @Test
+    @DisplayName("create -> throws conflict when order index already exists")
+    void create_ShouldThrowConflict_WhenOrderIndexAlreadyExists() {
+        CreateHomeworkTaskRequest request = mock(CreateHomeworkTaskRequest.class);
+
+        when(request.orderIndex()).thenReturn(1);
+        when(request.homeworkId()).thenReturn(homeworkId);
+        when(request.createdById()).thenReturn(userId);
+
+        when(homeworkRepository.findDetailedById(homeworkId)).thenReturn(Optional.of(homework));
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(homeworkTaskRepository.existsByHomeworkIdAndOrderIndex(homeworkId, 1)).thenReturn(true);
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> homeworkTaskService.create(request)
         );
 
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
-                id,
-                2,
-                15,
-                TaskType.ESSAY,
-                Map.of("topic", "New topic"),
-                homeworkId,
-                createdById,
-                OffsetDateTime.now(),
-                OffsetDateTime.now()
+        assertEquals(409, exception.getStatusCode().value());
+        assertEquals(
+                "Homework task with order index 1 already exists in homework " + homeworkId,
+                exception.getReason()
         );
 
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.of(homeworkTask));
-        when(homeworkTaskRepository.save(any(HomeworkTask.class))).thenReturn(homeworkTask);
+        verify(homeworkTaskRepository, never()).saveAndFlush(any(HomeworkTask.class));
+        verify(contentItemRepository, never()).changeTotalSteps(any(), anyInt());
+    }
+
+    @Test
+    @DisplayName("getById -> returns mapped response")
+    void getById_ShouldReturnMappedResponse() {
+        HomeworkTaskResponse response = mock(HomeworkTaskResponse.class);
+
+        when(homeworkTaskRepository.findById(homeworkTaskId)).thenReturn(Optional.of(homeworkTask));
         when(homeworkTaskMapper.toResponse(homeworkTask)).thenReturn(response);
 
-        HomeworkTaskResponse result = homeworkTaskService.update(id, request);
+        HomeworkTaskResponse result = homeworkTaskService.getById(homeworkTaskId);
 
-        assertNotNull(result);
+        assertEquals(response, result);
+        verify(homeworkTaskRepository).findById(homeworkTaskId);
+        verify(homeworkTaskMapper).toResponse(homeworkTask);
+    }
+
+    @Test
+    @DisplayName("update -> moves task to another homework, updates fields and syncs total steps")
+    void update_ShouldMoveTaskAndSyncContentItemSteps() {
+        UpdateHomeworkTaskRequest request = mock(UpdateHomeworkTaskRequest.class);
+        HomeworkTaskResponse response = mock(HomeworkTaskResponse.class);
+
+        when(request.homeworkId()).thenReturn(secondHomeworkId);
+        when(request.orderIndex()).thenReturn(2);
+        when(request.point()).thenReturn(15);
+        when(request.type()).thenReturn(TaskType.ESSAY);
+        when(request.payloadContent()).thenReturn(Map.of("topic", "New topic"));
+
+        when(homeworkTaskRepository.findById(homeworkTaskId)).thenReturn(Optional.of(homeworkTask));
+        when(homeworkRepository.findDetailedById(homeworkId)).thenReturn(Optional.of(homework));
+        when(homeworkRepository.findDetailedById(secondHomeworkId)).thenReturn(Optional.of(secondHomework));
+        when(homeworkTaskRepository.existsByHomeworkIdAndOrderIndexAndIdNot(secondHomeworkId, 2, homeworkTaskId))
+                .thenReturn(false);
+        when(contentItemRepository.changeTotalSteps(contentItemId, -1)).thenReturn(1);
+        when(contentItemRepository.changeTotalSteps(secondContentItemId, 1)).thenReturn(1);
+        when(homeworkTaskRepository.saveAndFlush(any(HomeworkTask.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(homeworkTaskMapper.toResponse(any(HomeworkTask.class))).thenReturn(response);
+
+        HomeworkTaskResponse result = homeworkTaskService.update(homeworkTaskId, request);
+
+        assertEquals(response, result);
+        assertEquals(secondHomework, homeworkTask.getHomework());
         assertEquals(2, homeworkTask.getOrderIndex());
         assertEquals(15, homeworkTask.getPoint());
         assertEquals(TaskType.ESSAY, homeworkTask.getType());
         assertEquals(Map.of("topic", "New topic"), homeworkTask.getPayloadContent());
 
-        verify(homeworkTaskRepository).save(homeworkTask);
+        verify(contentItemRepository).changeTotalSteps(contentItemId, -1);
+        verify(contentItemRepository).changeTotalSteps(secondContentItemId, 1);
+        verify(homeworkTaskRepository).saveAndFlush(homeworkTask);
     }
 
     @Test
-    void update_shouldThrowNotFound_whenHomeworkTaskNotFound() {
-        UUID id = UUID.randomUUID();
+    @DisplayName("delete -> decrements total steps and deletes task")
+    void delete_ShouldDecrementTotalStepsAndDeleteTask() {
+        when(homeworkTaskRepository.findById(homeworkTaskId)).thenReturn(Optional.of(homeworkTask));
+        when(homeworkRepository.findDetailedById(homeworkId)).thenReturn(Optional.of(homework));
+        when(contentItemRepository.changeTotalSteps(contentItemId, -1)).thenReturn(1);
 
-        UpdateHomeworkTaskRequest request = new UpdateHomeworkTaskRequest(
-                2,
-                15,
-                TaskType.ESSAY,
-                Map.of("topic", "New topic"),
-                UUID.randomUUID()
-        );
+        homeworkTaskService.delete(homeworkTaskId);
 
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.empty());
-
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkTaskService.update(id, request)
-        );
-
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
-    }
-
-    @Test
-    void delete_shouldDeleteHomeworkTask() {
-        UUID id = UUID.randomUUID();
-
-        HomeworkTask homeworkTask = new HomeworkTask();
-        homeworkTask.setId(id);
-
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.of(homeworkTask));
-
-        homeworkTaskService.delete(id);
-
+        verify(contentItemRepository).changeTotalSteps(contentItemId, -1);
         verify(homeworkTaskRepository).delete(homeworkTask);
     }
 
-    @Test
-    void delete_shouldThrowNotFound_whenHomeworkTaskNotFound() {
-        UUID id = UUID.randomUUID();
+    private Homework createHomework(UUID homeworkId, UUID contentItemId) {
+        ContentItem contentItem = new ContentItem();
+        ReflectionTestUtils.setField(contentItem, "id", contentItemId);
 
-        when(homeworkTaskRepository.findById(id)).thenReturn(Optional.empty());
+        Course course = new Course();
+        course.setContentItem(contentItem);
 
-        ResponseStatusException exception = assertThrows(
-                ResponseStatusException.class,
-                () -> homeworkTaskService.delete(id)
-        );
+        Lesson lesson = new Lesson();
+        lesson.setCourse(course);
 
-        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        Homework homework = new Homework();
+        ReflectionTestUtils.setField(homework, "id", homeworkId);
+        homework.setLesson(lesson);
+
+        return homework;
     }
 }

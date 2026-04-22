@@ -33,6 +33,9 @@ public class ContentItem extends BaseEntity {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "total_steps", nullable = false)
+    private int totalSteps;
+
     @ManyToOne
     @JoinColumn(name = "created_by",  nullable = false)
     private User createdBy;

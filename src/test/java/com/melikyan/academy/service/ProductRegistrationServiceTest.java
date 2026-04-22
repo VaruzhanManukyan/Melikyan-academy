@@ -1,40 +1,43 @@
 package com.melikyan.academy.service;
 
-import com.melikyan.academy.dto.request.productRegistration.CreateProductRegistrationRequest;
-import com.melikyan.academy.dto.response.productRegistration.ProductRegistrationResponse;
-import com.melikyan.academy.entity.Product;
-import com.melikyan.academy.entity.ProductRegistration;
-import com.melikyan.academy.entity.Transaction;
+import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
+import com.melikyan.academy.entity.Product;
+import com.melikyan.academy.entity.Transaction;
+import org.mockito.junit.jupiter.MockitoExtension;
+import com.melikyan.academy.repository.UserRepository;
+import com.melikyan.academy.entity.ProductRegistration;
+import com.melikyan.academy.repository.ProductRepository;
+import com.melikyan.academy.entity.enums.TransactionType;
+import com.melikyan.academy.entity.enums.TransactionStatus;
 import com.melikyan.academy.entity.enums.RegistrationStatus;
 import com.melikyan.academy.mapper.ProductRegistrationMapper;
-import com.melikyan.academy.repository.ProductRegistrationRepository;
-import com.melikyan.academy.repository.ProductRepository;
 import com.melikyan.academy.repository.TransactionRepository;
-import com.melikyan.academy.repository.UserRepository;
+import com.melikyan.academy.repository.UserProcessRepository;
+import org.springframework.web.server.ResponseStatusException;
+import com.melikyan.academy.repository.ProductRegistrationRepository;
+import com.melikyan.academy.dto.response.productRegistration.ProductRegistrationResponse;
+import com.melikyan.academy.dto.request.productRegistration.CreateProductRegistrationRequest;
+import org.mockito.Mock;
+import org.mockito.InjectMocks;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @ExtendWith(MockitoExtension.class)
 class ProductRegistrationServiceTest {
@@ -46,6 +49,9 @@ class ProductRegistrationServiceTest {
 
     @Mock
     private TransactionRepository transactionRepository;
+
+    @Mock
+    private UserProcessRepository userProcessRepository;
 
     @Mock
     private ProductRegistrationMapper productRegistrationMapper;
@@ -60,12 +66,14 @@ class ProductRegistrationServiceTest {
     private UUID userId;
     private UUID secondUserId;
     private UUID productId;
+    private UUID secondProductId;
     private UUID transactionId;
     private String email;
 
     private User user;
     private User secondUser;
     private Product product;
+    private Product secondProduct;
     private Transaction transaction;
     private ProductRegistration registration;
 
@@ -75,6 +83,7 @@ class ProductRegistrationServiceTest {
         userId = UUID.randomUUID();
         secondUserId = UUID.randomUUID();
         productId = UUID.randomUUID();
+        secondProductId = UUID.randomUUID();
         transactionId = UUID.randomUUID();
         email = "test@test.com";
 
@@ -88,9 +97,18 @@ class ProductRegistrationServiceTest {
 
         product = new Product();
         product.setId(productId);
+        product.setContentItems(List.of());
+
+        secondProduct = new Product();
+        secondProduct.setId(secondProductId);
+        secondProduct.setContentItems(List.of());
 
         transaction = new Transaction();
         transaction.setId(transactionId);
+        transaction.setUser(user);
+        transaction.setProduct(product);
+        transaction.setTransactionType(TransactionType.PAYMENT);
+        transaction.setStatus(TransactionStatus.SUCCESS);
 
         registration = new ProductRegistration();
         registration.setId(registrationId);
@@ -113,7 +131,11 @@ class ProductRegistrationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
-        when(productRegistrationRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(false);
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
         when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> {
             ProductRegistration saved = invocation.getArgument(0);
             saved.setId(registrationId);
@@ -148,7 +170,11 @@ class ProductRegistrationServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRegistrationRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(false);
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
         when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> {
             ProductRegistration saved = invocation.getArgument(0);
             saved.setId(registrationId);
@@ -174,8 +200,8 @@ class ProductRegistrationServiceTest {
     }
 
     @Test
-    @DisplayName("grantAccess -> throws conflict when user already has this product")
-    void grantAccess_ShouldThrowConflict_WhenUserAlreadyHasProduct() {
+    @DisplayName("grantAccess -> throws conflict when user already has active registration")
+    void grantAccess_ShouldThrowConflict_WhenUserAlreadyHasActiveRegistration() {
         CreateProductRegistrationRequest request = mock(CreateProductRegistrationRequest.class);
 
         when(request.userId()).thenReturn(userId);
@@ -183,7 +209,11 @@ class ProductRegistrationServiceTest {
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
-        when(productRegistrationRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(true);
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(true);
 
         ResponseStatusException ex = assertThrows(
                 ResponseStatusException.class,
@@ -191,7 +221,123 @@ class ProductRegistrationServiceTest {
         );
 
         assertEquals(409, ex.getStatusCode().value());
-        assertEquals("User already has this product", ex.getReason());
+        assertEquals("User already has an active registration for this product", ex.getReason());
+        verify(productRegistrationRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("grantAccess -> throws bad request when transaction belongs to another user")
+    void grantAccess_ShouldThrowBadRequest_WhenTransactionBelongsToAnotherUser() {
+        CreateProductRegistrationRequest request = mock(CreateProductRegistrationRequest.class);
+        transaction.setUser(secondUser);
+
+        when(request.userId()).thenReturn(userId);
+        when(request.productId()).thenReturn(productId);
+        when(request.transactionId()).thenReturn(transactionId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> productRegistrationService.grantAccess(request)
+        );
+
+        assertEquals(400, ex.getStatusCode().value());
+        assertEquals("Transaction does not belong to the specified user", ex.getReason());
+        verify(productRegistrationRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("grantAccess -> throws bad request when transaction belongs to another product")
+    void grantAccess_ShouldThrowBadRequest_WhenTransactionBelongsToAnotherProduct() {
+        CreateProductRegistrationRequest request = mock(CreateProductRegistrationRequest.class);
+        transaction.setProduct(secondProduct);
+
+        when(request.userId()).thenReturn(userId);
+        when(request.productId()).thenReturn(productId);
+        when(request.transactionId()).thenReturn(transactionId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> productRegistrationService.grantAccess(request)
+        );
+
+        assertEquals(400, ex.getStatusCode().value());
+        assertEquals("Transaction does not belong to the specified product", ex.getReason());
+        verify(productRegistrationRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("grantAccess -> throws bad request when transaction is not payment")
+    void grantAccess_ShouldThrowBadRequest_WhenTransactionIsNotPayment() {
+        CreateProductRegistrationRequest request = mock(CreateProductRegistrationRequest.class);
+        transaction.setTransactionType(TransactionType.REFUND);
+
+        when(request.userId()).thenReturn(userId);
+        when(request.productId()).thenReturn(productId);
+        when(request.transactionId()).thenReturn(transactionId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> productRegistrationService.grantAccess(request)
+        );
+
+        assertEquals(400, ex.getStatusCode().value());
+        assertEquals("Transaction must be a payment", ex.getReason());
+        verify(productRegistrationRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("grantAccess -> throws bad request when transaction is not successful")
+    void grantAccess_ShouldThrowBadRequest_WhenTransactionIsNotSuccessful() {
+        CreateProductRegistrationRequest request = mock(CreateProductRegistrationRequest.class);
+        transaction.setStatus(TransactionStatus.PENDING);
+
+        when(request.userId()).thenReturn(userId);
+        when(request.productId()).thenReturn(productId);
+        when(request.transactionId()).thenReturn(transactionId);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
+
+        ResponseStatusException ex = assertThrows(
+                ResponseStatusException.class,
+                () -> productRegistrationService.grantAccess(request)
+        );
+
+        assertEquals(400, ex.getStatusCode().value());
+        assertEquals("Transaction is not successful", ex.getReason());
         verify(productRegistrationRepository, never()).saveAndFlush(any());
     }
 
@@ -203,7 +349,11 @@ class ProductRegistrationServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(productRepository.findById(productId)).thenReturn(Optional.of(product));
         when(transactionRepository.findById(transactionId)).thenReturn(Optional.of(transaction));
-        when(productRegistrationRepository.existsByUserIdAndProductId(userId, productId)).thenReturn(false);
+        when(productRegistrationRepository.existsByUserIdAndProductIdAndStatus(
+                userId,
+                productId,
+                RegistrationStatus.ACTIVE
+        )).thenReturn(false);
         when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> {
             ProductRegistration saved = invocation.getArgument(0);
             saved.setId(registrationId);
@@ -334,7 +484,8 @@ class ProductRegistrationServiceTest {
         registration.setStatus(RegistrationStatus.SUSPENDED);
 
         when(productRegistrationRepository.findDetailedById(registrationId)).thenReturn(Optional.of(registration));
-        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
         when(productRegistrationMapper.toResponse(any(ProductRegistration.class))).thenReturn(response);
 
         ProductRegistrationResponse result = productRegistrationService.activate(registrationId);
@@ -350,7 +501,8 @@ class ProductRegistrationServiceTest {
         ProductRegistrationResponse response = mock(ProductRegistrationResponse.class);
 
         when(productRegistrationRepository.findDetailedById(registrationId)).thenReturn(Optional.of(registration));
-        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
         when(productRegistrationMapper.toResponse(any(ProductRegistration.class))).thenReturn(response);
 
         ProductRegistrationResponse result = productRegistrationService.suspend(registrationId);
@@ -366,7 +518,8 @@ class ProductRegistrationServiceTest {
         ProductRegistrationResponse response = mock(ProductRegistrationResponse.class);
 
         when(productRegistrationRepository.findDetailedById(registrationId)).thenReturn(Optional.of(registration));
-        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(productRegistrationRepository.saveAndFlush(any(ProductRegistration.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
         when(productRegistrationMapper.toResponse(any(ProductRegistration.class))).thenReturn(response);
 
         ProductRegistrationResponse result = productRegistrationService.expire(registrationId);

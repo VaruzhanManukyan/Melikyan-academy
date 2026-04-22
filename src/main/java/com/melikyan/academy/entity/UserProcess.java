@@ -28,9 +28,6 @@ public class UserProcess extends BaseEntity {
     @Column(name = "current_step", nullable = false)
     private int currentStep;
 
-    @Column(name = "total_steps", nullable = false)
-    private int totalSteps;
-
     @Column(name = "score_accumulated", precision = 10, scale = 2)
     private BigDecimal scoreAccumulated;
 

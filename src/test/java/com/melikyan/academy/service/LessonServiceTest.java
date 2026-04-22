@@ -1,13 +1,13 @@
 package com.melikyan.academy.service;
 
-import com.melikyan.academy.entity.enums.LessonState;
-import com.melikyan.academy.entity.enums.LessonType;
 import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
 import com.melikyan.academy.entity.Lesson;
 import com.melikyan.academy.mapper.LessonMapper;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.melikyan.academy.entity.enums.LessonType;
+import com.melikyan.academy.entity.enums.LessonState;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.repository.LessonRepository;
@@ -24,8 +24,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.Optional;
 import java.time.Duration;
+import java.util.Optional;
 import java.time.OffsetDateTime;
 
 import static org.mockito.Mockito.*;
@@ -34,7 +34,6 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class LessonServiceTest {
-
     @Mock
     private LessonMapper lessonMapper;
 
@@ -102,6 +101,8 @@ class LessonServiceTest {
 
         LessonResponse response = mock(LessonResponse.class);
 
+        when(lessonRepository.existsByCourseIdAndTitleIgnoreCase(courseId, "Introduction to Spring"))
+                .thenReturn(false);
         when(lessonRepository.existsByCourseIdAndOrderIndex(courseId, 1)).thenReturn(false);
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
@@ -147,6 +148,7 @@ class LessonServiceTest {
                 userId
         );
 
+        when(lessonRepository.existsByCourseIdAndTitleIgnoreCase(courseId, "Lesson")).thenReturn(false);
         when(lessonRepository.existsByCourseIdAndOrderIndex(courseId, 1)).thenReturn(true);
 
         ResponseStatusException ex = assertThrows(
@@ -228,16 +230,16 @@ class LessonServiceTest {
                 "  https://youtube.com/test  ",
                 LessonState.ONGOING,
                 OffsetDateTime.parse("2026-04-22T16:00:00+04:00"),
-                Duration.ofMinutes(60),
-                courseId
+                Duration.ofMinutes(60)
         );
 
         LessonResponse response = mock(LessonResponse.class);
 
         when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
         when(lessonRepository.existsByCourseIdAndOrderIndexAndIdNot(courseId, 2, lessonId)).thenReturn(false);
-        when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
-        when(lessonRepository.save(any(Lesson.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(lessonRepository.existsByCourseIdAndTitleIgnoreCaseAndIdNot(courseId, "Updated title", lessonId))
+                .thenReturn(false);
+        when(lessonRepository.saveAndFlush(any(Lesson.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(lessonMapper.toResponse(any(Lesson.class))).thenReturn(response);
 
         LessonResponse result = lessonService.update(lessonId, request);
@@ -264,8 +266,7 @@ class LessonServiceTest {
                 null,
                 null,
                 null,
-                null,
-                courseId
+                null
         );
 
         when(lessonRepository.findById(lessonId)).thenReturn(Optional.of(lesson));
@@ -277,7 +278,7 @@ class LessonServiceTest {
         );
 
         assertEquals(409, ex.getStatusCode().value());
-        verify(lessonRepository, never()).save(any());
+        verify(lessonRepository, never()).saveAndFlush(any());
     }
 
     @Test

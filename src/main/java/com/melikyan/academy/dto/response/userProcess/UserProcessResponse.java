@@ -7,7 +7,6 @@ import java.time.OffsetDateTime;
 public record UserProcessResponse(
         UUID id,
         Integer currentStep,
-        Integer totalSteps,
         BigDecimal scoreAccumulated,
         UUID userId,
         UUID contentItemId,

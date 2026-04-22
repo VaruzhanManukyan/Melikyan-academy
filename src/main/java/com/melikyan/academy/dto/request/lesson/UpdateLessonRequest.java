@@ -27,8 +27,6 @@ public record UpdateLessonRequest(
 
         OffsetDateTime startsAt,
 
-        Duration duration,
-
-        UUID courseId
+        Duration duration
 ) {
 }

@@ -20,8 +20,6 @@ public record UpdateHomeworkRequest(
         OffsetDateTime dueDate,
 
         @JsonProperty("is_published")
-        Boolean isPublished,
-
-        UUID lessonId
+        Boolean isPublished
 ) {
 }

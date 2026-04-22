@@ -1,15 +1,13 @@
 package com.melikyan.academy.service;
 
-import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
-import com.melikyan.academy.entity.enums.ContentItemType;
 import org.springframework.http.HttpStatus;
-import com.melikyan.academy.entity.Category;
+import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.mapper.CourseMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CourseRepository;
-import com.melikyan.academy.repository.CategoryRepository;
+import com.melikyan.academy.entity.enums.ContentItemType;
 import com.melikyan.academy.repository.ContentItemRepository;
 import org.springframework.web.server.ResponseStatusException;
 import com.melikyan.academy.dto.response.course.CourseResponse;
@@ -29,9 +27,8 @@ public class CourseService {
     private final CourseMapper courseMapper;
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
-    private final CategoryRepository categoryRepository;
     private final ContentItemRepository contentItemRepository;
-
+;
     private String normalizeTitle(String title) {
         String normalizedTitle = title.trim();
 
@@ -88,21 +85,13 @@ public class CourseService {
                 ));
     }
 
-    private Category getCategoryById(UUID id) {
-        return categoryRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.NOT_FOUND,
-                        "Category not found with id: " + id
-                ));
-    }
-
     public CourseResponse create(CreateCourseRequest request) {
         validateCreateType(request.type());
 
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
 
-        if (contentItemRepository.existsByTitleIgnoreCase(normalizedTitle)) {
+        if (contentItemRepository.existsByTypeAndTitleIgnoreCase(ContentItemType.COURSE, normalizedTitle)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Course with this title already exists"
@@ -150,7 +139,11 @@ public class CourseService {
         if (request.title() != null) {
             String normalizedTitle = normalizeTitle(request.title());
 
-            if (contentItemRepository.existsByTitleIgnoreCaseAndIdNot(normalizedTitle, contentItem.getId())) {
+            if (contentItemRepository.existsByTypeAndTitleIgnoreCaseAndIdNot(
+                    ContentItemType.COURSE,
+                    normalizedTitle,
+                    contentItem.getId()
+            )) {
                 throw new ResponseStatusException(
                         HttpStatus.CONFLICT,
                         "Course with this title already exists"
