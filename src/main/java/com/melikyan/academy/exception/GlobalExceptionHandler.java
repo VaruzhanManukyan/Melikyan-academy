@@ -8,6 +8,7 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.access.AccessDeniedException;
 import com.melikyan.academy.dto.response.common.ApiErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -133,6 +134,22 @@ public class GlobalExceptionHandler {
                 HttpStatus.NOT_FOUND.value(),
                 HttpStatus.NOT_FOUND.getReasonPhrase(),
                 "Endpoint not found",
+                request.getRequestURI(),
+                null
+        );
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public ApiErrorResponse handleMethodNotSupported(
+            HttpRequestMethodNotSupportedException exception,
+            HttpServletRequest request
+    ) {
+        return new ApiErrorResponse(
+                OffsetDateTime.now(),
+                HttpStatus.METHOD_NOT_ALLOWED.value(),
+                HttpStatus.METHOD_NOT_ALLOWED.getReasonPhrase(),
+                exception.getMessage(),
                 request.getRequestURI(),
                 null
         );

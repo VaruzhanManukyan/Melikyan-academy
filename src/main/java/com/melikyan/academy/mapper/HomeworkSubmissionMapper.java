@@ -1,10 +1,10 @@
 package com.melikyan.academy.mapper;
 
+import com.melikyan.academy.dto.request.homeworkSubmission.UpdateHomeworkSubmissionRequest;
 import com.melikyan.academy.entity.HomeworkSubmission;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import com.melikyan.academy.dto.response.homeworkSubmission.HomeworkSubmissionResponse;
 import com.melikyan.academy.dto.request.homeworkSubmission.CreateHomeworkSubmissionRequest;
-import com.melikyan.academy.dto.request.homeworkSubmission.UpdateHomeworkSubmissionRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.BeanMapping;

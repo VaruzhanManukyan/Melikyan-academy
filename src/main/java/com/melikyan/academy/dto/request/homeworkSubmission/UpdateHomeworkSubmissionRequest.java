@@ -1,14 +1,12 @@
 package com.melikyan.academy.dto.request.homeworkSubmission;
 
 import com.melikyan.academy.entity.enums.HomeworkStatus;
-
-import java.util.Map;
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateHomeworkSubmissionRequest(
-        String note,
+        @NotNull(message = "Status is required")
         HomeworkStatus status,
-        Map<String, Object> answerPayload,
-        UUID taskId
+
+        String note
 ) {
 }

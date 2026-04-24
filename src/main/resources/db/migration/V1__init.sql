@@ -712,6 +712,10 @@ CREATE UNIQUE INDEX uidx_homework_tasks_homework_id_order_index__active
     ON homework_tasks (homework_id, order_index)
     WHERE deleted_at IS NULL;
 
+CREATE UNIQUE INDEX uidx_homework_submissions_user_id_task_id__active
+    ON homework_submissions (user_id, task_id)
+    WHERE deleted_at IS NULL;
+
 CREATE UNIQUE INDEX uidx_exam_sections_exam_id_order_index__active
     ON exam_sections (exam_id, order_index)
     WHERE deleted_at IS NULL;
