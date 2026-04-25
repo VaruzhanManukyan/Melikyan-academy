@@ -14,21 +14,6 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface LessonAttendanceMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "lesson", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    LessonAttendance toEntity(CreateLessonAttendanceRequest request);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "lesson", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    void updateEntityFromRequest(UpdateLessonAttendanceRequest request, @MappingTarget LessonAttendance lessonAttendance);
-
     @Mapping(target = "userId", source = "user.id")
     @Mapping(target = "lessonId", source = "lesson.id")
     LessonAttendanceResponse toResponse(LessonAttendance lessonAttendance);

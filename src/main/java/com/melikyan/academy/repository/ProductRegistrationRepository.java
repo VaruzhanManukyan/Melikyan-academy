@@ -4,6 +4,7 @@ import com.melikyan.academy.entity.ProductRegistration;
 import com.melikyan.academy.entity.enums.RegistrationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.List;
@@ -32,6 +33,16 @@ public interface ProductRegistrationRepository extends JpaRepository<ProductRegi
             "transaction"
     })
     List<ProductRegistration> findAllByProductId(UUID productId);
+
+    @Query("""
+            SELECT DISTINCT productRegistration.user.id
+            FROM ProductRegistration productRegistration
+            JOIN productRegistration.product product
+            JOIN product.contentItems productContentItem
+            WHERE productContentItem.contentItem.id = :contentItemId
+            AND productRegistration.status = :status
+            """)
+    List<UUID> findUserIdsByContentItemIdAndStatus(UUID contentItemId, RegistrationStatus status);
 
     boolean existsByUserIdAndProductIdAndStatus(
             UUID userId,
