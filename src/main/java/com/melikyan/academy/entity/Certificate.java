@@ -42,6 +42,10 @@ public class Certificate extends BaseEntity {
     @Column(name = "pdf_url")
     private String pdfUrl;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "issued_by", nullable = false, updatable = false)
+    private User issuedBy;
+
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

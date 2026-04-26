@@ -1,8 +1,8 @@
 package com.melikyan.academy.dto.response.certificate;
 
-import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 public record CertificateResponse(
         UUID id,

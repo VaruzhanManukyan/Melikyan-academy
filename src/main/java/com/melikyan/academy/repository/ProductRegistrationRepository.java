@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.UUID;
@@ -40,9 +41,27 @@ public interface ProductRegistrationRepository extends JpaRepository<ProductRegi
             JOIN productRegistration.product product
             JOIN product.contentItems productContentItem
             WHERE productContentItem.contentItem.id = :contentItemId
-            AND productRegistration.status = :status
+              AND productRegistration.status = :status
             """)
-    List<UUID> findUserIdsByContentItemIdAndStatus(UUID contentItemId, RegistrationStatus status);
+    List<UUID> findUserIdsByContentItemIdAndStatus(
+            @Param("contentItemId") UUID contentItemId,
+            @Param("status") RegistrationStatus status
+    );
+
+    @Query("""
+            SELECT COUNT(productRegistration) > 0
+            FROM ProductRegistration productRegistration
+            JOIN productRegistration.product product
+            JOIN product.contentItems productContentItem
+            WHERE productRegistration.user.id = :userId
+              AND productContentItem.contentItem.id = :contentItemId
+              AND productRegistration.status = :status
+            """)
+    boolean existsByUserIdAndContentItemIdAndStatus(
+            @Param("userId") UUID userId,
+            @Param("contentItemId") UUID contentItemId,
+            @Param("status") RegistrationStatus status
+    );
 
     boolean existsByUserIdAndProductIdAndStatus(
             UUID userId,

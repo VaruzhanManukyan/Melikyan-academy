@@ -4,8 +4,8 @@ import com.melikyan.academy.entity.User;
 import com.melikyan.academy.mapper.UserMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.exception.NotFoundException;
-import com.melikyan.academy.storage.LocalStorageService;
 import org.springframework.security.core.Authentication;
+import com.melikyan.academy.storage.AvatarStorageService;
 import com.melikyan.academy.exception.BadRequestException;
 import com.melikyan.academy.repository.RememberMeTokenRepository;
 import com.melikyan.academy.dto.request.user.UpdateProfileRequest;
@@ -27,7 +27,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final LocalStorageService localStorageService;
+    private final AvatarStorageService avatarStorageService;
     private final RememberMeTokenRepository rememberMeTokenRepository;
 
     private static final Set<String> ALLOWED_CONTENT_TYPES = Set.of(
@@ -95,7 +95,7 @@ public class UserService {
 
         if (request.avatar() != null && !request.avatar().isEmpty()) {
             validateAvatar(request);
-            newAvatarPath = localStorageService.saveAvatar(request.avatar(), user.getId());
+            newAvatarPath = avatarStorageService.saveAvatar(request.avatar(), user.getId());
             user.setAvatarUrl(newAvatarPath);
         }
 
@@ -103,13 +103,13 @@ public class UserService {
             User savedUser = userRepository.save(user);
 
             if (newAvatarPath != null && oldAvatarPath != null && !oldAvatarPath.isBlank()) {
-                localStorageService.delete(oldAvatarPath);
+                avatarStorageService.delete(oldAvatarPath);
             }
 
             return userMapper.toProfileResponse(savedUser);
         } catch (RuntimeException exception) {
             if (newAvatarPath != null) {
-                localStorageService.delete(newAvatarPath);
+                avatarStorageService.delete(newAvatarPath);
             }
             throw exception;
         }

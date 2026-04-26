@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.nio.file.StandardCopyOption;
 
 @Service
-public class LocalStorageService {
+public class AvatarStorageService {
     private static final Path ROOT = Path.of("uploads", "avatars");
 
     private String getExtension(String fileName) {

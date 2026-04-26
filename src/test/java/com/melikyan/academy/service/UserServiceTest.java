@@ -6,7 +6,7 @@ import com.melikyan.academy.mapper.UserMapper;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.multipart.MultipartFile;
 import com.melikyan.academy.repository.UserRepository;
-import com.melikyan.academy.storage.LocalStorageService;
+import com.melikyan.academy.storage.AvatarStorageService;
 import com.melikyan.academy.exception.BadRequestException;
 import org.springframework.security.core.context.SecurityContext;
 import com.melikyan.academy.repository.RememberMeTokenRepository;
@@ -36,7 +36,7 @@ class UserServiceTest {
     @Mock private UserMapper userMapper;
     @Mock private UserRepository userRepository;
     @Mock private PasswordEncoder passwordEncoder;
-    @Mock private LocalStorageService localStorageService;
+    @Mock private AvatarStorageService avatarStorageService;
     @Mock private RememberMeTokenRepository rememberMeTokenRepository;
 
     @InjectMocks
@@ -232,7 +232,7 @@ class UserServiceTest {
                 null, null, null, mockFile
         );
 
-        when(localStorageService.saveAvatar(mockFile, testUser.getId()))
+        when(avatarStorageService.saveAvatar(mockFile, testUser.getId()))
                 .thenReturn("/uploads/avatars/new_avatar.jpg");
 
         when(userRepository.save(testUser)).thenReturn(testUser);
@@ -240,7 +240,7 @@ class UserServiceTest {
 
         userService.updateCurrentUserProfile(request);
 
-        verify(localStorageService, times(1))
+        verify(avatarStorageService, times(1))
                 .delete("/uploads/avatars/old_avatar.jpg");
     }
 
@@ -260,7 +260,7 @@ class UserServiceTest {
                 mockFile
         );
 
-        when(localStorageService.saveAvatar(mockFile, testUser.getId()))
+        when(avatarStorageService.saveAvatar(mockFile, testUser.getId()))
                 .thenReturn("/uploads/avatars/new_avatar.png");
 
         when(userRepository.save(any())).thenThrow(new RuntimeException("DB error"));
@@ -268,7 +268,7 @@ class UserServiceTest {
         assertThrows(RuntimeException.class,
                 () -> userService.updateCurrentUserProfile(request));
 
-        verify(localStorageService, times(1))
+        verify(avatarStorageService, times(1))
                 .delete("/uploads/avatars/new_avatar.png");
     }
 
