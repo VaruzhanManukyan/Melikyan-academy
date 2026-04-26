@@ -13,6 +13,7 @@ import com.melikyan.academy.exception.BadRequestException;
 import com.melikyan.academy.dto.response.auth.LoginResponse;
 import com.melikyan.academy.security.RememberMeCookieService;
 import com.melikyan.academy.dto.request.auth.RegisterRequest;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.melikyan.academy.dto.response.auth.RegisterResponse;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,9 +76,12 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setRole(defaultUserRole());
 
-        user = userRepository.saveAndFlush(user);
-
-        return userMapper.toRegisterResponse(user);
+        try {
+            user = userRepository.saveAndFlush(user);
+            return userMapper.toRegisterResponse(user);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ConflictException("Email is already in use");
+        }
     }
 
     public LoginResponse login(

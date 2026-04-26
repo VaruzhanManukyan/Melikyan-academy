@@ -7,6 +7,7 @@ import com.melikyan.academy.mapper.CategoryMapper;
 import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.repository.CategoryRepository;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.melikyan.academy.dto.response.category.CategoryResponse;
 import com.melikyan.academy.dto.request.category.UpdateCategoryRequest;
 import com.melikyan.academy.dto.request.category.CreateCategoryRequest;
@@ -57,8 +58,16 @@ public class CategoryService {
             category.setDescription(request.description());
         }
 
-        Category savedCategory = categoryRepository.saveAndFlush(category);
-        return categoryMapper.toResponse(savedCategory);
+        try {
+            Category savedCategory = categoryRepository.saveAndFlush(category);
+            return categoryMapper.toResponse(savedCategory);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Category with this title already exists",
+                    exception
+            );
+        }
     }
 
     @Transactional(readOnly = true)
@@ -101,8 +110,16 @@ public class CategoryService {
             category.setDescription(request.description().trim());
         }
 
-        Category savedCategory = categoryRepository.saveAndFlush(category);
-        return categoryMapper.toResponse(savedCategory);
+        try {
+            Category savedCategory = categoryRepository.saveAndFlush(category);
+            return categoryMapper.toResponse(savedCategory);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Category with this title already exists",
+                    exception
+            );
+        }
     }
 
     public void delete(UUID categoryId) {

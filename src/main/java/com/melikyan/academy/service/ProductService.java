@@ -1,33 +1,34 @@
 package com.melikyan.academy.service;
 
-import com.melikyan.academy.dto.request.product.CreateProductRequest;
-import com.melikyan.academy.dto.request.product.UpdateProductRequest;
-import com.melikyan.academy.dto.response.product.ProductResponse;
+import com.melikyan.academy.entity.User;
+import org.springframework.http.HttpStatus;
+import com.melikyan.academy.entity.Product;
 import com.melikyan.academy.entity.Category;
 import com.melikyan.academy.entity.ContentItem;
-import com.melikyan.academy.entity.Product;
-import com.melikyan.academy.entity.ProductContentItem;
-import com.melikyan.academy.entity.User;
-import com.melikyan.academy.entity.enums.ProductType;
 import com.melikyan.academy.mapper.ProductMapper;
+import com.melikyan.academy.entity.enums.ProductType;
+import com.melikyan.academy.entity.ProductContentItem;
+import com.melikyan.academy.repository.UserRepository;
+import com.melikyan.academy.repository.ProductRepository;
 import com.melikyan.academy.repository.CategoryRepository;
 import com.melikyan.academy.repository.ContentItemRepository;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
+import com.melikyan.academy.dto.response.product.ProductResponse;
 import com.melikyan.academy.repository.ProductContentItemRepository;
-import com.melikyan.academy.repository.ProductRepository;
-import com.melikyan.academy.repository.UserRepository;
+import com.melikyan.academy.dto.request.product.CreateProductRequest;
+import com.melikyan.academy.dto.request.product.UpdateProductRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
-import java.util.function.Function;
+import java.util.Objects;
+import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
+import java.util.function.Function;
 
 @Service
 @Transactional
@@ -264,13 +265,22 @@ public class ProductService {
         product.setCategory(category);
         product.setCreatedBy(createdBy);
 
-        Product savedProduct = productRepository.saveAndFlush(product);
+        try {
+            Product savedProduct = productRepository.saveAndFlush(product);
 
-        List<ProductContentItem> productContentItems = buildProductContentItems(savedProduct, contentItems);
-        productContentItemRepository.saveAllAndFlush(productContentItems);
+            List<ProductContentItem> productContentItems = buildProductContentItems(savedProduct, contentItems);
+            productContentItemRepository.saveAllAndFlush(productContentItems);
 
-        Product detailedProduct = getProductEntityById(savedProduct.getId());
-        return productMapper.toResponse(detailedProduct);
+            Product detailedProduct = getProductEntityById(savedProduct.getId());
+            return productMapper.toResponse(detailedProduct);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Product with this title already exists or contains duplicate content item",
+                    exception
+            );
+        }
+
     }
 
     @Transactional(readOnly = true)
@@ -344,20 +354,28 @@ public class ProductService {
             product.setCategory(category);
         }
 
-        Product savedProduct = productRepository.saveAndFlush(product);
+        try {
+            Product savedProduct = productRepository.saveAndFlush(product);
 
-        if (request.contentItemIds() != null && !currentContentItemIds.equals(actualContentItemIds)) {
-            productContentItemRepository.deleteAllByProduct_Id(savedProduct.getId());
-            productContentItemRepository.flush();
+            if (request.contentItemIds() != null && !currentContentItemIds.equals(actualContentItemIds)) {
+                productContentItemRepository.deleteAllByProduct_Id(savedProduct.getId());
+                productContentItemRepository.flush();
 
-            List<ProductContentItem> productContentItems =
-                    buildProductContentItems(savedProduct, contentItems);
+                List<ProductContentItem> productContentItems =
+                        buildProductContentItems(savedProduct, contentItems);
 
-            productContentItemRepository.saveAllAndFlush(productContentItems);
+                productContentItemRepository.saveAllAndFlush(productContentItems);
+            }
+
+            Product detailedProduct = getProductEntityById(savedProduct.getId());
+            return productMapper.toResponse(detailedProduct);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Product with this title already exists or contains duplicate content item",
+                    exception
+            );
         }
-
-        Product detailedProduct = getProductEntityById(savedProduct.getId());
-        return productMapper.toResponse(detailedProduct);
     }
 
     public void delete(UUID id) {

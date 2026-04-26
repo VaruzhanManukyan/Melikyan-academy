@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
-public record CreateProfessorRequest(
+public record AssignProfessorRequest(
         @NotNull(message = "{professor.userId.notNull}")
         UUID userId,
 

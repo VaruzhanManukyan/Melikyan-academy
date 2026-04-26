@@ -10,6 +10,7 @@ import com.melikyan.academy.repository.CourseRepository;
 import com.melikyan.academy.entity.enums.ContentItemType;
 import com.melikyan.academy.repository.ContentItemRepository;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.dao.DataIntegrityViolationException;
 import com.melikyan.academy.dto.response.course.CourseResponse;
 import com.melikyan.academy.dto.request.course.UpdateCourseRequest;
 import com.melikyan.academy.dto.request.course.CreateCourseRequest;
@@ -28,7 +29,8 @@ public class CourseService {
     private final UserRepository userRepository;
     private final CourseRepository courseRepository;
     private final ContentItemRepository contentItemRepository;
-;
+    ;
+
     private String normalizeTitle(String title) {
         String normalizedTitle = title.trim();
 
@@ -106,16 +108,25 @@ public class CourseService {
         contentItem.setType(ContentItemType.COURSE);
         contentItem.setCreatedBy(createdBy);
 
-        ContentItem savedContentItem = contentItemRepository.save(contentItem);
+        try {
+            ContentItem savedContentItem = contentItemRepository.saveAndFlush(contentItem);
 
-        Course course = new Course();
-        course.setContentItem(savedContentItem);
-        course.setStartDate(request.startDate());
-        course.setDurationWeeks(request.durationWeeks());
+            Course course = new Course();
+            course.setContentItem(savedContentItem);
+            course.setStartDate(request.startDate());
+            course.setDurationWeeks(request.durationWeeks());
 
-        Course savedCourse = courseRepository.saveAndFlush(course);
+            Course savedCourse = courseRepository.saveAndFlush(course);
 
-        return courseMapper.toResponse(savedCourse);
+            return courseMapper.toResponse(savedCourse);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Course with this title already exists",
+                    exception
+            );
+        }
+
     }
 
     @Transactional(readOnly = true)
@@ -165,9 +176,16 @@ public class CourseService {
             course.setDurationWeeks(request.durationWeeks());
         }
 
-        Course updatedCourse = courseRepository.saveAndFlush(course);
-
-        return courseMapper.toResponse(updatedCourse);
+        try {
+            Course updatedCourse = courseRepository.saveAndFlush(course);
+            return courseMapper.toResponse(updatedCourse);
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Course with this title already exists",
+                    exception
+            );
+        }
     }
 
     public void delete(UUID id) {

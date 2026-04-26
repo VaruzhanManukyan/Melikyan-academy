@@ -165,8 +165,7 @@ public class HomeworkSubmissionService {
         homeworkSubmission.setNote(normalizeNote(note));
 
         try {
-            HomeworkSubmission savedHomeworkSubmission =
-                    homeworkSubmissionRepository.saveAndFlush(homeworkSubmission);
+            HomeworkSubmission savedHomeworkSubmission = homeworkSubmissionRepository.saveAndFlush(homeworkSubmission);
 
             return homeworkSubmissionMapper.toResponse(savedHomeworkSubmission);
         } catch (DataIntegrityViolationException exception) {
@@ -200,8 +199,7 @@ public class HomeworkSubmissionService {
         homeworkSubmission.setTask(task);
 
         try {
-            HomeworkSubmission savedHomeworkSubmission =
-                    homeworkSubmissionRepository.saveAndFlush(homeworkSubmission);
+            HomeworkSubmission savedHomeworkSubmission = homeworkSubmissionRepository.saveAndFlush(homeworkSubmission);
 
             advanceUserProcess(currentUser, contentItem);
 
