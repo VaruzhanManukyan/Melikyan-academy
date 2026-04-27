@@ -9,13 +9,13 @@ import java.util.UUID;
 
 @Repository
 public interface LessonRepository extends JpaRepository<Lesson, UUID> {
-    List<Lesson> findByCourseIdOrderByOrderIndexAsc(UUID lessonId);
+    List<Lesson> findByCourseIdOrderByOrderIndexAsc(UUID courseId);
 
-    boolean existsByCourseIdAndOrderIndex(UUID id, Integer orderIndex);
+    boolean existsByCourseIdAndOrderIndex(UUID courseId, Integer orderIndex);
 
     boolean existsByCourseIdAndTitleIgnoreCase(UUID courseId, String title);
 
-    boolean existsByCourseIdAndTitleIgnoreCaseAndIdNot(UUID courseId, String title, UUID id);
+    boolean existsByCourseIdAndTitleIgnoreCaseAndIdNot(UUID courseId, String title, UUID lessonId);
 
-    boolean existsByCourseIdAndOrderIndexAndIdNot(UUID courseId, Integer orderIndex, UUID id);
+    boolean existsByCourseIdAndOrderIndexAndIdNot(UUID courseId, Integer orderIndex, UUID lessonId);
 }

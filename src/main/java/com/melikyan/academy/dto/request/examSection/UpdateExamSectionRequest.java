@@ -15,8 +15,6 @@ public record UpdateExamSectionRequest(
 
         String description,
 
-        Duration duration,
-
-        UUID examId
+        Duration duration
 ) {
 }

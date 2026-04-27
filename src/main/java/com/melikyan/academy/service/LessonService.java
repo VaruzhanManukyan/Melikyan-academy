@@ -88,26 +88,26 @@ public class LessonService {
                 ));
     }
 
-    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex) {
-        if (lessonRepository.existsByCourseIdAndOrderIndex(lessonId, orderIndex)) {
+    private void validateOrderIndexUnique(UUID courseId, Integer orderIndex) {
+        if (lessonRepository.existsByCourseIdAndOrderIndex(courseId, orderIndex)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Lesson with order index " + orderIndex +
-                            " already exists in course " + lessonId
+                            " already exists in course " + courseId
             );
         }
     }
 
-    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex, UUID homeworkId) {
+    private void validateOrderIndexUnique(UUID courseId, Integer orderIndex, UUID lessonId) {
         if (lessonRepository.existsByCourseIdAndOrderIndexAndIdNot(
-                lessonId,
+                courseId,
                 orderIndex,
-                homeworkId
+                lessonId
         )) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Lesson with order index " + orderIndex +
-                            " already exists in course " + lessonId
+                            " already exists in course " + courseId
             );
         }
     }

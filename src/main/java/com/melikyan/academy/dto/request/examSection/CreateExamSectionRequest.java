@@ -19,6 +19,7 @@ public record CreateExamSectionRequest(
 
         String description,
 
+        @NotNull(message = "{examSection.duration.notNull}")
         Duration duration,
 
         @NotNull(message = "{examSection.examId.notNull}")

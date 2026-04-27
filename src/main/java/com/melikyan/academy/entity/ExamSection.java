@@ -1,13 +1,15 @@
 package com.melikyan.academy.entity;
 
-import com.melikyan.academy.entity.base.BaseEntity;
 import jakarta.persistence.*;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.util.List;
 import java.time.Duration;
@@ -40,6 +42,7 @@ public class ExamSection extends BaseEntity {
     @Column(name = "description")
     private String description;
 
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     @Column(name = "duration", columnDefinition = "Interval")
     private Duration duration;
 
