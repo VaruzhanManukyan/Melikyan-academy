@@ -1,8 +1,12 @@
 package com.melikyan.academy.dto.request.exam;
 
-import java.util.UUID;
+import jakarta.validation.constraints.Size;
 
 public record UpdateExamRequest(
-        UUID contentItemId
+        @Size(max = 50, message = "{course.title.size}")
+        String title,
+
+        @Size(max = 500, message = "{course.description.size}")
+        String description
 ) {
 }

@@ -1,10 +1,8 @@
 package com.melikyan.academy.dto.request.course;
 
-import com.melikyan.academy.entity.enums.ContentItemType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 
-import java.util.UUID;
 import java.time.OffsetDateTime;
 
 public record UpdateCourseRequest(
@@ -13,8 +11,6 @@ public record UpdateCourseRequest(
 
         @Size(max = 500, message = "{course.description.size}")
         String description,
-
-        ContentItemType type,
 
         OffsetDateTime startDate,
 

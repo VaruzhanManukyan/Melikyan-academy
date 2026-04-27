@@ -2,14 +2,14 @@ package com.melikyan.academy.controller;
 
 import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
-import com.melikyan.academy.service.CourseService;
+import com.melikyan.academy.service.ExamService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.FilterType;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.entity.enums.ContentItemType;
-import com.melikyan.academy.dto.response.course.CourseResponse;
-import com.melikyan.academy.dto.request.course.CreateCourseRequest;
-import com.melikyan.academy.dto.request.course.UpdateCourseRequest;
+import com.melikyan.academy.dto.response.exam.ExamResponse;
+import com.melikyan.academy.dto.request.exam.CreateExamRequest;
+import com.melikyan.academy.dto.request.exam.UpdateExamRequest;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.security.autoconfigure.web.servlet.SecurityFilterAutoConfiguration;
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 
 @WebMvcTest(
-        controllers = CourseController.class,
+        controllers = ExamController.class,
         excludeAutoConfiguration = {
                 SecurityAutoConfiguration.class,
                 SecurityFilterAutoConfiguration.class,
@@ -53,7 +53,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
         }
 )
 @AutoConfigureMockMvc(addFilters = false)
-class CourseControllerTest {
+class ExamControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -61,219 +61,195 @@ class CourseControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private CourseService courseService;
+    private ExamService examService;
 
     private String toUtcString(OffsetDateTime value) {
         return value.toInstant().toString();
     }
 
     @Test
-    @DisplayName("POST /api/v1/courses -> should create course and return 201")
-    void create_shouldReturnCreatedCourse() throws Exception {
-        UUID courseId = UUID.randomUUID();
+    @DisplayName("POST /api/v1/exams -> should create exam and return 201")
+    void create_shouldReturnCreatedExam() throws Exception {
+        UUID examId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
         UUID contentItemId = UUID.randomUUID();
 
-        OffsetDateTime startDate = OffsetDateTime.parse("2026-05-01T10:00:00+04:00");
         OffsetDateTime createdAt = OffsetDateTime.parse("2026-04-14T12:00:00+04:00");
         OffsetDateTime updatedAt = OffsetDateTime.parse("2026-04-14T12:30:00+04:00");
 
-        CreateCourseRequest request = new CreateCourseRequest(
-                "Java Backend Fundamentals",
-                "Spring Boot, JPA, Security",
-                startDate,
-                12,
+        CreateExamRequest request = new CreateExamRequest(
+                "Java Final Exam",
+                "Final exam description",
                 createdById
         );
 
-        CourseResponse response = new CourseResponse(
-                courseId,
-                "Java Backend Fundamentals",
-                "Spring Boot, JPA, Security",
-                ContentItemType.COURSE,
-                12,
-                startDate,
+        ExamResponse response = new ExamResponse(
+                examId,
+                "Java Final Exam",
+                "Final exam description",
+                ContentItemType.EXAM,
                 createdById,
                 contentItemId,
                 createdAt,
                 updatedAt
         );
 
-        when(courseService.create(any(CreateCourseRequest.class))).thenReturn(response);
+        when(examService.create(any(CreateExamRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/courses")
+        mockMvc.perform(post("/api/v1/exams")
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(courseId.toString()))
-                .andExpect(jsonPath("$.title").value("Java Backend Fundamentals"))
-                .andExpect(jsonPath("$.description").value("Spring Boot, JPA, Security"))
-                .andExpect(jsonPath("$.type").value("COURSE"))
-                .andExpect(jsonPath("$.durationWeeks").value(12))
-                .andExpect(jsonPath("$.startDate").value(toUtcString(startDate)))
+                .andExpect(jsonPath("$.id").value(examId.toString()))
+                .andExpect(jsonPath("$.title").value("Java Final Exam"))
+                .andExpect(jsonPath("$.description").value("Final exam description"))
+                .andExpect(jsonPath("$.type").value("EXAM"))
                 .andExpect(jsonPath("$.createdById").value(createdById.toString()))
                 .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()))
                 .andExpect(jsonPath("$.createdAt").value(toUtcString(createdAt)))
                 .andExpect(jsonPath("$.updatedAt").value(toUtcString(updatedAt)));
 
-        verify(courseService).create(any(CreateCourseRequest.class));
+        verify(examService).create(any(CreateExamRequest.class));
     }
 
     @Test
-    @DisplayName("GET /api/v1/courses/{id} -> should return course by id")
-    void getById_shouldReturnCourse() throws Exception {
-        UUID courseId = UUID.randomUUID();
+    @DisplayName("GET /api/v1/exams/{id} -> should return exam by id")
+    void getById_shouldReturnExam() throws Exception {
+        UUID examId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
         UUID contentItemId = UUID.randomUUID();
 
-        CourseResponse response = new CourseResponse(
-                courseId,
-                "Java Backend Fundamentals",
-                "Spring Boot, JPA, Security",
-                ContentItemType.COURSE,
-                12,
-                OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
+        ExamResponse response = new ExamResponse(
+                examId,
+                "Java Final Exam",
+                "Final exam description",
+                ContentItemType.EXAM,
                 createdById,
                 contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-14T12:30:00+04:00")
         );
 
-        when(courseService.getById(courseId)).thenReturn(response);
+        when(examService.getById(examId)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/courses/{id}", courseId)
+        mockMvc.perform(get("/api/v1/exams/{id}", examId)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(courseId.toString()))
-                .andExpect(jsonPath("$.title").value("Java Backend Fundamentals"))
-                .andExpect(jsonPath("$.description").value("Spring Boot, JPA, Security"))
-                .andExpect(jsonPath("$.type").value("COURSE"))
-                .andExpect(jsonPath("$.durationWeeks").value(12))
+                .andExpect(jsonPath("$.id").value(examId.toString()))
+                .andExpect(jsonPath("$.title").value("Java Final Exam"))
+                .andExpect(jsonPath("$.description").value("Final exam description"))
+                .andExpect(jsonPath("$.type").value("EXAM"))
                 .andExpect(jsonPath("$.createdById").value(createdById.toString()))
                 .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()));
 
-        verify(courseService).getById(courseId);
+        verify(examService).getById(examId);
     }
 
     @Test
-    @DisplayName("GET /api/v1/courses -> should return all courses")
-    void getAll_shouldReturnAllCourses() throws Exception {
+    @DisplayName("GET /api/v1/exams -> should return all exams")
+    void getAll_shouldReturnAllExams() throws Exception {
         UUID firstId = UUID.randomUUID();
         UUID secondId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
         UUID firstContentItemId = UUID.randomUUID();
         UUID secondContentItemId = UUID.randomUUID();
 
-        CourseResponse first = new CourseResponse(
+        ExamResponse first = new ExamResponse(
                 firstId,
-                "Java Backend Fundamentals",
-                "Spring Boot course",
-                ContentItemType.COURSE,
-                12,
-                OffsetDateTime.parse("2026-05-01T10:00:00+04:00"),
+                "Java Final Exam",
+                "Final exam description",
+                ContentItemType.EXAM,
                 createdById,
                 firstContentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-14T12:30:00+04:00")
         );
 
-        CourseResponse second = new CourseResponse(
+        ExamResponse second = new ExamResponse(
                 secondId,
-                "Algorithms",
-                "Data structures and algorithms",
-                ContentItemType.COURSE,
-                10,
-                OffsetDateTime.parse("2026-06-01T10:00:00+04:00"),
+                "Algorithms Exam",
+                "Algorithms exam description",
+                ContentItemType.EXAM,
                 createdById,
                 secondContentItemId,
                 OffsetDateTime.parse("2026-04-15T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-15T12:30:00+04:00")
         );
 
-        when(courseService.getAll()).thenReturn(List.of(first, second));
+        when(examService.getAll()).thenReturn(List.of(first, second));
 
-        mockMvc.perform(get("/api/v1/courses")
+        mockMvc.perform(get("/api/v1/exams")
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].id").value(firstId.toString()))
-                .andExpect(jsonPath("$[0].title").value("Java Backend Fundamentals"))
-                .andExpect(jsonPath("$[0].type").value("COURSE"))
-                .andExpect(jsonPath("$[0].durationWeeks").value(12))
+                .andExpect(jsonPath("$[0].title").value("Java Final Exam"))
+                .andExpect(jsonPath("$[0].type").value("EXAM"))
                 .andExpect(jsonPath("$[0].contentItemId").value(firstContentItemId.toString()))
                 .andExpect(jsonPath("$[1].id").value(secondId.toString()))
-                .andExpect(jsonPath("$[1].title").value("Algorithms"))
-                .andExpect(jsonPath("$[1].type").value("COURSE"))
-                .andExpect(jsonPath("$[1].durationWeeks").value(10))
+                .andExpect(jsonPath("$[1].title").value("Algorithms Exam"))
+                .andExpect(jsonPath("$[1].type").value("EXAM"))
                 .andExpect(jsonPath("$[1].contentItemId").value(secondContentItemId.toString()));
 
-        verify(courseService).getAll();
+        verify(examService).getAll();
     }
 
     @Test
-    @DisplayName("PATCH /api/v1/courses/{id} -> should update course")
-    void update_shouldReturnUpdatedCourse() throws Exception {
-        UUID courseId = UUID.randomUUID();
+    @DisplayName("PATCH /api/v1/exams/{id} -> should update exam")
+    void update_shouldReturnUpdatedExam() throws Exception {
+        UUID examId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
         UUID contentItemId = UUID.randomUUID();
 
-        OffsetDateTime updatedStartDate = OffsetDateTime.parse("2026-06-10T10:00:00+04:00");
-
-        UpdateCourseRequest request = new UpdateCourseRequest(
-                "Advanced Java",
-                "Updated description",
-                updatedStartDate,
-                16
+        UpdateExamRequest request = new UpdateExamRequest(
+                "Updated Java Exam",
+                "Updated exam description"
         );
 
-        CourseResponse response = new CourseResponse(
-                courseId,
-                "Advanced Java",
-                "Updated description",
-                ContentItemType.COURSE,
-                16,
-                updatedStartDate,
+        ExamResponse response = new ExamResponse(
+                examId,
+                "Updated Java Exam",
+                "Updated exam description",
+                ContentItemType.EXAM,
                 createdById,
                 contentItemId,
                 OffsetDateTime.parse("2026-04-14T12:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-16T14:00:00+04:00")
         );
 
-        when(courseService.update(eq(courseId), any(UpdateCourseRequest.class)))
+        when(examService.update(eq(examId), any(UpdateExamRequest.class)))
                 .thenReturn(response);
 
-        mockMvc.perform(patch("/api/v1/courses/{id}", courseId)
+        mockMvc.perform(patch("/api/v1/exams/{id}", examId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(courseId.toString()))
-                .andExpect(jsonPath("$.title").value("Advanced Java"))
-                .andExpect(jsonPath("$.description").value("Updated description"))
-                .andExpect(jsonPath("$.type").value("COURSE"))
-                .andExpect(jsonPath("$.durationWeeks").value(16))
-                .andExpect(jsonPath("$.startDate").value(toUtcString(updatedStartDate)))
+                .andExpect(jsonPath("$.id").value(examId.toString()))
+                .andExpect(jsonPath("$.title").value("Updated Java Exam"))
+                .andExpect(jsonPath("$.description").value("Updated exam description"))
+                .andExpect(jsonPath("$.type").value("EXAM"))
                 .andExpect(jsonPath("$.contentItemId").value(contentItemId.toString()));
 
-        verify(courseService).update(eq(courseId), any(UpdateCourseRequest.class));
+        verify(examService).update(eq(examId), any(UpdateExamRequest.class));
     }
 
     @Test
-    @DisplayName("DELETE /api/v1/courses/{id} -> should return 204")
+    @DisplayName("DELETE /api/v1/exams/{id} -> should return 204")
     void delete_shouldReturnNoContent() throws Exception {
-        UUID courseId = UUID.randomUUID();
+        UUID examId = UUID.randomUUID();
 
-        doNothing().when(courseService).delete(courseId);
+        doNothing().when(examService).delete(examId);
 
-        mockMvc.perform(delete("/api/v1/courses/{id}", courseId))
+        mockMvc.perform(delete("/api/v1/exams/{id}", examId))
                 .andExpect(status().isNoContent())
                 .andExpect(content().string(""));
 
-        verify(courseService).delete(courseId);
+        verify(examService).delete(examId);
     }
 }

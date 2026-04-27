@@ -1,6 +1,5 @@
 package com.melikyan.academy.dto.request.course;
 
-import com.melikyan.academy.entity.enums.ContentItemType;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
@@ -16,9 +15,6 @@ public record CreateCourseRequest(
 
         @Size(max = 500, message = "{course.description.size}")
         String description,
-
-        @NotNull(message = "{course.type.notNull}")
-        ContentItemType type,
 
         @NotNull(message = "{course.startDate.notNull}")
         OffsetDateTime startDate,

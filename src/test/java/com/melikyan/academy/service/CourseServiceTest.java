@@ -86,26 +86,31 @@ class CourseServiceTest {
 
         OffsetDateTime startDate = OffsetDateTime.parse("2026-05-01T10:00:00+04:00");
 
-        when(request.type()).thenReturn(ContentItemType.COURSE);
         when(request.title()).thenReturn("  Java Backend  ");
         when(request.description()).thenReturn("  Course description  ");
         when(request.startDate()).thenReturn(startDate);
         when(request.durationWeeks()).thenReturn(12);
         when(request.createdById()).thenReturn(userId);
 
-        when(contentItemRepository.existsByTypeAndTitleIgnoreCase(ContentItemType.COURSE, "Java Backend"))
-                .thenReturn(false);
+        when(contentItemRepository.existsByTypeAndTitleIgnoreCase(
+                ContentItemType.COURSE,
+                "Java Backend"
+        )).thenReturn(false);
+
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(contentItemRepository.save(any(ContentItem.class))).thenAnswer(invocation -> {
+
+        when(contentItemRepository.saveAndFlush(any(ContentItem.class))).thenAnswer(invocation -> {
             ContentItem saved = invocation.getArgument(0);
             ReflectionTestUtils.setField(saved, "id", contentItemId);
             return saved;
         });
+
         when(courseRepository.saveAndFlush(any(Course.class))).thenAnswer(invocation -> {
             Course saved = invocation.getArgument(0);
             ReflectionTestUtils.setField(saved, "id", courseId);
             return saved;
         });
+
         when(courseMapper.toResponse(any(Course.class))).thenReturn(response);
 
         CourseResponse result = courseService.create(request);
@@ -113,28 +118,32 @@ class CourseServiceTest {
         assertEquals(response, result);
 
         ArgumentCaptor<ContentItem> contentCaptor = ArgumentCaptor.forClass(ContentItem.class);
-        verify(contentItemRepository).save(contentCaptor.capture());
+        verify(contentItemRepository).saveAndFlush(contentCaptor.capture());
 
         ContentItem savedContentItem = contentCaptor.getValue();
         assertEquals(ContentItemType.COURSE, savedContentItem.getType());
         assertEquals("Java Backend", savedContentItem.getTitle());
         assertEquals("Course description", savedContentItem.getDescription());
+        assertEquals(0, savedContentItem.getTotalSteps());
         assertEquals(user, savedContentItem.getCreatedBy());
 
         ArgumentCaptor<Course> courseCaptor = ArgumentCaptor.forClass(Course.class);
         verify(courseRepository).saveAndFlush(courseCaptor.capture());
 
         Course savedCourse = courseCaptor.getValue();
+        assertEquals(savedContentItem, savedCourse.getContentItem());
         assertEquals(startDate, savedCourse.getStartDate());
         assertEquals(12, savedCourse.getDurationWeeks());
+
+        verify(courseMapper).toResponse(any(Course.class));
     }
 
     @Test
-    @DisplayName("create -> throws bad request when type is not COURSE")
-    void create_ShouldThrowBadRequest_WhenTypeIsNotCourse() {
+    @DisplayName("create -> throws bad request when title is blank")
+    void create_ShouldThrowBadRequest_WhenTitleIsBlank() {
         CreateCourseRequest request = mock(CreateCourseRequest.class);
 
-        when(request.type()).thenReturn(ContentItemType.EXAM);
+        when(request.title()).thenReturn("   ");
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -142,9 +151,9 @@ class CourseServiceTest {
         );
 
         assertEquals(400, exception.getStatusCode().value());
-        assertEquals("Type must be COURSE for course creation", exception.getReason());
+        assertEquals("Course title must not be blank", exception.getReason());
 
-        verifyNoInteractions(userRepository, contentItemRepository, courseRepository, courseMapper);
+        verifyNoInteractions(userRepository, courseRepository, contentItemRepository, courseMapper);
     }
 
     @Test
@@ -152,11 +161,13 @@ class CourseServiceTest {
     void create_ShouldThrowConflict_WhenTitleAlreadyExists() {
         CreateCourseRequest request = mock(CreateCourseRequest.class);
 
-        when(request.type()).thenReturn(ContentItemType.COURSE);
         when(request.title()).thenReturn("Java Backend");
+        when(request.description()).thenReturn(null);
 
-        when(contentItemRepository.existsByTypeAndTitleIgnoreCase(ContentItemType.COURSE, "Java Backend"))
-                .thenReturn(true);
+        when(contentItemRepository.existsByTypeAndTitleIgnoreCase(
+                ContentItemType.COURSE,
+                "Java Backend"
+        )).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(
                 ResponseStatusException.class,
@@ -166,8 +177,39 @@ class CourseServiceTest {
         assertEquals(409, exception.getStatusCode().value());
         assertEquals("Course with this title already exists", exception.getReason());
 
-        verify(contentItemRepository, never()).save(any(ContentItem.class));
+        verify(userRepository, never()).findById(any(UUID.class));
+        verify(contentItemRepository, never()).saveAndFlush(any(ContentItem.class));
         verify(courseRepository, never()).saveAndFlush(any(Course.class));
+        verifyNoInteractions(courseMapper);
+    }
+
+    @Test
+    @DisplayName("create -> throws not found when user does not exist")
+    void create_ShouldThrowNotFound_WhenUserDoesNotExist() {
+        CreateCourseRequest request = mock(CreateCourseRequest.class);
+
+        when(request.title()).thenReturn("Java Backend");
+        when(request.description()).thenReturn("Course description");
+        when(request.createdById()).thenReturn(userId);
+
+        when(contentItemRepository.existsByTypeAndTitleIgnoreCase(
+                ContentItemType.COURSE,
+                "Java Backend"
+        )).thenReturn(false);
+
+        when(userRepository.findById(userId)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> courseService.create(request)
+        );
+
+        assertEquals(404, exception.getStatusCode().value());
+        assertEquals("User not found with id: " + userId, exception.getReason());
+
+        verify(contentItemRepository, never()).saveAndFlush(any(ContentItem.class));
+        verify(courseRepository, never()).saveAndFlush(any(Course.class));
+        verifyNoInteractions(courseMapper);
     }
 
     @Test
@@ -183,6 +225,22 @@ class CourseServiceTest {
         assertEquals(response, result);
         verify(courseRepository).findDetailedById(courseId);
         verify(courseMapper).toResponse(course);
+    }
+
+    @Test
+    @DisplayName("getById -> throws not found when course does not exist")
+    void getById_ShouldThrowNotFound_WhenCourseDoesNotExist() {
+        when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> courseService.getById(courseId)
+        );
+
+        assertEquals(404, exception.getStatusCode().value());
+        assertEquals("Course not found with id: " + courseId, exception.getReason());
+
+        verifyNoInteractions(courseMapper);
     }
 
     @Test
@@ -213,18 +271,19 @@ class CourseServiceTest {
 
         OffsetDateTime updatedStartDate = OffsetDateTime.parse("2026-06-01T09:00:00+04:00");
 
-        when(request.type()).thenReturn(null);
         when(request.title()).thenReturn("  Updated Course  ");
         when(request.description()).thenReturn("   ");
         when(request.startDate()).thenReturn(updatedStartDate);
         when(request.durationWeeks()).thenReturn(16);
 
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
+
         when(contentItemRepository.existsByTypeAndTitleIgnoreCaseAndIdNot(
                 ContentItemType.COURSE,
                 "Updated Course",
                 contentItemId
         )).thenReturn(false);
+
         when(courseRepository.saveAndFlush(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(courseMapper.toResponse(any(Course.class))).thenReturn(response);
 
@@ -237,6 +296,65 @@ class CourseServiceTest {
         assertEquals(16, course.getDurationWeeks());
 
         verify(courseRepository).saveAndFlush(course);
+        verify(courseMapper).toResponse(course);
+    }
+
+    @Test
+    @DisplayName("update -> updates only course fields when title and description are null")
+    void update_ShouldUpdateOnlyCourseFields_WhenTitleAndDescriptionAreNull() {
+        UpdateCourseRequest request = mock(UpdateCourseRequest.class);
+        CourseResponse response = mock(CourseResponse.class);
+
+        OffsetDateTime updatedStartDate = OffsetDateTime.parse("2026-07-01T09:00:00+04:00");
+
+        when(request.title()).thenReturn(null);
+        when(request.description()).thenReturn(null);
+        when(request.startDate()).thenReturn(updatedStartDate);
+        when(request.durationWeeks()).thenReturn(20);
+
+        when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
+        when(courseRepository.saveAndFlush(any(Course.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(courseMapper.toResponse(any(Course.class))).thenReturn(response);
+
+        CourseResponse result = courseService.update(courseId, request);
+
+        assertEquals(response, result);
+        assertEquals("Old title", contentItem.getTitle());
+        assertEquals("Old description", contentItem.getDescription());
+        assertEquals(updatedStartDate, course.getStartDate());
+        assertEquals(20, course.getDurationWeeks());
+
+        verify(contentItemRepository, never()).existsByTypeAndTitleIgnoreCaseAndIdNot(
+                any(ContentItemType.class),
+                anyString(),
+                any(UUID.class)
+        );
+        verify(courseRepository).saveAndFlush(course);
+    }
+
+    @Test
+    @DisplayName("update -> throws bad request when title is blank")
+    void update_ShouldThrowBadRequest_WhenTitleIsBlank() {
+        UpdateCourseRequest request = mock(UpdateCourseRequest.class);
+
+        when(request.title()).thenReturn("   ");
+        when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> courseService.update(courseId, request)
+        );
+
+        assertEquals(400, exception.getStatusCode().value());
+        assertEquals("Course title must not be blank", exception.getReason());
+
+        verify(contentItemRepository, never()).existsByTypeAndTitleIgnoreCaseAndIdNot(
+                any(ContentItemType.class),
+                anyString(),
+                any(UUID.class)
+        );
+        verify(courseRepository, never()).saveAndFlush(any(Course.class));
+        verifyNoInteractions(courseMapper);
     }
 
     @Test
@@ -244,10 +362,10 @@ class CourseServiceTest {
     void update_ShouldThrowConflict_WhenNewTitleAlreadyExists() {
         UpdateCourseRequest request = mock(UpdateCourseRequest.class);
 
-        when(request.type()).thenReturn(null);
         when(request.title()).thenReturn("Existing title");
 
         when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.of(course));
+
         when(contentItemRepository.existsByTypeAndTitleIgnoreCaseAndIdNot(
                 ContentItemType.COURSE,
                 "Existing title",
@@ -263,6 +381,7 @@ class CourseServiceTest {
         assertEquals("Course with this title already exists", exception.getReason());
 
         verify(courseRepository, never()).saveAndFlush(any(Course.class));
+        verifyNoInteractions(courseMapper);
     }
 
     @Test
@@ -274,5 +393,22 @@ class CourseServiceTest {
 
         verify(courseRepository).delete(course);
         verify(contentItemRepository).delete(contentItem);
+    }
+
+    @Test
+    @DisplayName("delete -> throws not found when course does not exist")
+    void delete_ShouldThrowNotFound_WhenCourseDoesNotExist() {
+        when(courseRepository.findDetailedById(courseId)).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+                ResponseStatusException.class,
+                () -> courseService.delete(courseId)
+        );
+
+        assertEquals(404, exception.getStatusCode().value());
+        assertEquals("Course not found with id: " + courseId, exception.getReason());
+
+        verify(courseRepository, never()).delete(any(Course.class));
+        verify(contentItemRepository, never()).delete(any(ContentItem.class));
     }
 }
