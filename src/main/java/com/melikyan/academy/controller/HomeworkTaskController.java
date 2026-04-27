@@ -18,7 +18,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/homework-tasks")
 public class HomeworkTaskController {
-
     private final HomeworkTaskService homeworkTaskService;
 
     @PostMapping

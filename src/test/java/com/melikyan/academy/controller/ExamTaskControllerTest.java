@@ -2,16 +2,17 @@ package com.melikyan.academy.controller;
 
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
+import com.melikyan.academy.entity.enums.TaskType;
 import org.springframework.test.web.servlet.MockMvc;
-import com.melikyan.academy.service.HomeworkTaskService;
+import com.melikyan.academy.service.ExamTaskService;
 import org.springframework.security.config.Customizer;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.security.web.SecurityFilterChain;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
-import com.melikyan.academy.dto.response.homeworkTask.HomeworkTaskResponse;
-import com.melikyan.academy.dto.request.homeworkTask.UpdateHomeworkTaskRequest;
-import com.melikyan.academy.dto.request.homeworkTask.CreateHomeworkTaskRequest;
-import com.melikyan.academy.entity.enums.TaskType;
+import com.melikyan.academy.dto.response.examTask.ExamTaskResponse;
+import com.melikyan.academy.dto.request.examTask.CreateExamTaskRequest;
+import com.melikyan.academy.dto.request.examTask.UpdateExamTaskRequest;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -22,11 +23,11 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-import java.util.List;
 import java.util.Map;
+import java.util.List;
 import java.util.UUID;
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 import static org.mockito.Mockito.when;
@@ -43,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 @WebMvcTest(
-        controllers = HomeworkTaskController.class,
+        controllers = ExamTaskController.class,
         excludeFilters = {
                 @ComponentScan.Filter(
                         type = FilterType.ASSIGNABLE_TYPE,
@@ -51,9 +52,8 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
                 )
         }
 )
-@Import(HomeworkTaskControllerTest.TestSecurityConfig.class)
-class HomeworkTaskControllerTest {
-
+@Import(ExamTaskControllerTest.TestSecurityConfig.class)
+class ExamTaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -61,12 +61,11 @@ class HomeworkTaskControllerTest {
     private ObjectMapper objectMapper;
 
     @MockitoBean
-    private HomeworkTaskService homeworkTaskService;
+    private ExamTaskService examTaskService;
 
     @TestConfiguration
     @EnableMethodSecurity
     static class TestSecurityConfig {
-
         @Bean
         SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
             return http
@@ -74,46 +73,48 @@ class HomeworkTaskControllerTest {
                     .httpBasic(Customizer.withDefaults())
                     .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
                     .build();
-        };
+        }
     }
 
     @Test
     @WithMockUser(roles = {"ADMIN"})
-    void create_shouldReturnCreatedHomeworkTask() throws Exception {
+    void create_shouldReturnCreatedExamTask() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
 
-        CreateHomeworkTaskRequest request = new CreateHomeworkTaskRequest(
+        CreateExamTaskRequest request = new CreateExamTaskRequest(
                 1,
                 10,
                 TaskType.QUIZ,
+                Duration.ofMinutes(30),
                 Map.of(
                         "question", "What is Spring Boot?",
                         "correctAnswer", "Framework"
                 ),
-                homeworkId,
+                sectionId,
                 createdById
         );
 
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
+        ExamTaskResponse response = new ExamTaskResponse(
                 id,
                 1,
                 10,
                 TaskType.QUIZ,
+                Duration.ofMinutes(30),
                 Map.of(
                         "question", "What is Spring Boot?",
                         "correctAnswer", "Framework"
                 ),
-                homeworkId,
+                sectionId,
                 createdById,
                 OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
         );
 
-        when(homeworkTaskService.create(any(CreateHomeworkTaskRequest.class))).thenReturn(response);
+        when(examTaskService.create(any(CreateExamTaskRequest.class))).thenReturn(response);
 
-        mockMvc.perform(post("/api/v1/homework-tasks")
+        mockMvc.perform(post("/api/v1/exam-tasks")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -122,27 +123,29 @@ class HomeworkTaskControllerTest {
                 .andExpect(jsonPath("$.orderIndex").value(1))
                 .andExpect(jsonPath("$.point").value(10))
                 .andExpect(jsonPath("$.type").value("QUIZ"))
-                .andExpect(jsonPath("$.homeworkId").value(homeworkId.toString()))
+                .andExpect(jsonPath("$.duration").value("PT30M"))
+                .andExpect(jsonPath("$.sectionId").value(sectionId.toString()))
                 .andExpect(jsonPath("$.createdById").value(createdById.toString()))
-                .andExpect(jsonPath("$.payloadContent.question").value("What is Spring Boot?"))
-                .andExpect(jsonPath("$.payloadContent.correctAnswer").value("Framework"));
+                .andExpect(jsonPath("$.contentPayload.question").value("What is Spring Boot?"))
+                .andExpect(jsonPath("$.contentPayload.correctAnswer").value("Framework"));
 
-        verify(homeworkTaskService).create(any(CreateHomeworkTaskRequest.class));
+        verify(examTaskService).create(any(CreateExamTaskRequest.class));
     }
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
     void create_shouldReturnForbidden_forStudent() throws Exception {
-        CreateHomeworkTaskRequest request = new CreateHomeworkTaskRequest(
+        CreateExamTaskRequest request = new CreateExamTaskRequest(
                 1,
                 10,
                 TaskType.QUIZ,
+                Duration.ofMinutes(30),
                 Map.of("question", "Test"),
                 UUID.randomUUID(),
                 UUID.randomUUID()
         );
 
-        mockMvc.perform(post("/api/v1/homework-tasks")
+        mockMvc.perform(post("/api/v1/exam-tasks")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -153,172 +156,184 @@ class HomeworkTaskControllerTest {
     void getById_shouldReturnUnauthorized_whenNoAuth() throws Exception {
         UUID id = UUID.randomUUID();
 
-        mockMvc.perform(get("/api/v1/homework-tasks/{id}", id))
+        mockMvc.perform(get("/api/v1/exam-tasks/{id}", id))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
-    void getById_shouldReturnHomeworkTask() throws Exception {
+    void getById_shouldReturnExamTask() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
 
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
+        ExamTaskResponse response = new ExamTaskResponse(
                 id,
                 1,
                 10,
                 TaskType.QUIZ,
+                Duration.ofMinutes(30),
                 Map.of(
                         "question", "What is Spring Boot?",
                         "correctAnswer", "Framework"
                 ),
-                homeworkId,
+                sectionId,
                 createdById,
                 OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
         );
 
-        when(homeworkTaskService.getById(id)).thenReturn(response);
+        when(examTaskService.getById(id)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/homework-tasks/{id}", id))
+        mockMvc.perform(get("/api/v1/exam-tasks/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id.toString()))
                 .andExpect(jsonPath("$.orderIndex").value(1))
                 .andExpect(jsonPath("$.point").value(10))
                 .andExpect(jsonPath("$.type").value("QUIZ"))
-                .andExpect(jsonPath("$.homeworkId").value(homeworkId.toString()));
+                .andExpect(jsonPath("$.duration").value("PT30M"))
+                .andExpect(jsonPath("$.sectionId").value(sectionId.toString()));
 
-        verify(homeworkTaskService).getById(id);
+        verify(examTaskService).getById(id);
     }
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
-    void getAll_shouldReturnHomeworkTaskList() throws Exception {
+    void getAll_shouldReturnExamTaskList() throws Exception {
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
 
-        List<HomeworkTaskResponse> response = List.of(
-                new HomeworkTaskResponse(
+        List<ExamTaskResponse> response = List.of(
+                new ExamTaskResponse(
                         id1,
                         1,
                         10,
                         TaskType.QUIZ,
+                        Duration.ofMinutes(30),
                         Map.of("question", "Question 1"),
-                        homeworkId,
+                        sectionId,
                         createdById,
                         OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
                         OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
                 ),
-                new HomeworkTaskResponse(
+                new ExamTaskResponse(
                         id2,
                         2,
                         20,
                         TaskType.ESSAY,
+                        Duration.ofMinutes(45),
                         Map.of("topic", "Essay topic"),
-                        homeworkId,
+                        sectionId,
                         createdById,
                         OffsetDateTime.parse("2026-04-16T11:00:00+04:00"),
                         OffsetDateTime.parse("2026-04-16T11:00:00+04:00")
                 )
         );
 
-        when(homeworkTaskService.getAll()).thenReturn(response);
+        when(examTaskService.getAll()).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/homework-tasks"))
+        mockMvc.perform(get("/api/v1/exam-tasks"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[0].orderIndex").value(1))
                 .andExpect(jsonPath("$[0].type").value("QUIZ"))
+                .andExpect(jsonPath("$[0].duration").value("PT30M"))
                 .andExpect(jsonPath("$[1].orderIndex").value(2))
-                .andExpect(jsonPath("$[1].type").value("ESSAY"));
+                .andExpect(jsonPath("$[1].type").value("ESSAY"))
+                .andExpect(jsonPath("$[1].duration").value("PT45M"));
 
-        verify(homeworkTaskService).getAll();
+        verify(examTaskService).getAll();
     }
 
     @Test
     @WithMockUser(roles = {"STUDENT"})
-    void getAllByHomeworkId_shouldReturnHomeworkTaskList() throws Exception {
+    void getAllBySectionId_shouldReturnExamTaskList() throws Exception {
         UUID id1 = UUID.randomUUID();
         UUID id2 = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
 
-        List<HomeworkTaskResponse> response = List.of(
-                new HomeworkTaskResponse(
+        List<ExamTaskResponse> response = List.of(
+                new ExamTaskResponse(
                         id1,
                         1,
                         10,
                         TaskType.QUIZ,
+                        Duration.ofMinutes(30),
                         Map.of("question", "Question 1"),
-                        homeworkId,
+                        sectionId,
                         createdById,
                         OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
                         OffsetDateTime.parse("2026-04-16T10:00:00+04:00")
                 ),
-                new HomeworkTaskResponse(
+                new ExamTaskResponse(
                         id2,
                         2,
                         20,
                         TaskType.ESSAY,
+                        Duration.ofMinutes(45),
                         Map.of("topic", "Essay topic"),
-                        homeworkId,
+                        sectionId,
                         createdById,
                         OffsetDateTime.parse("2026-04-16T11:00:00+04:00"),
                         OffsetDateTime.parse("2026-04-16T11:00:00+04:00")
                 )
         );
 
-        when(homeworkTaskService.getAllByHomeworkId(homeworkId)).thenReturn(response);
+        when(examTaskService.getAllByExamSectionId(sectionId)).thenReturn(response);
 
-        mockMvc.perform(get("/api/v1/homework-tasks")
-                        .param("homeworkId", homeworkId.toString()))
+        mockMvc.perform(get("/api/v1/exam-tasks")
+                        .param("sectionId", sectionId.toString()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].homeworkId").value(homeworkId.toString()))
-                .andExpect(jsonPath("$[1].homeworkId").value(homeworkId.toString()));
+                .andExpect(jsonPath("$[0].sectionId").value(sectionId.toString()))
+                .andExpect(jsonPath("$[0].duration").value("PT30M"))
+                .andExpect(jsonPath("$[1].sectionId").value(sectionId.toString()))
+                .andExpect(jsonPath("$[1].duration").value("PT45M"));
 
-        verify(homeworkTaskService).getAllByHomeworkId(homeworkId);
+        verify(examTaskService).getAllByExamSectionId(sectionId);
     }
 
     @Test
     @WithMockUser(roles = {"PROFESSOR"})
-    void update_shouldReturnUpdatedHomeworkTask() throws Exception {
+    void update_shouldReturnUpdatedExamTask() throws Exception {
         UUID id = UUID.randomUUID();
-        UUID homeworkId = UUID.randomUUID();
+        UUID sectionId = UUID.randomUUID();
         UUID createdById = UUID.randomUUID();
 
-        UpdateHomeworkTaskRequest request = new UpdateHomeworkTaskRequest(
+        UpdateExamTaskRequest request = new UpdateExamTaskRequest(
                 2,
                 15,
                 TaskType.ESSAY,
+                Duration.ofHours(1),
                 Map.of(
                         "topic", "Explain dependency injection",
                         "minWords", 200
                 ),
-                homeworkId
+                sectionId
         );
 
-        HomeworkTaskResponse response = new HomeworkTaskResponse(
+        ExamTaskResponse response = new ExamTaskResponse(
                 id,
                 2,
                 15,
                 TaskType.ESSAY,
+                Duration.ofHours(1),
                 Map.of(
                         "topic", "Explain dependency injection",
                         "minWords", 200
                 ),
-                homeworkId,
+                sectionId,
                 createdById,
                 OffsetDateTime.parse("2026-04-16T10:00:00+04:00"),
                 OffsetDateTime.parse("2026-04-17T10:00:00+04:00")
         );
 
-        when(homeworkTaskService.update(eq(id), any(UpdateHomeworkTaskRequest.class))).thenReturn(response);
+        when(examTaskService.update(eq(id), any(UpdateExamTaskRequest.class))).thenReturn(response);
 
-        mockMvc.perform(patch("/api/v1/homework-tasks/{id}", id)
+        mockMvc.perform(patch("/api/v1/exam-tasks/{id}", id)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -327,9 +342,11 @@ class HomeworkTaskControllerTest {
                 .andExpect(jsonPath("$.orderIndex").value(2))
                 .andExpect(jsonPath("$.point").value(15))
                 .andExpect(jsonPath("$.type").value("ESSAY"))
-                .andExpect(jsonPath("$.payloadContent.topic").value("Explain dependency injection"));
+                .andExpect(jsonPath("$.duration").value("PT1H"))
+                .andExpect(jsonPath("$.sectionId").value(sectionId.toString()))
+                .andExpect(jsonPath("$.contentPayload.topic").value("Explain dependency injection"));
 
-        verify(homeworkTaskService).update(eq(id), any(UpdateHomeworkTaskRequest.class));
+        verify(examTaskService).update(eq(id), any(UpdateExamTaskRequest.class));
     }
 
     @Test
@@ -337,15 +354,16 @@ class HomeworkTaskControllerTest {
     void update_shouldReturnForbidden_forStudent() throws Exception {
         UUID id = UUID.randomUUID();
 
-        UpdateHomeworkTaskRequest request = new UpdateHomeworkTaskRequest(
+        UpdateExamTaskRequest request = new UpdateExamTaskRequest(
                 2,
                 15,
                 TaskType.ESSAY,
+                Duration.ofHours(1),
                 Map.of("topic", "Updated"),
                 UUID.randomUUID()
         );
 
-        mockMvc.perform(patch("/api/v1/homework-tasks/{id}", id)
+        mockMvc.perform(patch("/api/v1/exam-tasks/{id}", id)
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
@@ -357,13 +375,13 @@ class HomeworkTaskControllerTest {
     void delete_shouldReturnNoContent() throws Exception {
         UUID id = UUID.randomUUID();
 
-        doNothing().when(homeworkTaskService).delete(id);
+        doNothing().when(examTaskService).delete(id);
 
-        mockMvc.perform(delete("/api/v1/homework-tasks/{id}", id)
+        mockMvc.perform(delete("/api/v1/exam-tasks/{id}", id)
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        verify(homeworkTaskService).delete(id);
+        verify(examTaskService).delete(id);
     }
 
     @Test
@@ -371,7 +389,7 @@ class HomeworkTaskControllerTest {
     void delete_shouldReturnForbidden_forStudent() throws Exception {
         UUID id = UUID.randomUUID();
 
-        mockMvc.perform(delete("/api/v1/homework-tasks/{id}", id)
+        mockMvc.perform(delete("/api/v1/exam-tasks/{id}", id)
                         .with(csrf()))
                 .andExpect(status().isForbidden());
     }

@@ -271,16 +271,17 @@ public class ProductService {
             List<ProductContentItem> productContentItems = buildProductContentItems(savedProduct, contentItems);
             productContentItemRepository.saveAllAndFlush(productContentItems);
 
-            Product detailedProduct = getProductEntityById(savedProduct.getId());
-            return productMapper.toResponse(detailedProduct);
+            savedProduct.setContentItems(productContentItems);
+
+            return productMapper.toResponse(savedProduct);
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Product with this title already exists or contains duplicate content item",
                     exception
+
             );
         }
-
     }
 
     @Transactional(readOnly = true)
@@ -288,13 +289,11 @@ public class ProductService {
         Product product = getProductEntityById(id);
         return productMapper.toResponse(product);
     }
-
     @Transactional(readOnly = true)
     public List<ProductResponse> getAll() {
         List<Product> products = productRepository.findAllBy();
         return productMapper.toResponseList(products);
     }
-
     public ProductResponse update(UUID id, UpdateProductRequest request) {
         Product product = getProductEntityById(id);
 

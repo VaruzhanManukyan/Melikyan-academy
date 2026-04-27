@@ -13,5 +13,5 @@ public interface HomeworkTaskRepository extends JpaRepository<HomeworkTask, UUID
 
     boolean existsByHomeworkIdAndOrderIndex(UUID homeworkId, Integer orderIndex);
 
-    boolean existsByHomeworkIdAndOrderIndexAndIdNot(UUID homeworkId, Integer orderIndex, UUID id);
+    boolean existsByHomeworkIdAndOrderIndexAndIdNot(UUID homeworkId, Integer orderIndex, UUID homeworkTaskId);
 }

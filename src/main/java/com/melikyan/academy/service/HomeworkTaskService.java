@@ -124,7 +124,6 @@ public class HomeworkTaskService {
                     exception
             );
         }
-
     }
 
     @Transactional(readOnly = true)

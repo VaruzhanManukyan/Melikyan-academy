@@ -39,9 +39,11 @@ public class ExamTask extends BaseEntity {
     private int point;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "type", columnDefinition = "TASK_TYPE", nullable = false)
     private TaskType type;
 
+    @JdbcTypeCode(SqlTypes.INTERVAL_SECOND)
     @Column(name = "duration", columnDefinition = "Interval")
     private Duration duration;
 
