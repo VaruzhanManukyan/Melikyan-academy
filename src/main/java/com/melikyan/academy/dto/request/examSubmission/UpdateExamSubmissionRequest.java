@@ -1,14 +1,12 @@
 package com.melikyan.academy.dto.request.examSubmission;
 
 import com.melikyan.academy.entity.enums.ExamStatus;
-
-import java.util.Map;
-import java.util.UUID;
+import jakarta.validation.constraints.NotNull;
 
 public record UpdateExamSubmissionRequest(
-        String note,
+        @NotNull(message = "Status is required")
         ExamStatus status,
-        Map<String, Object> answerPayload,
-        UUID taskId
+
+        String note
 ) {
 }

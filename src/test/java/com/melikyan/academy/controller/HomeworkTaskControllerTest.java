@@ -124,8 +124,8 @@ class HomeworkTaskControllerTest {
                 .andExpect(jsonPath("$.type").value("QUIZ"))
                 .andExpect(jsonPath("$.homeworkId").value(homeworkId.toString()))
                 .andExpect(jsonPath("$.createdById").value(createdById.toString()))
-                .andExpect(jsonPath("$.payloadContent.question").value("What is Spring Boot?"))
-                .andExpect(jsonPath("$.payloadContent.correctAnswer").value("Framework"));
+                .andExpect(jsonPath("$.contentPayload.question").value("What is Spring Boot?"))
+                .andExpect(jsonPath("$.contentPayload.correctAnswer").value("Framework"));
 
         verify(homeworkTaskService).create(any(CreateHomeworkTaskRequest.class));
     }
@@ -327,7 +327,7 @@ class HomeworkTaskControllerTest {
                 .andExpect(jsonPath("$.orderIndex").value(2))
                 .andExpect(jsonPath("$.point").value(15))
                 .andExpect(jsonPath("$.type").value("ESSAY"))
-                .andExpect(jsonPath("$.payloadContent.topic").value("Explain dependency injection"));
+                .andExpect(jsonPath("$.contentPayload.topic").value("Explain dependency injection"));
 
         verify(homeworkTaskService).update(eq(id), any(UpdateHomeworkTaskRequest.class));
     }

@@ -5,8 +5,8 @@ import com.melikyan.academy.entity.enums.RegistrationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.jpa.repository.EntityGraph;
 
 import java.util.List;
 import java.util.UUID;
@@ -67,5 +67,22 @@ public interface ProductRegistrationRepository extends JpaRepository<ProductRegi
             UUID userId,
             UUID productId,
             RegistrationStatus status
+    );
+
+    @Query(value = """
+        SELECT EXISTS (
+            SELECT 1
+            FROM product_registrations pr
+            JOIN product_content_items pci
+                ON pci.product_id = pr.product_id
+            WHERE pr.user_id = :userId
+              AND pci.content_item_id = :contentItemId
+              AND pr.status = 'ACTIVE'
+              AND pr.deleted_at IS NULL
+        )
+        """, nativeQuery = true)
+    boolean existsActiveRegistrationByUserIdAndContentItemId(
+            UUID userId,
+            UUID contentItemId
     );
 }
