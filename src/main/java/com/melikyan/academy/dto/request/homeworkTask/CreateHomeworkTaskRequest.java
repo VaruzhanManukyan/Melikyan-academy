@@ -20,7 +20,7 @@ public record CreateHomeworkTaskRequest(
         TaskType type,
 
         @NotNull(message = "{homeworkTask.payloadContent.notNull}")
-        Map<String, Object> payloadContent,
+        Map<String, Object> contentPayload,
 
         @NotNull(message = "{homeworkTask.homeworkId.notNull}")
         UUID homeworkId,

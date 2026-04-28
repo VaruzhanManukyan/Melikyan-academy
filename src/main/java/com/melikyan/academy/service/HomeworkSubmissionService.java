@@ -2,20 +2,18 @@ package com.melikyan.academy.service;
 
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
+import com.melikyan.academy.repository.*;
 import org.springframework.http.HttpStatus;
 import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.UserProcess;
 import com.melikyan.academy.entity.HomeworkTask;
 import com.melikyan.academy.entity.HomeworkSubmission;
-import com.melikyan.academy.repository.UserRepository;
 import com.melikyan.academy.entity.enums.HomeworkStatus;
 import org.springframework.security.core.Authentication;
+import com.melikyan.academy.entity.enums.RegistrationStatus;
 import com.melikyan.academy.mapper.HomeworkSubmissionMapper;
-import com.melikyan.academy.repository.UserProcessRepository;
-import com.melikyan.academy.repository.HomeworkTaskRepository;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.dao.DataIntegrityViolationException;
-import com.melikyan.academy.repository.HomeworkSubmissionRepository;
 import com.melikyan.academy.dto.response.homeworkSubmission.HomeworkSubmissionResponse;
 import com.melikyan.academy.dto.request.homeworkSubmission.UpdateHomeworkSubmissionRequest;
 import com.melikyan.academy.dto.request.homeworkSubmission.CreateHomeworkSubmissionRequest;
@@ -35,8 +33,9 @@ public class HomeworkSubmissionService {
     private final UserRepository userRepository;
     private final UserProcessRepository userProcessRepository;
     private final HomeworkTaskRepository homeworkTaskRepository;
-    private final HomeworkSubmissionRepository homeworkSubmissionRepository;
     private final HomeworkSubmissionMapper homeworkSubmissionMapper;
+    private final HomeworkSubmissionRepository homeworkSubmissionRepository;
+    private final ProductRegistrationRepository productRegistrationRepository;
 
     private String normalizeNote(String note) {
         if (note == null) {
@@ -153,6 +152,20 @@ public class HomeworkSubmissionService {
         }
     }
 
+    private void validateUserHasActiveAccessToCourse(User user, ContentItem contentItem) {
+        List<UUID> userIds = productRegistrationRepository.findUserIdsByContentItemIdAndStatus(
+                contentItem.getId(),
+                RegistrationStatus.ACTIVE
+        );
+
+        if (!userIds.contains(user.getId())) {
+            throw new ResponseStatusException(
+                    HttpStatus.FORBIDDEN,
+                    "User does not have active access to this course"
+            );
+        }
+    }
+
     private HomeworkSubmissionResponse updateStatusInternal(
             UUID id,
             HomeworkStatus status,
@@ -184,6 +197,8 @@ public class HomeworkSubmissionService {
         User currentUser = getCurrentUser(authentication);
         HomeworkTask task = getHomeworkTaskById(request.taskId());
         ContentItem contentItem = getContentItemFromTask(task);
+
+        validateUserHasActiveAccessToCourse(currentUser, contentItem);
 
         if (homeworkSubmissionRepository.existsByUserIdAndTaskId(currentUser.getId(), task.getId())) {
             throw new ResponseStatusException(

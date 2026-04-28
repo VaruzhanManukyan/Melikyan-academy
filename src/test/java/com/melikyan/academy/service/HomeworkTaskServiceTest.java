@@ -85,7 +85,7 @@ class HomeworkTaskServiceTest {
         homeworkTask.setOrderIndex(1);
         homeworkTask.setPoint(10);
         homeworkTask.setType(TaskType.QUIZ);
-        homeworkTask.setPayloadContent(Map.of("question", "Old"));
+        homeworkTask.setContentPayload(Map.of("question", "Old"));
         homeworkTask.setHomework(homework);
         homeworkTask.setCreatedBy(user);
     }
@@ -99,7 +99,7 @@ class HomeworkTaskServiceTest {
         when(request.orderIndex()).thenReturn(1);
         when(request.point()).thenReturn(10);
         when(request.type()).thenReturn(TaskType.QUIZ);
-        when(request.payloadContent()).thenReturn(Map.of("question", "What is Spring Boot?"));
+        when(request.contentPayload()).thenReturn(Map.of("question", "What is Spring Boot?"));
         when(request.homeworkId()).thenReturn(homeworkId);
         when(request.createdById()).thenReturn(userId);
 
@@ -184,7 +184,7 @@ class HomeworkTaskServiceTest {
         when(request.orderIndex()).thenReturn(2);
         when(request.point()).thenReturn(15);
         when(request.type()).thenReturn(TaskType.ESSAY);
-        when(request.payloadContent()).thenReturn(Map.of("topic", "New topic"));
+        when(request.contentPayload()).thenReturn(Map.of("topic", "New topic"));
 
         when(homeworkTaskRepository.findById(homeworkTaskId)).thenReturn(Optional.of(homeworkTask));
         when(homeworkRepository.findDetailedById(homeworkId)).thenReturn(Optional.of(homework));
@@ -203,7 +203,7 @@ class HomeworkTaskServiceTest {
         assertEquals(2, homeworkTask.getOrderIndex());
         assertEquals(15, homeworkTask.getPoint());
         assertEquals(TaskType.ESSAY, homeworkTask.getType());
-        assertEquals(Map.of("topic", "New topic"), homeworkTask.getPayloadContent());
+        assertEquals(Map.of("topic", "New topic"), homeworkTask.getContentPayload());
 
         verify(contentItemRepository).changeTotalSteps(contentItemId, -1);
         verify(contentItemRepository).changeTotalSteps(secondContentItemId, 1);
