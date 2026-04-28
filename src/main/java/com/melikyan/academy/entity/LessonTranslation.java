@@ -28,6 +28,9 @@ public class LessonTranslation extends BaseEntity {
     @Column(length = 2, name = "code",  nullable = false)
     private String code;
 
+    @Column(name = "value_url", nullable = false)
+    private String valueUrl;
+
     @ManyToOne
     @JoinColumn(name = "lesson_id", nullable = false)
     private Lesson lesson;

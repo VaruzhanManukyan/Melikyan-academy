@@ -310,6 +310,7 @@ CREATE TABLE lesson_translations
     code        VARCHAR(2)   NOT NULL,
     title       VARCHAR(255) NOT NULL,
     description VARCHAR(255),
+    value_url   VARCHAR(255),
     lesson_id   UUID         NOT NULL,
     created_by  UUID         NOT NULL,
     created_at  TIMESTAMPTZ  NOT NULL,
@@ -359,7 +360,7 @@ CREATE TABLE homework_tasks
     order_index     INTEGER     NOT NULL,
     type            TASK_TYPE   NOT NULL,
     point           INTEGER     NOT NULL,
-    payload_content JSONB       NOT NULL,
+    content_payload JSONB       NOT NULL,
     homework_id     UUID        NOT NULL,
     created_by      UUID        NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL,
@@ -731,7 +732,7 @@ CREATE UNIQUE INDEX uidx_exam_tasks_section_id_order_index__active
 CREATE UNIQUE INDEX uidx_product_registrations_user_id_product_id__active
     ON product_registrations (user_id, product_id)
     WHERE deleted_at IS NULL
-    AND status = 'ACTIVE';
+        AND status = 'ACTIVE';
 
 CREATE UNIQUE INDEX uidx_certificates_certificate_code__active
     ON certificates (certificate_code)
