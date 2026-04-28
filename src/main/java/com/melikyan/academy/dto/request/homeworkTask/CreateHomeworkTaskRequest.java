@@ -19,7 +19,7 @@ public record CreateHomeworkTaskRequest(
         @NotNull(message = "{homeworkTask.type.notNull}")
         TaskType type,
 
-        @NotNull(message = "{homeworkTask.payloadContent.notNull}")
+        @NotNull(message = "{homeworkTask.contentPayload.notNull}")
         Map<String, Object> contentPayload,
 
         @NotNull(message = "{homeworkTask.homeworkId.notNull}")

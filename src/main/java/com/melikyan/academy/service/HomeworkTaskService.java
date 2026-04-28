@@ -109,7 +109,7 @@ public class HomeworkTaskService {
         homeworkTask.setOrderIndex(request.orderIndex());
         homeworkTask.setPoint(request.point());
         homeworkTask.setType(request.type());
-        homeworkTask.setPayloadContent(request.payloadContent());
+        homeworkTask.setContentPayload(request.contentPayload());
         homeworkTask.setCreatedBy(createdBy);
         homeworkTask.setHomework(homework);
 
@@ -187,8 +187,8 @@ public class HomeworkTaskService {
             homeworkTask.setType(request.type());
         }
 
-        if (request.payloadContent() != null) {
-            homeworkTask.setPayloadContent(request.payloadContent());
+        if (request.contentPayload() != null) {
+            homeworkTask.setContentPayload(request.contentPayload());
         }
 
         try {

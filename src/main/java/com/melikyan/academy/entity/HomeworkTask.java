@@ -43,8 +43,8 @@ public class HomeworkTask extends BaseEntity {
     private TaskType type;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "payload_content", columnDefinition = "jsonb", nullable = false)
-    private Map<String, Object> payloadContent;
+    @Column(name = "contentPayload", columnDefinition = "jsonb", nullable = false)
+    private Map<String, Object> contentPayload;
 
     @ManyToOne
     @JoinColumn(name = "homework_id", nullable = false)

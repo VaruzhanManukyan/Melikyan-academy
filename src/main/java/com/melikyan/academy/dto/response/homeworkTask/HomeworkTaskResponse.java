@@ -11,7 +11,7 @@ public record HomeworkTaskResponse(
         Integer orderIndex,
         Integer point,
         TaskType type,
-        Map<String, Object> payloadContent,
+        Map<String, Object> contentPayload,
         UUID homeworkId,
         UUID createdById,
         OffsetDateTime createdAt,

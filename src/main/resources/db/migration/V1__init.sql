@@ -310,6 +310,7 @@ CREATE TABLE lesson_translations
     code        VARCHAR(2)   NOT NULL,
     title       VARCHAR(255) NOT NULL,
     description VARCHAR(255),
+    value_url   VARCHAR(255) NOT NULL,
     lesson_id   UUID         NOT NULL,
     created_by  UUID         NOT NULL,
     created_at  TIMESTAMPTZ  NOT NULL,
@@ -359,7 +360,7 @@ CREATE TABLE homework_tasks
     order_index     INTEGER     NOT NULL,
     type            TASK_TYPE   NOT NULL,
     point           INTEGER     NOT NULL,
-    payload_content JSONB       NOT NULL,
+    content_payload JSONB       NOT NULL,
     homework_id     UUID        NOT NULL,
     created_by      UUID        NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL,
@@ -674,7 +675,6 @@ CREATE TABLE user_processes
     CONSTRAINT fk_user_processes_content_item_id__content_items
         FOREIGN KEY (content_item_id) REFERENCES content_items (id)
 );
-
 
 CREATE UNIQUE INDEX uidx_users_email__active
     ON users (email)
