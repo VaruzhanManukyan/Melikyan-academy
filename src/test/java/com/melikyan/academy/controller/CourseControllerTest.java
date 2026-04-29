@@ -1,12 +1,12 @@
 package com.melikyan.academy.controller;
 
-import tools.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.ObjectMapper;
 import com.melikyan.academy.service.CourseService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.FilterType;
-import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.entity.enums.ContentItemType;
+import com.melikyan.academy.security.RememberMeSecurityFilter;
 import com.melikyan.academy.dto.response.course.CourseResponse;
 import com.melikyan.academy.dto.request.course.CreateCourseRequest;
 import com.melikyan.academy.dto.request.course.UpdateCourseRequest;

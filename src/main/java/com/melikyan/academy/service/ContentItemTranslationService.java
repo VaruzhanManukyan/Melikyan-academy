@@ -3,18 +3,14 @@ package com.melikyan.academy.service;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Exam;
 import com.melikyan.academy.entity.Course;
-import com.melikyan.academy.entity.ContentItem;
+import com.melikyan.academy.repository.*;
 import org.springframework.http.HttpStatus;
+import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.enums.ContentItemType;
 import com.melikyan.academy.entity.ContentItemTranslation;
-import com.melikyan.academy.repository.UserRepository;
-import com.melikyan.academy.repository.ExamRepository;
-import com.melikyan.academy.repository.CourseRepository;
-import com.melikyan.academy.repository.LanguageRepository;
-import com.melikyan.academy.mapper.ContentItemTranslationMapper;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.dao.DataIntegrityViolationException;
-import com.melikyan.academy.repository.ContentItemTranslationRepository;
+import com.melikyan.academy.mapper.ContentItemTranslationMapper;
 import com.melikyan.academy.dto.response.contentItemTranslation.ContentItemTranslationResponse;
 import com.melikyan.academy.dto.request.contentItemTranslation.CreateContentItemTranslationRequest;
 import com.melikyan.academy.dto.request.contentItemTranslation.UpdateContentItemTranslationRequest;
@@ -34,6 +30,7 @@ public class ContentItemTranslationService {
     private final ExamRepository examRepository;
     private final CourseRepository courseRepository;
     private final LanguageRepository languageRepository;
+    private final ContentItemRepository contentItemRepository;
     private final ContentItemTranslationMapper contentItemTranslationMapper;
     private final ContentItemTranslationRepository contentItemTranslationRepository;
 
@@ -103,6 +100,14 @@ public class ContentItemTranslationService {
                 ));
     }
 
+    private ContentItem getContentItemById(UUID id) {
+        return contentItemRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Content item not found with id: " + id
+                ));
+    }
+
     private ContentItemTranslation getContentItemTranslationById(UUID id) {
         return contentItemTranslationRepository.findById(id)
                 .orElseThrow(() -> new ResponseStatusException(
@@ -132,6 +137,18 @@ public class ContentItemTranslationService {
         }
     }
 
+    private void validateContentItemType(
+            ContentItem contentItem,
+            ContentItemType type
+    ) {
+        if (contentItem.getType() != type) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Content item type must be " + type
+            );
+        }
+    }
+
     private ContentItem getCourseContentItem(UUID courseId) {
         Course course = getCourseById(courseId);
         return course.getContentItem();
@@ -147,7 +164,9 @@ public class ContentItemTranslationService {
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
 
-        ContentItem contentItem = getCourseContentItem(request.contentItemId());
+        ContentItem contentItem = getContentItemById(request.contentItemId());
+        validateContentItemType(contentItem, ContentItemType.COURSE);
+
         User createdBy = getUserById(request.createdById());
 
         validateLanguageExists(normalizedCode);
@@ -188,7 +207,9 @@ public class ContentItemTranslationService {
         String normalizedTitle = normalizeTitle(request.title());
         String normalizedDescription = normalizeDescription(request.description());
 
-        ContentItem contentItem = getExamContentItem(request.createdById());
+        ContentItem contentItem = getContentItemById(request.contentItemId());
+        validateContentItemType(contentItem, ContentItemType.EXAM);
+
         User createdBy = getUserById(request.createdById());
 
         validateLanguageExists(normalizedCode);
