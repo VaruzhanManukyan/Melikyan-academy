@@ -2,6 +2,7 @@ package com.melikyan.academy.entity;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.SoftDeleteType;
+import com.melikyan.academy.entity.base.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -17,8 +18,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Table(name = "languages")
 @SoftDelete(strategy = SoftDeleteType.TIMESTAMP, columnName = "deleted_at")
-public class Language {
-    @Id
+public class Language extends BaseEntity {
     @Column(length = 2, name = "code", unique = true, nullable = false)
     private String code;
 
@@ -28,12 +28,4 @@ public class Language {
     @ManyToOne(fetch =  FetchType.LAZY)
     @JoinColumn(name = "created_by")
     private User createdBy;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
-    private OffsetDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at", nullable = false)
-    private OffsetDateTime updatedAt;
 }

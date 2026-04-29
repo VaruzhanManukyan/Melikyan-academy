@@ -150,6 +150,7 @@ CREATE TABLE products
 
 CREATE TABLE languages
 (
+    id         UUID        NOT NULL,
     code       VARCHAR(2)  NOT NULL,
     name       VARCHAR(50) NOT NULL,
     created_by UUID        NOT NULL,
@@ -157,7 +158,7 @@ CREATE TABLE languages
     updated_at TIMESTAMPTZ NOT NULL,
     deleted_at TIMESTAMPTZ,
 
-    CONSTRAINT pk_languages PRIMARY KEY (code),
+    CONSTRAINT pk_languages PRIMARY KEY (id),
     CONSTRAINT chk_languages_code_not_blank
         CHECK (btrim(code) <> ''),
     CONSTRAINT chk_languages_name_not_blank
@@ -742,6 +743,14 @@ CREATE INDEX idx_products_category_id
 
 CREATE INDEX idx_certificates_user_id
     ON certificates (user_id);
+
+CREATE UNIQUE INDEX uidx_languages_code__active
+    ON languages (code)
+    WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX uidx_languages_name__active
+    ON languages (name)
+    WHERE deleted_at IS NULL;
 
 CREATE INDEX idx_certificates_content_item_id
     ON certificates (content_item_id);
