@@ -12,7 +12,12 @@ public record CreateLessonTranslationRequest(
         @Size(max = 255, message = "{lessonTranslation.title.size}")
         String title,
 
+        @Size(max = 500, message = "{lessonTranslation.description.size}")
         String description,
+
+        @NotBlank(message = "{lessonTranslation.valueUrl.notBlank}")
+        @Size(max = 255, message = "{lessonTranslation.valueUrl.size}")
+        String valueUrl,
 
         @NotBlank(message = "{lessonTranslation.code.notBlank}")
         @Size(min = 2, max = 2, message = "{lessonTranslation.code.size}")

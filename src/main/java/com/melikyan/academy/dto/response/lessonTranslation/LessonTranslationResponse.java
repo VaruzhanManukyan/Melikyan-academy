@@ -1,13 +1,14 @@
 package com.melikyan.academy.dto.response.lessonTranslation;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 public record LessonTranslationResponse(
         UUID id,
+        String code,
         String title,
         String description,
-        String code,
+        String valueUrl,
         UUID lessonId,
         UUID createdById,
         OffsetDateTime createdAt,
