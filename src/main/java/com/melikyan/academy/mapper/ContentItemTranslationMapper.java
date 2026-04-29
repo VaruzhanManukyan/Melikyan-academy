@@ -3,8 +3,6 @@ package com.melikyan.academy.mapper;
 import org.mapstruct.*;
 import com.melikyan.academy.entity.ContentItemTranslation;
 import com.melikyan.academy.dto.response.contentItemTranslation.ContentItemTranslationResponse;
-import com.melikyan.academy.dto.request.contentItemTranslation.CreateContentItemTranslationRequest;
-import com.melikyan.academy.dto.request.contentItemTranslation.UpdateContentItemTranslationRequest;
 
 import java.util.List;
 
