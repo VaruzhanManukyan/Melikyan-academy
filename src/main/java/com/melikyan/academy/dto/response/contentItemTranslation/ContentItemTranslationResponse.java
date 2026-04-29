@@ -5,9 +5,9 @@ import java.time.OffsetDateTime;
 
 public record ContentItemTranslationResponse(
         UUID id,
+        String code,
         String title,
         String description,
-        String code,
         UUID contentItemId,
         UUID createdById,
         OffsetDateTime createdAt,
