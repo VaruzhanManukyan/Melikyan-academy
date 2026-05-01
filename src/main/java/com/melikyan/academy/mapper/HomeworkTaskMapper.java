@@ -9,7 +9,7 @@ import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface HomeworkTaskMapper {
-    @Mapping(target = "homeworkId", source = "homework.id")
+    @Mapping(target = "lessonId", source = "lesson.id")
     @Mapping(target = "createdById", source = "createdBy.id")
     HomeworkTaskResponse toResponse(HomeworkTask homeworkTask);
 

@@ -79,28 +79,21 @@ public class HomeworkSubmissionService {
     }
 
     private ContentItem getContentItemFromTask(HomeworkTask task) {
-        if (task.getHomework() == null) {
+        if (task.getLesson() == null) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Homework task is not linked to homework"
+                    "Homework task is not linked to lesson"
             );
         }
 
-        if (task.getHomework().getLesson() == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.INTERNAL_SERVER_ERROR,
-                    "Homework is not linked to lesson"
-            );
-        }
-
-        if (task.getHomework().getLesson().getCourse() == null) {
+        if (task.getLesson().getCourse() == null) {
             throw new ResponseStatusException(
                     HttpStatus.INTERNAL_SERVER_ERROR,
                     "Lesson is not linked to course"
             );
         }
 
-        Course course = task.getHomework().getLesson().getCourse();
+        Course course = task.getLesson().getCourse();
 
         if (course.getContentItem() == null) {
             throw new ResponseStatusException(

@@ -1,7 +1,7 @@
 package com.melikyan.academy.dto.response.category;
 
-import java.time.OffsetDateTime;
 import java.util.UUID;
+import java.time.OffsetDateTime;
 
 public record CategoryResponse(
         UUID id,

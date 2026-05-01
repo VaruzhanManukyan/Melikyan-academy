@@ -9,9 +9,9 @@ import java.util.UUID;
 
 @Repository
 public interface HomeworkTaskRepository extends JpaRepository<HomeworkTask, UUID> {
-    List<HomeworkTask> findAllByHomeworkIdOrderByOrderIndexAsc(UUID homeworkId);
+    List<HomeworkTask> findAllByLessonIdOrderByOrderIndexAsc(UUID lessonId);
 
-    boolean existsByHomeworkIdAndOrderIndex(UUID homeworkId, Integer orderIndex);
+    boolean existsByLessonIdAndOrderIndex(UUID lessonId, Integer orderIndex);
 
-    boolean existsByHomeworkIdAndOrderIndexAndIdNot(UUID homeworkId, Integer orderIndex, UUID homeworkTaskId);
+    boolean existsByLessonIdAndOrderIndexAndIdNot(UUID lessonId, Integer orderIndex, UUID homeworkTaskId);
 }

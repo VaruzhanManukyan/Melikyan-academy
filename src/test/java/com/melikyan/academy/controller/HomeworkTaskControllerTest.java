@@ -271,7 +271,7 @@ class HomeworkTaskControllerTest {
                 )
         );
 
-        when(homeworkTaskService.getAllByHomeworkId(homeworkId)).thenReturn(response);
+        when(homeworkTaskService.getAllByLessonId(homeworkId)).thenReturn(response);
 
         mockMvc.perform(get("/api/v1/homework-tasks")
                         .param("homeworkId", homeworkId.toString()))
@@ -280,7 +280,7 @@ class HomeworkTaskControllerTest {
                 .andExpect(jsonPath("$[0].homeworkId").value(homeworkId.toString()))
                 .andExpect(jsonPath("$[1].homeworkId").value(homeworkId.toString()));
 
-        verify(homeworkTaskService).getAllByHomeworkId(homeworkId);
+        verify(homeworkTaskService).getAllByLessonId(homeworkId);
     }
 
     @Test

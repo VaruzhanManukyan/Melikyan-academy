@@ -37,10 +37,10 @@ public class HomeworkTaskController {
 
     @GetMapping
     public ResponseEntity<List<HomeworkTaskResponse>> getAll(
-            @RequestParam(required = false) UUID homeworkId
+            @RequestParam(required = false) UUID lessonId
     ) {
-        if (homeworkId != null) {
-            return ResponseEntity.ok(homeworkTaskService.getAllByHomeworkId(homeworkId));
+        if (lessonId != null) {
+            return ResponseEntity.ok(homeworkTaskService.getAllByLessonId(lessonId));
         }
 
         return ResponseEntity.ok(homeworkTaskService.getAll());

@@ -4,7 +4,6 @@ import org.mockito.ArgumentCaptor;
 import com.melikyan.academy.entity.User;
 import com.melikyan.academy.entity.Course;
 import com.melikyan.academy.entity.Lesson;
-import com.melikyan.academy.entity.Homework;
 import com.melikyan.academy.entity.ContentItem;
 import com.melikyan.academy.entity.UserProcess;
 import com.melikyan.academy.entity.HomeworkTask;

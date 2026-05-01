@@ -15,8 +15,6 @@ public record UpdateHomeworkTaskRequest(
 
         TaskType type,
 
-        Map<String, Object> contentPayload,
-
-        UUID homeworkId
+        Map<String, Object> contentPayload
 ) {
 }

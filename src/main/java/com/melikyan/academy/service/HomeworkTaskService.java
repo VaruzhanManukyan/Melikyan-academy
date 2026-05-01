@@ -1,12 +1,12 @@
 package com.melikyan.academy.service;
 
 import com.melikyan.academy.entity.User;
+import com.melikyan.academy.entity.Lesson;
 import org.springframework.http.HttpStatus;
-import com.melikyan.academy.entity.Homework;
 import com.melikyan.academy.entity.HomeworkTask;
 import com.melikyan.academy.mapper.HomeworkTaskMapper;
 import com.melikyan.academy.repository.UserRepository;
-import com.melikyan.academy.repository.HomeworkRepository;
+import com.melikyan.academy.repository.LessonRepository;
 import com.melikyan.academy.repository.ContentItemRepository;
 import com.melikyan.academy.repository.HomeworkTaskRepository;
 import org.springframework.web.server.ResponseStatusException;
@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class HomeworkTaskService {
     private final UserRepository userRepository;
-    private final HomeworkRepository homeworkRepository;
+    private final LessonRepository lessonRepository;
     private final HomeworkTaskMapper homeworkTaskMapper;
     private final ContentItemRepository contentItemRepository;
     private final HomeworkTaskRepository homeworkTaskRepository;
@@ -39,11 +39,11 @@ public class HomeworkTaskService {
                 ));
     }
 
-    private Homework getHomeworkById(UUID id) {
-        return homeworkRepository.findDetailedById(id)
+    private Lesson getLessonById(UUID id) {
+        return lessonRepository.findDetailedById(id)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND,
-                        "Homework not found with id: " + id
+                        "Lesson not found with id: " + id
                 ));
     }
 
@@ -55,33 +55,32 @@ public class HomeworkTaskService {
                 ));
     }
 
-    private void validateOrderIndexUnique(UUID homeworkId, Integer orderIndex) {
-        if (homeworkTaskRepository.existsByHomeworkIdAndOrderIndex(homeworkId, orderIndex)) {
+    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex) {
+        if (homeworkTaskRepository.existsByLessonIdAndOrderIndex(lessonId, orderIndex)) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Homework task with order index " + orderIndex +
-                            " already exists in homework " + homeworkId
+                            " already exists in lesson " + lessonId
             );
         }
     }
 
-    private void validateOrderIndexUnique(UUID homeworkId, Integer orderIndex, UUID homeworkTaskId) {
-        if (homeworkTaskRepository.existsByHomeworkIdAndOrderIndexAndIdNot(
-                homeworkId,
+    private void validateOrderIndexUnique(UUID lessonId, Integer orderIndex, UUID homeworkTaskId) {
+        if (homeworkTaskRepository.existsByLessonIdAndOrderIndexAndIdNot(
+                lessonId,
                 orderIndex,
                 homeworkTaskId
         )) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
                     "Homework task with order index " + orderIndex +
-                            " already exists in homework " + homeworkId
+                            " already exists in lesson " + lessonId
             );
         }
     }
 
-    private UUID getContentItemId(Homework homework) {
-        return homework.getLesson()
-                .getCourse()
+    private UUID getContentItemId(Lesson lesson) {
+        return lesson.getCourse()
                 .getContentItem()
                 .getId();
     }
@@ -100,10 +99,10 @@ public class HomeworkTaskService {
     }
 
     public HomeworkTaskResponse create(CreateHomeworkTaskRequest request) {
-        Homework homework = getHomeworkById(request.homeworkId());
+        Lesson lesson = getLessonById(request.lessonId());
         User createdBy = getUserById(request.createdById());
 
-        validateOrderIndexUnique(homework.getId(), request.orderIndex());
+        validateOrderIndexUnique(lesson.getId(), request.orderIndex());
 
         HomeworkTask homeworkTask = new HomeworkTask();
         homeworkTask.setOrderIndex(request.orderIndex());
@@ -111,16 +110,16 @@ public class HomeworkTaskService {
         homeworkTask.setType(request.type());
         homeworkTask.setContentPayload(request.contentPayload());
         homeworkTask.setCreatedBy(createdBy);
-        homeworkTask.setHomework(homework);
+        homeworkTask.setLesson(lesson);
 
         try {
             HomeworkTask savedHomeworkTask = homeworkTaskRepository.saveAndFlush(homeworkTask);
-            changeContentItemTotalSteps(getContentItemId(homework), 1);
+            changeContentItemTotalSteps(getContentItemId(lesson), 1);
             return homeworkTaskMapper.toResponse(savedHomeworkTask);
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Homework task with such order index already exists in this homework",
+                    "Homework task with such order index already exists in this lesson",
                     exception
             );
         }
@@ -139,40 +138,24 @@ public class HomeworkTaskService {
     }
 
     @Transactional(readOnly = true)
-    public List<HomeworkTaskResponse> getAllByHomeworkId(UUID homeworkId) {
-        getHomeworkById(homeworkId);
+    public List<HomeworkTaskResponse> getAllByLessonId(UUID lessonId) {
+        getLessonById(lessonId);
         List<HomeworkTask> homeworkTasks = homeworkTaskRepository
-                .findAllByHomeworkIdOrderByOrderIndexAsc(homeworkId);
+                .findAllByLessonIdOrderByOrderIndexAsc(lessonId);
         return homeworkTaskMapper.toResponseList(homeworkTasks);
     }
 
     public HomeworkTaskResponse update(UUID id, UpdateHomeworkTaskRequest request) {
         HomeworkTask homeworkTask = getHomeworkTaskEntityById(id);
 
-        Homework currentHomework = getHomeworkById(homeworkTask.getHomework().getId());
-        Homework targetHomework = request.homeworkId() != null
-                ? getHomeworkById(request.homeworkId())
-                : currentHomework;
+        Lesson lesson = homeworkTask.getLesson();
 
         Integer targetOrderIndex = request.orderIndex() != null
                 ? request.orderIndex()
                 : homeworkTask.getOrderIndex();
 
-        if (!targetHomework.getId().equals(currentHomework.getId())
-                || !targetOrderIndex.equals(homeworkTask.getOrderIndex())) {
-            validateOrderIndexUnique(targetHomework.getId(), targetOrderIndex, homeworkTask.getId());
-        }
-
-        if (!targetHomework.getId().equals(currentHomework.getId())) {
-            UUID currentContentItemId = getContentItemId(currentHomework);
-            UUID targetContentItemId = getContentItemId(targetHomework);
-
-            if (!currentContentItemId.equals(targetContentItemId)) {
-                changeContentItemTotalSteps(currentContentItemId, -1);
-                changeContentItemTotalSteps(targetContentItemId, 1);
-            }
-
-            homeworkTask.setHomework(targetHomework);
+        if (!targetOrderIndex.equals(homeworkTask.getOrderIndex())) {
+            validateOrderIndexUnique(lesson.getId(), targetOrderIndex, homeworkTask.getId());
         }
 
         if (request.orderIndex() != null) {
@@ -197,7 +180,7 @@ public class HomeworkTaskService {
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(
                     HttpStatus.CONFLICT,
-                    "Homework task with such order index already exists in this homework",
+                    "Homework task with such order index already exists in this Lesson",
                     exception
             );
         }
@@ -205,9 +188,9 @@ public class HomeworkTaskService {
 
     public void delete(UUID id) {
         HomeworkTask homeworkTask = getHomeworkTaskEntityById(id);
-        Homework homework = getHomeworkById(homeworkTask.getHomework().getId());
+        Lesson lesson = getLessonById(homeworkTask.getLesson().getId());
 
-        changeContentItemTotalSteps(getContentItemId(homework), -1);
+        changeContentItemTotalSteps(getContentItemId(lesson), -1);
 
         homeworkTaskRepository.delete(homeworkTask);
     }

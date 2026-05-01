@@ -12,7 +12,7 @@ public record HomeworkTaskResponse(
         Integer point,
         TaskType type,
         Map<String, Object> contentPayload,
-        UUID homeworkId,
+        UUID lessonId,
         UUID createdById,
         OffsetDateTime createdAt,
         OffsetDateTime updatedAt

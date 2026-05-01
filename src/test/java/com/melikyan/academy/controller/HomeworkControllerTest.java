@@ -2,7 +2,6 @@ package com.melikyan.academy.controller;
 
 import org.springframework.http.MediaType;
 import tools.jackson.databind.ObjectMapper;
-import com.melikyan.academy.service.HomeworkService;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.security.config.Customizer;
 import org.springframework.context.annotation.FilterType;

@@ -330,31 +330,6 @@ CREATE TABLE lesson_translations
         FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
-CREATE TABLE homeworks
-(
-    id           UUID        NOT NULL,
-    order_index  INTEGER     NOT NULL,
-    title        VARCHAR(50) NOT NULL,
-    description  VARCHAR(255),
-    is_published BOOLEAN     NOT NULL DEFAULT FALSE,
-    due_date     TIMESTAMPTZ NOT NULL,
-    lesson_id    UUID        NOT NULL,
-    created_by   UUID        NOT NULL,
-    created_at   TIMESTAMPTZ NOT NULL,
-    updated_at   TIMESTAMPTZ NOT NULL,
-    deleted_at   TIMESTAMPTZ,
-
-    CONSTRAINT pk_homeworks PRIMARY KEY (id),
-    CONSTRAINT chk_homeworks_order_index_positive
-        CHECK (order_index > 0),
-    CONSTRAINT chk_homeworks_title_not_blank
-        CHECK (btrim(title) <> ''),
-    CONSTRAINT fk_homeworks_lesson_id__lessons
-        FOREIGN KEY (lesson_id) REFERENCES lessons (id),
-    CONSTRAINT fk_homeworks_created_by__users
-        FOREIGN KEY (created_by) REFERENCES users (id)
-);
-
 CREATE TABLE homework_tasks
 (
     id              UUID        NOT NULL,
@@ -362,7 +337,7 @@ CREATE TABLE homework_tasks
     type            TASK_TYPE   NOT NULL,
     point           INTEGER     NOT NULL,
     content_payload JSONB       NOT NULL,
-    homework_id     UUID        NOT NULL,
+    lesson_id     UUID        NOT NULL,
     created_by      UUID        NOT NULL,
     created_at      TIMESTAMPTZ NOT NULL,
     updated_at      TIMESTAMPTZ NOT NULL,
@@ -373,8 +348,8 @@ CREATE TABLE homework_tasks
         CHECK (order_index > 0),
     CONSTRAINT chk_homework_tasks_point_positive
         CHECK (point > 0),
-    CONSTRAINT fk_homework_tasks_homework_id__homeworks
-        FOREIGN KEY (homework_id) REFERENCES homeworks (id),
+    CONSTRAINT fk_homework_tasks_lesson_id__lessons
+        FOREIGN KEY (lesson_id) REFERENCES lessons (id),
     CONSTRAINT fk_homework_tasks_created_by__users
         FOREIGN KEY (created_by) REFERENCES users (id)
 );
@@ -396,30 +371,6 @@ CREATE TABLE homework_submissions
         FOREIGN KEY (task_id) REFERENCES homework_tasks (id),
     CONSTRAINT fk_homework_submissions_user_id__users
         FOREIGN KEY (user_id) REFERENCES users (id)
-);
-
-CREATE TABLE homework_translations
-(
-    id          UUID         NOT NULL,
-    code        VARCHAR(2)   NOT NULL,
-    title       VARCHAR(255) NOT NULL,
-    description VARCHAR(255),
-    homework_id UUID         NOT NULL,
-    created_by  UUID         NOT NULL,
-    created_at  TIMESTAMPTZ  NOT NULL,
-    updated_at  TIMESTAMPTZ  NOT NULL,
-
-    CONSTRAINT pk_homework_translations PRIMARY KEY (id),
-    CONSTRAINT uq_homework_translations_homework_id_code
-        UNIQUE (homework_id, code),
-    CONSTRAINT chk_homework_translations_code_not_blank
-        CHECK (btrim(code) <> ''),
-    CONSTRAINT chk_homework_translations_title_not_blank
-        CHECK (btrim(title) <> ''),
-    CONSTRAINT fk_homework_translations_homework_id__homeworks
-        FOREIGN KEY (homework_id) REFERENCES homeworks (id) ON DELETE CASCADE,
-    CONSTRAINT fk_homework_translations_created_by__users
-        FOREIGN KEY (created_by) REFERENCES users (id)
 );
 
 CREATE TABLE exam_sections
@@ -701,16 +652,8 @@ CREATE UNIQUE INDEX uidx_lessons_course_id_title__active
     ON lessons (course_id, title)
     WHERE deleted_at IS NULL;
 
-CREATE UNIQUE INDEX uidx_homeworks_lesson_id_order_index__active
-    ON homeworks (lesson_id, order_index)
-    WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uidx_homeworks_lesson_id_title__active
-    ON homeworks (lesson_id, title)
-    WHERE deleted_at IS NULL;
-
-CREATE UNIQUE INDEX uidx_homework_tasks_homework_id_order_index__active
-    ON homework_tasks (homework_id, order_index)
+CREATE UNIQUE INDEX uidx_homework_tasks_lesson_id_order_index__active
+    ON homework_tasks (lesson_id, order_index)
     WHERE deleted_at IS NULL;
 
 CREATE UNIQUE INDEX uidx_homework_submissions_user_id_task_id__active

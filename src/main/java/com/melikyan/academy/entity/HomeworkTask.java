@@ -47,8 +47,8 @@ public class HomeworkTask extends BaseEntity {
     private Map<String, Object> contentPayload;
 
     @ManyToOne
-    @JoinColumn(name = "homework_id", nullable = false)
-    private Homework homework;
+    @JoinColumn(name = "lesson_id", nullable = false)
+    private Lesson lesson;
 
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)

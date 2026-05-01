@@ -4,7 +4,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.context.annotation.FilterType;
 import com.melikyan.academy.security.RememberMeSecurityFilter;
-import com.melikyan.academy.service.HomeworkTranslationService;
 import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
 import com.melikyan.academy.dto.response.homeworkTranslation.HomeworkTranslationResponse;
 import org.springframework.boot.security.autoconfigure.UserDetailsServiceAutoConfiguration;

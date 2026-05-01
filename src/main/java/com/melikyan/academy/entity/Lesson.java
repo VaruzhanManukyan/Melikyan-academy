@@ -1,11 +1,11 @@
 package com.melikyan.academy.entity;
 
-import com.melikyan.academy.entity.enums.LessonState;
 import jakarta.persistence.*;
 import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.SoftDeleteType;
 import com.melikyan.academy.entity.base.BaseEntity;
 import com.melikyan.academy.entity.enums.LessonType;
+import com.melikyan.academy.entity.enums.LessonState;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -69,6 +69,9 @@ public class Lesson extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "created_by", nullable = false)
     private User createdBy;
+
+    @OneToMany(mappedBy = "lesson")
+    private List<HomeworkTask> homeworkTasks;
 
     @OneToMany(mappedBy = "lesson")
     private List<LessonAttendance> lessonAttendances;

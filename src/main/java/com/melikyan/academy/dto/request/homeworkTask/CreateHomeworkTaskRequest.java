@@ -23,7 +23,7 @@ public record CreateHomeworkTaskRequest(
         Map<String, Object> contentPayload,
 
         @NotNull(message = "{homeworkTask.homeworkId.notNull}")
-        UUID homeworkId,
+        UUID lessonId,
 
         @NotNull(message = "{homeworkTask.createdById.notNull}")
         UUID createdById
